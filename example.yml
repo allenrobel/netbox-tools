@@ -1,0 +1,300 @@
+# The scripts in this repo with a --yaml argument assume that the YAML file pointed to contains the YAML structure below.
+# 
+---
+# Color choices are used in both device_roles and tags.
+# Netbox requires RGB values, but the scripts in this
+# repo accept the below color choices and convert them to
+# RGB when submitting requests to Netbox.  We'll add more 
+# colors later if needed.
+# blue
+# cyan
+# green
+# green_dark
+# indigo
+# orange
+# purple
+# red
+# teal
+# yellow
+# gray_light
+# gray
+# gray_dark
+
+# Sites
+# Mandatory keys:
+#   name: name of the site
+#   status: status of the site (Active, Planned, Staging, Decommissioning, Retired)
+#
+# Optional keys:
+#   description: free-form description
+#   tags: YAML list of tags to allow later searching by tag
+sites:
+  mysite:
+    name: mysite
+    status: Active
+    description: This describes mysite
+
+# Racks
+# Mandatory keys:
+#   name: Name of the rack
+#   location: Location in which rack is installed e.g. row-v
+#   site: Site in which rack is installed. Must be present in the 
+#         sites section of this file.
+# Optional keys:
+#   u_height: How many RU are in this rack (typically 42 or 48)
+racks:
+  rack_1:
+    name: rack_1
+    location: row-a
+    site: mysite
+    u_height: 48
+
+# Locations
+# Mandatory keys
+#   name: Name of the location
+#   site: Site which contains the location
+locations:
+  row-a:
+    name: row-a
+    site: mysite
+
+# Manufacturers
+# Mandatory keys
+#   name: Name of the manufacturer
+#
+# NOTES:
+# 1. Manufacturer name is compared to existing manufacturers in Netbox.  
+#    If the name differs even slightly, it will result in a new manufacturer
+#    being created.  E.g. 'Cisco Systems, Inc.' is a different manufacturer
+#    than 'Cisco Systems, Inc'  For this reason, it might be good to keep 
+#    these names simple, e.g. cisco, arista, juniper, etc.
+manufacturers:
+  cisco:
+    name: cisco
+  arista:
+    name: arista
+  juniper:
+    name: juniper
+  spirent:
+    name: spirent
+
+# Device Types
+# Mandatory keys
+#   model: The device's model number
+#   manufacturer: The device's manufacturer.
+#
+# Optional keys
+#   u_height: Height of the device, in RU.  e.g. N9K-C9504 is 7 RU
+#   comments: Free form comment for the device
+# NOTES:
+# 1. The manufacturer string must match one of the entries
+#    in manufacturers section in this file.
+device_types:
+  CISCO-UNKNOWN:
+    model: CISCO-UNKNOWN
+    manufacturer: cisco
+  CISCO-2600:
+    model: CISCO-2600
+    manufacturer: cisco
+    u_height: 1
+  N3K-C3048TP-1GE:
+    model: N3K-C3048TP-1GE
+    manufacturer: cisco
+    u_height: 1
+  N3K-C3172TQ-XL:
+    model: N3K-C3172TQ-XL
+    manufacturer: cisco
+    u_height: 1
+    comments: 48x10GT + 6x40G Supervisor
+  N9K-C9232C:
+    model: N9K-C9232C
+    manufacturer: cisco
+    u_height: 1
+    comments: 32x40/100G QSFP28 Ethernet Module
+  N3K-C3264C-E:
+    model: N3K-C3264C-E
+    manufacturer: cisco
+    u_height: 1
+    comments: 64x100G QSFP28 + 2x10G SFP+ Ethernet
+  N9K-C93108TC-FX:
+    model: N9K-C93108TC-FX
+    manufacturer: cisco
+    u_height: 1
+  N9K-C93180YC-EX:
+    model: N9K-C93180YC-EX
+    manufacturer: cisco
+    u_height: 1
+    comments: 48x10/25G + 6x40/100G Ethernet Module
+  N9K-C93600CD-GX:
+    model: N9K-C93600CD-GX
+    manufacturer: cisco
+    u_height: 1
+  N9K-C9316D-GX:
+    model: N9K-C9316D-GX
+    manufacturer: cisco
+    u_height: 1
+  N9K-C9336C-FX2:
+    model: N9K-C9336C-FX2
+    manufacturer: cisco
+    u_height: 1
+    comments: 36x40/100G QSFP28 Ethernet Module
+  N9K-C9348GC-FXP:
+    model: N9K-C9348GC-FXP
+    manufacturer: cisco
+    u_height: 1
+  N9K-C9364D-GX2A:
+    model: N9K-C9364D-GX2A
+    manufacturer: cisco
+    u_height: 1
+    comments: 64x400G QSFP-DD + 2x10G SFP+ Ethernet Module, Duval
+  N9K-C9504:
+    model: N9K-C9504
+    manufacturer: cisco
+    u_height: 7
+    comments: Nexus9000 C9504 (4 Slot) Chassis
+  SPT-N11U:
+    model: SPT-N11U
+    manufacturer: spirent
+    u_height: 11
+  SPT-N12U:
+    model: SPT-N12U
+    manufacturer: spirent
+    u_height: 12
+    comments: Spirent 12U 400G Appliance
+  UCS-C210-M2:
+    model: UCS-C210-M2
+    manufacturer: cisco
+    u_height: 2
+
+# Device Roles
+# Mandatory keys:
+#   name: Name of the role
+#   color: Use one of the color choices from the top of this file
+#
+# Optional keys
+#   description : free-form description
+device_roles:
+  lab_gateway:
+    name: lab_gateway
+    color: gray
+    description: lab mgmt vlan gateways
+  lab_tor:
+    name: lab_tor
+    color: gray
+    description: lab mgmt vlan L2 tor
+  mgmt:
+    name: mgmt
+    color: gray
+    description: top of rack L2 switches for management vlans
+  na:
+    name: na
+    color: gray_light
+    description: Roles are not applicable to this device
+  terminal_server:
+    name: terminal_server
+    color: gray
+    description: console port connectivity
+  traffic_generator:
+    name: traffic_generator
+    color: purple
+  unknown:
+    name: unknown
+    color: gray_dark
+    description: unknown role for device
+
+# Devices
+# Mandatory keys
+#   name: Name of the device
+#   site: The site in which the device is located (could be a fabric name, testbed, or physical location, etc)
+#   mgmt_ip: The IP address of mgmt_interface
+#   mgmt_interface: The interface used to manage the device, e.g. mgmt0 for NX-OS
+#   role: The device's functional role e.g. spine.
+#   type: The hardware device type which defines the device's make & model.
+#
+# Optional keys
+#   interface_type: The type of interface (pertains to mgmt0). If not present, mgmt0 interface_type defaults
+#                   to 1000base-t
+#   mac_address: The mac address of the mgmt_interface e.g. from 'show interface mgmt0'
+#   rack: The rack in which device resides (rack must be present in racks section of this file)
+#   position: The bottom-most position (RU) in the rack that the device occupies (e.g. for a 3-RU
+#             unit taking spaces 1-3, you would list 1 as the position).  If rack is specified,
+#             position must also be specified.
+#   face: The rack face the device is installed in. Valid values: front, rear
+#   serial: The serial number of the device e.g. from 'show module'
+#   tags: A YAML list of tags to associate with the device to enable filtering based on tag.
+# NOTES
+# 1. role. This must match an entry in device_roles section.
+#          Use 'unknown' if you don't know the role
+#          Use 'na' if the role is not applicable
+# 2. type. This must match an entry in device_types section.
+# 3. tags. All tags must be listed in the tags section of this file.  We could have written the
+#          scripts to create tags "on demand" if they are added to a device below but are not 
+#          present in netbox, but that would likely result in "tag explosion."  Instead, we 
+#          opted to force the user to think about why they are adding a tag by requiring that
+#          all tags be listed in the tags section. This also forces you to document all your
+#          tags in a single place.
+
+devices:
+  lab_gateway_167_1:
+    name: lab_gateway_1
+    mgmt_ip: 192.168.1.1/24
+    mgmt_interface: mgmt0
+    role: lab_gateway
+    type: CISCO-UNKNOWN
+    serial: na
+    site: mysite
+    tags:
+      - infra
+
+# Tags
+# Mandatory keys
+#   - name: name of the tag
+#   - color: color from the color choices at the top of this file
+#
+# Optional keys
+#   - description: describes what the tag signifies
+# Below are some suggested tags.
+# Use the script ./device_print_filtered.py with the --tags argument to filter
+# on tags.  Example:
+# ./device_print_filtered.py --tags cleanup,lab_tor
+# The above would filter one all lab_tor devices that need to be cleaned up (if any)
+tags:
+  # TODO/Action tags
+  cleanup:
+    name: cleanup
+    color: yellow
+    description: Items to be cleaned up
+  # Usage tags
+  lab_tor:
+    name: lab_tor
+    color: teal
+    description: lab L2 switches for mgmt vlans
+  lab_gateway:
+    name: lab_gateway
+    color: green_dark
+    description: lab gateways (typically host 1 on each vlan)
+  lab_ts:
+    name: lab_ts
+    color: orange
+    description: lab terminal servers
+  tgen:
+    name: tgen
+    color: purple
+    description: traffic generators
+  # People (I use color blue for people and use their email alias for name)
+  c3po:
+    name: c3po
+    color: blue
+  yoda:
+    name: yoda
+    color: blue
+  # projects (I use color red)
+  starbase_nw:
+    name: starbase
+    color: red
+    description: Build starbase in the northwest quadrant
+  # Lab Admin (I use color gray)
+  infra:
+    name: infra
+    color: gray
+    description: any lab infra devices e.g. terminal servers, gateways, etc

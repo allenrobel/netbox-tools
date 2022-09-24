@@ -38,7 +38,7 @@ netbox-tools uses a python script (netbox_config.py) to load a config file (conf
 
 1. Edit ./lib/config/netbox_config.py
 
-In this file, edit the line that currently says and change config_file to point to config.yml (it's also located in lib/config, but you can move it somewhere else if you'd like):
+In this file, edit the line that starts with ``config_file`` and change config_file to point to config.yml (it's also located in lib/config, but you can move it somewhere else if you'd like):
 
 ```python
 # EDIT THIS LINE TO POINT TO YOUR CONFIG FILE
@@ -112,7 +112,7 @@ url: !vault |
 
 4. Copy netbox-tools/example.yml and edit it to include the information about your equipment.
 
-There are example extries for sites, racks, locations, manufacturers, device types, devices, device roles, and tags.
+There are example entries for sites, racks, locations, manufacturers, device types, devices, device roles, and tags.
 
 Follow the comments in this file and create your first device.  Then use the script below to add it to netbox (it adds all the other items as well):
 
@@ -150,18 +150,18 @@ etc...
 
 The first script you should look at is:
 
-Script                       | Description
-------------                 | -----------
-[device_create_all.py]       | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
+Script                        | Description
+------------                  | -----------
+[device_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
 
 Below is a complete list. (TODO add the other scripts...)
 
-Script                       | Description
-------------                 | -----------
-[device_create_all.py]       | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
+Script                         | Description
+------------                   | -----------
+[device_create__update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
 
 
-[device_create_all.py]: https://github.com/allenrobel/netbox-tools/tree/master/device_create_all.py
+[device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py
 
 ### Code of Conduct
 

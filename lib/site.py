@@ -23,6 +23,17 @@ class Site(object):
             self.args['description'] = self.description
         if self.tags != None:
             self.args['tags'] = self.tags
+        
+    def delete(self):
+        if self.site == None:
+            print('exiting. Site {} does not exist in netbox.'.format(self.name))
+            exit(1)
+        print('Site.delete: {}'.format(self.name))
+        try:
+            self.site.delete()
+        except Exception as e:
+            print('Site.delete: Exiting. Unable to delete site {}.  Error was: {}'.format(self.name, e))
+            exit(1)
 
     def create(self):
         print('Site.create: {}'.format(self.name))

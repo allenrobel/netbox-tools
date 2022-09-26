@@ -26,7 +26,6 @@ class Site(object):
 
     def create(self):
         print('Site.create: {}'.format(self.name))
-        print('args {}'.format(self.args))
         try:
             self.nb.dcim.sites.create(self.args)
         except Exception as e:

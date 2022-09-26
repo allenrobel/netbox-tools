@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 '''
-Name: tag_create_all.py
-Summary: Delete all tags contained in the YAML file pointed to with --yaml
+Name: tag_delete.py
 Description: Delete tag --tag from netbox
 '''
 our_version = 101
@@ -14,7 +13,7 @@ from lib.tag import Tag
 help_tag = 'Name of the tag to delete.'
 
 ex_prefix = ' Example: '
-ex_tag = '{} --tag leaf_3'.format(ex_prefix)
+ex_tag = '{} --tag infra'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a tag')
 
@@ -39,5 +38,5 @@ def get_info():
 
 nc = NetboxCredentials()
 nb = pynetbox.api(nc.url, token=nc.token)
-d = Tag(nb, get_info())
-d.delete()
+t = Tag(nb, get_info())
+t.delete()

@@ -23,18 +23,18 @@ parser.add_argument('--version',
 cfg = parser.parse_args()
 
 def get_fmt():
-    return '{:>5} {:<15} {:>12} {:>6} {:<15}'
+    return '{:>5} {:<15} {:>12} {:>6} {:<10} {:<30}'
 
 def print_headers():
     fmt = get_fmt()
-    print(fmt.format('id', 'name', 'tagged_items', 'rgb', 'color'))
-    print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 6, '-' * 15))
+    print(fmt.format('id', 'name', 'tagged_items', 'rgb', 'color', 'description'))
+    print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 6, '-' * 10, '-' * 30))
 
 def print_tags():
     tags = nb.extras.tags.all()
     fmt = get_fmt()
     for tag in tags:
-        print(fmt.format(tag.id, tag.name, tag.tagged_items, tag.color, color(tag.color)))
+        print(fmt.format(tag.id, tag.name, tag.tagged_items, tag.color, color(tag.color), tag.description))
 
 nc = NetboxCredentials()
 nb = pynetbox.api(nc.url, token=nc.token)

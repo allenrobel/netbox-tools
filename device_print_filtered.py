@@ -64,8 +64,7 @@ def print_header():
         'serial',
         'primary_ip4',
         'ip4_id',
-        'status',
-    ))
+        'status'))
     print(fmt.format(
         '-' * 9,
         '-' * 18,
@@ -73,25 +72,43 @@ def print_header():
         '-' * 12,
         '-' * 22,
         '-' * 6,
-        '-' * 10,
-    ))
+        '-' * 10))
 
-def print_filtered_model(devices):
+def get_primary_ip(device):
+    if device.primary_ip4 == None:
+        return 'na'
+    else:
+        return str(device.primary_ip4)
+
+def get_primary_ip_id(device):
+    if device.primary_ip4 == None:
+        return 'na'
+    else:
+        return device.primary_ip4.id
+
+def print_matches(matches):
+    for device_name in matches:
+        if matches[device_name] == False:
+            continue
+        device = matches[device_name]
+        print(fmt.format(
+            device.id,
+            device.name,
+            device.device_type.model,
+            device.serial,
+            get_primary_ip(device),
+            get_primary_ip_id(device),
+            str(device.status)))
+
+def filtered_on_model(devices):
     matches = dict()
     for device in devices:
         matches[device.name] = device
         if device.device_type.model != cfg.model:
             matches[device.name] = False
-    for device_name in matches:
-        if matches[device_name] == False:
-            continue
-        device = matches[device_name]
-        if device.primary_ip4 == None:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, 'na', 'na', str(device.status)))
-        else:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, str(device.primary_ip4.address), device.primary_ip4.id, str(device.status)))
+    print_matches(matches)
 
-def print_filtered_tag(devices):
+def filtered_on_tag(devices):
     tags = cfg.tags.split(',')
     matches = dict()
     for device in devices:
@@ -99,22 +116,13 @@ def print_filtered_tag(devices):
         for tag in tags:
             if tag not in [tag.name for tag in device.tags]:
                 matches[device.name] = False
-    for device_name in matches:
-        if matches[device_name] == False:
-            continue
-        device = matches[device_name]
-        if device.primary_ip4 == None:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, 'na', 'na', str(device.status)))
-        else:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, str(device.primary_ip4.address), device.primary_ip4.id, str(device.status)))
+    print_matches(matches)
 
-def print_devices(devices):
+def unfiltered(devices):
+    matches = dict()
     for device in devices:
-        if device.primary_ip4 == None:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, 'na', 'na', str(device.status)))
-        else:
-            print(fmt.format(device.id, device.name, device.device_type.model, device.serial, str(device.primary_ip4.address), device.primary_ip4.id, str(device.status)))
-
+        matches[device.name] = device
+    print_matches(matches)
 
 fmt = '{:<9} {:<18} {:<18} {:<12} {:<22} {:<6} {:<10}'
 
@@ -127,8 +135,8 @@ if cfg.tags != None and cfg.model != None:
     exit(1)
 print_header()
 if cfg.tags != None:
-    print_filtered_tag(devices)
+    filtered_on_tag(devices)
 elif cfg.model != None:
-    print_filtered_model(devices)
+    filtered_on_model(devices)
 else:
-    print_devices(devices)
+    unfiltered(devices)

@@ -26,14 +26,15 @@ class Site(object):
 
     def create(self):
         print('Site.create: {}'.format(self.name))
+        print('args {}'.format(self.args))
         try:
-            self.nb.dcim.racks.create(self.args)
+            self.nb.dcim.sites.create(self.args)
         except Exception as e:
-            print('Site.create: Exiting. Unable to create site {}.  Error was: {}'.format(self.name, e))
+            print('Site.create: Exiting. Unable to create site {}.  Error was: {}'.format(self.site, e))
             exit(1)
 
     def update(self):
-        print('Site.update: {}'.format(self.name))
+        print('Site.update: {}'.format(self.site))
         self.args['id'] = self.site_id
         try:
             self.site.update(self.args)

@@ -34,6 +34,7 @@ from lib.device import Device, initialize_device_primary_ip, make_device_primary
 from lib.device_type import DeviceType
 from lib.interface import Interface
 from lib.ip_address import IpAddress
+from lib.ip_prefix import IpPrefix
 from lib.location import Location
 from lib.manufacturer import Manufacturer
 from lib.rack import Rack
@@ -110,6 +111,9 @@ print('---')
 for key in info['tags']:
     t = Tag(nb, info['tags'][key])
     t.create_or_update()
+for key in info['prefixes']:
+    p = IpPrefix(nb, info['prefixes'][key])
+    p.create_or_update()
 for key in info['devices']:
     print('---')
     d = Device(nb, info['devices'][key])

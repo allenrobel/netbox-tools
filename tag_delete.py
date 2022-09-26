@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
 '''
-Name: tag_delete.py
-Description: Delete a tag
+Name: tag_create_all.py
+Summary: Delete all tags contained in the YAML file pointed to with --yaml
+Description: Delete tag --tag from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
 import pynetbox
+
 from lib.credentials import NetboxCredentials
+from lib.tag import Tag
 
-help_name = 'Name of the tag to delete.'
+help_tag = 'Name of the tag to delete.'
 
-ex_prefix     = 'Example: '
-ex_name = '{} --name mytag'.format(ex_prefix)
+ex_prefix = ' Example: '
+ex_tag = '{} --tag leaf_3'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Delete a tag')
+parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a tag')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--name',
-                     dest='name',
+mandatory.add_argument('--tag',
+                     dest='tag',
                      required=True,
-                     help=help_name + ex_name)
+                     help=help_tag + ex_tag)
 
 parser.add_argument('--version',
                     action='version',
@@ -30,19 +32,12 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-def get_tag():
-    return nb.extras.tags.get(name=cfg.name)
-
-def delete_tag():
-    tag = get_tag()
-    if tag == None:
-        print('Exiting. tag {} does not exist in netbox.'.format(cfg.name))
-        exit(1)
-    if tag.delete():
-        print('{} deleted'.format(cfg.name))
-    else:
-        print('Unable to delete {}'.format(cfg.name))
+def get_info():
+    info = dict()
+    info['name'] = cfg.tag
+    return info
 
 nc = NetboxCredentials()
 nb = pynetbox.api(nc.url, token=nc.token)
-delete_tag()
+d = Tag(nb, get_info())
+d.delete()

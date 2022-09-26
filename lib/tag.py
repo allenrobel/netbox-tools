@@ -8,8 +8,6 @@ class Tag(object):
         self.args = dict()
         self.mandatory_keys = ['color', 'name']
         self.optional_keys = ['description']
-        self.validate_keys()
-        self.generate_args()
 
     def validate_keys(self):
         for key in self.mandatory_keys:
@@ -24,6 +22,17 @@ class Tag(object):
         for key in self.optional_keys:
             if key in self.info:
                 self.args[key] = self.info[key]
+
+    def delete(self):
+        if self.tag == None:
+            print('exiting. Tag {} does not exist in netbox.'.format(self.name))
+            exit(1)
+        print('Tag.delete: {}'.format(self.name))
+        try:
+            self.tag.delete()
+        except Exception as e:
+            print('Tag.delete: Exiting. Unable to delete tag {}.  Error was: {}'.format(self.name, e))
+            exit(1)
 
     def create(self):
         print('Tag.create: {}'.format(self.name))
@@ -43,6 +52,8 @@ class Tag(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_keys()
+        self.generate_args()
         if self.tag == None:
             self.create()
         else:

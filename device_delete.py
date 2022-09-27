@@ -8,7 +8,7 @@ our_version = 100
 import argparse
 import pynetbox
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.device import Device
 
 help_device = 'Name of the device to delete.'
@@ -37,7 +37,6 @@ def get_info():
     info['name'] = cfg.device
     return info
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 d = Device(nb, get_info())
 d.delete()

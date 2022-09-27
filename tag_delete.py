@@ -3,11 +3,11 @@
 Name: tag_delete.py
 Description: Delete tag --tag from netbox
 '''
-our_version = 101
+our_version = 102
 import argparse
 import pynetbox
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.tag import Tag
 
 help_tag = 'Name of the tag to delete.'
@@ -36,7 +36,6 @@ def get_info():
     info['name'] = cfg.tag
     return info
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 t = Tag(nb, get_info())
 t.delete()

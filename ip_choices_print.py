@@ -3,8 +3,7 @@
 Name: ip_choices_print.py
 Description: print choices associated with ipam.ip_addresses
 '''
-import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 def print_header():
     print(fmt.format(
@@ -20,10 +19,9 @@ def print_choices(items):
             choices.append(d['value'])
         print(fmt.format(item, ', '.join(choices)))
 
-nc = NetboxCredentials()
+nb = netbox()
 
-netbox = pynetbox.api(nc.url, token=nc.token)
-items = netbox.ipam.ip_addresses.choices()
+items = nb.ipam.ip_addresses.choices()
 
 fmt = '{:<15} {:<65}'
 print_header()

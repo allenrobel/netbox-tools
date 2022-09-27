@@ -1,1 +1,14 @@
+# Full path to your ansible vault
 vault: '/home/myaccount/netbox-tools/lib/config/secrets'
+
+# If you encounter an error that looks similar to below, set
+# ssl_verify to False.
+#
+# SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self signed certificate
+
+ssl_verify: True
+
+# If you encounter urllib3 InsecureRequestWarning warnings, set
+# disable_insecure_request_warnings to True.
+
+disable_insecure_request_warnings: False

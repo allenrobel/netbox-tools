@@ -2,6 +2,29 @@ import re
 from string import punctuation
 import yaml
 
+# return a configured netbox instance
+def netbox():
+    import requests
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    import pynetbox
+
+    from lib.config.netbox_config import LoadConfig
+    from lib.credentials import NetboxCredentials
+
+    cfg = LoadConfig()
+    nc = NetboxCredentials()
+    nb = pynetbox.api(nc.url, token=nc.token)
+
+    session = requests.Session()
+    if 'ssl_verify' in cfg.config:
+        session.verify = cfg.config['ssl_verify']
+    if 'disable_insecure_request_warnings' in cfg.config:
+        if cfg.config['disable_insecure_request_warnings'] == True:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+    nb.http_session = session
+    return nb
+
 # device
 def get_device(nb, name):
     '''

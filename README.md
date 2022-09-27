@@ -47,7 +47,7 @@ config_file = '/home/myaccount/netbox-tools/lib/config/config.yml'
 
 2. Edit ./lib/config/config.yml
 
-config.yml contains one line, which points to your ansible vault.  Below, it points to an Ansible vault file named 'secrets'.  Edit this to point to your Ansible vault file.  If you don't have a vault file, we're going to create one in the next step.
+Among other things, config.yml points to your Ansible vault with the line below (in this case, it points to an Ansible vault file named ``secrets``).  Edit this to point to your Ansible vault file.  If you don't have a vault file, we're going to create one in the next step.  There are a couple other options in this file related to SSL certificates which we don't cover here, but which are described in the comments in this file.  If you encounter any urllib3 errors related to SSL certificates, have a look here and play with these options.
 
 ```yaml
 vault: '/home/myaccount/netbox-tools/lib/config/secrets'

@@ -3,10 +3,9 @@
 Name: sites_print.py
 Description: Print information about all sites
 '''
-our_version = 100
-import pynetbox
+our_version = 101
 import argparse
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Print information about all sites')
@@ -36,7 +35,6 @@ def print_sites():
     for site in sites:
         print(fmt.format(site.id, site.name, site.device_count, site.rack_count, site.prefix_count, site.status.value, site.description))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 print_headers()
 print_sites()

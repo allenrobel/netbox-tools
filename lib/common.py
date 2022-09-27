@@ -31,7 +31,9 @@ def get_device(nb, name):
     Given netbox instance and device name, return device.
     If device does not exist in netbox, return None
     '''
-    device = nb.dcim.devices.get(name=name)
+    if device == None:
+        print('common.get_device: returning None. device {} does not exist in netbox'.format(device))
+        return None
     try:
         device = nb.dcim.devices.get(name=name)
         return device
@@ -44,6 +46,10 @@ def device_id(nb, name):
     Given netbox instance and device name, return device_id.
     If device does not exist in netbox, return None
     '''
+    device = nb.dcim.devices.get(name=name)
+    if device == None:
+        print('common.device_id: returning None. device {} does not exist in netbox'.format(device))
+        return None
     try:
         device = nb.dcim.devices.get(name=name)
         return device.id

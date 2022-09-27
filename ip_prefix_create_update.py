@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 '''
-Name: ip_prefix_create.py
-Description: Create an ip prefix in netbox
+Name: ip_prefix_create_update.py
+Description: Create or update an ip prefix in netbox
 '''
-our_version = 100
-import pynetbox
+our_version = 101
 import argparse
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.ip_prefix import IpPrefix
 
 help_description = 'Optional. Quoted free-form description for this prefix'
@@ -56,8 +55,7 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 info = dict()
 info['prefix'] = cfg.prefix

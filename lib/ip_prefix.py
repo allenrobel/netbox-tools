@@ -1,6 +1,6 @@
 '''
 Name: ip_prefix.py
-Description: Class for create and update operations on netbox ip_prefix
+Description: Class for create, update, delete operations on netbox ip_prefix
 '''
 
 from lib.common import device_id, get_device
@@ -28,13 +28,29 @@ class IpPrefix(object):
         if self.description != None:
             self.args['description'] = self.description
         if self.site != None:
+            if self._site_id == None:
+                print('IpPrefix.generate_args: exiting. prefix {} site {} does not exist in netbox. Either create the site first, or do not specify a site for this prefix.'.format(
+                    self.prefix,
+                    self.site))
+                exit(1)
             self.args['site'] = self._site_id
         if self.status != None:
             self.args['status'] = self.status
         else:
             self.args['status'] = self.default_status
-        # if self.vlan != None:
-        #     self.args['status'] = self.status
+
+    def delete(self):
+        print('IpPrefix.delete: prefix {}'.format(self.prefix))
+        #self.args['id'] = self.prefix_id
+        if self.prefix_object == None:
+            print('IpPrefix.delete: Nothing to do. Prefix {} does not exist in netbox'.format(self.prefix))
+            return
+        try:
+            self.prefix_object.delete()
+        except Exception as e:
+            print('IpPrefix.delete: Exiting. Unable to delete prefix {}.  Error was: {}'.format(
+                self.prefix, e))
+            exit(1)
 
     def create(self):
         print('IpPrefix.create: prefix {}'.format(self.prefix))

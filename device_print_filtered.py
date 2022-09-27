@@ -24,7 +24,7 @@ Would match devices with model number N9K-C9336C-FX2
 '''
 import argparse
 import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 our_version = 100
 
@@ -32,7 +32,7 @@ help_tags = 'Comma-separated list of tags (no spaces). If present, only devices 
 help_model = 'Device model number'
 
 ex_prefix     = ' Example: '
-ex_tags = '{} --tags arobel,cvd_poc'.format(ex_prefix)
+ex_tags = '{} --tags deathstar,admin'.format(ex_prefix)
 ex_model = '{} --model N9K-C9336C-FX2'
 
 parser = argparse.ArgumentParser(
@@ -126,12 +126,11 @@ def unfiltered(devices):
 
 fmt = '{:<9} {:<18} {:<18} {:<12} {:<22} {:<6} {:<10}'
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 devices = nb.dcim.devices.all()
 
 if cfg.tags != None and cfg.model != None:
-    print('exiting. --tags and --model are mutually-exclusive. Use one or the other, but not both.')
+    print('exiting. --tags and --model are currently mutually-exclusive. Use one or the other, but not both. We\'ll fix this soon...')
     exit(1)
 print_header()
 if cfg.tags != None:

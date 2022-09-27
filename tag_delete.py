@@ -3,9 +3,8 @@
 Name: tag_delete.py
 Description: Delete tag --tag from netbox
 '''
-our_version = 102
+our_version = 103
 import argparse
-import pynetbox
 
 from lib.common import netbox
 from lib.tag import Tag

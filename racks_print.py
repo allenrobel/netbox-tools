@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 '''
-Name: racks_list.py
+Name: racks_print.py
 Description: Display information about all racks
 '''
-our_version = 100
-import pynetbox
+our_version = 101
 import argparse
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 
 parser = argparse.ArgumentParser(
@@ -30,8 +29,7 @@ def print_headers():
 
 fmt = '{:>5} {:>15} {:>15}'
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 racks = get_racks()
 print_headers()

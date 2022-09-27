@@ -120,8 +120,8 @@ class Device(object):
         print('Device.delete: {}'.format(self.name))
         self.validate_keys_delete()
         if self.device == None:
-            print('Device.delete: exiting. device {} does not exist in netbox.'.format(self.name))
-            exit(0)
+            print('Device.delete: Nothing to do, device {} does not exist in netbox.'.format(self.name))
+            return
         try:
             self.device.delete()
         except Exception as e:

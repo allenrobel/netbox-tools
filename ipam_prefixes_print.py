@@ -3,8 +3,7 @@
 Name: ipam_prefixes_print.py
 Description: print all ip prefixes
 '''
-import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 def get_fmt():
     return '{id:>6} {prefix:<18} {status:<10} {site:<15} {vrf:<10} {description:<25}'
@@ -38,8 +37,7 @@ def print_headers():
     print(fmt.format(id='id', prefix='prefix', status='status', site='site', vrf='vrf', description='description'))
     print(fmt.format(id='-' * 6, prefix='-' * 18, status='-' * 10, site='-' * 15, vrf='-' * 10, description='-' * 25))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 print_headers()
 print_ip_prefixes()

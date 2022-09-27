@@ -5,9 +5,8 @@ Description: Print information about an interface
 '''
 our_version = 100
 import argparse
-import json
-import pynetbox
-from lib.credentials import NetboxCredentials
+import json # json provides better output than pprint, IMHO...
+from lib.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about device.'
 help_device = 'Name of the device on which interface resides.'
@@ -45,7 +44,6 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-
 def get_interface():
     interface = nb.dcim.interfaces.get(device=cfg.device, name=cfg.interface)
     if interface == None:
@@ -63,8 +61,7 @@ def print_headers():
 
 fmt = '{:>5} {:<20} {:<15} {:<17} {:<12} {:<7} {:<9}'
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 interface = get_interface()
 if cfg.detail:

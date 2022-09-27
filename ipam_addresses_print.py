@@ -3,8 +3,7 @@
 Name: ipam_addresses_print.py
 Description: Print all ip addresses
 '''
-import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 def get_fmt():
     return '{:>5} {:<18} {:<18} {:<30}'
@@ -25,8 +24,7 @@ def print_headers():
     print(fmt.format('id', 'address', 'device_name', 'description'))
     print(fmt.format('-' * 5, '-' * 18, '-' * 18, '-' * 30))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 print_headers()
 print_ip_addresses()

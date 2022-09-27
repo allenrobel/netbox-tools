@@ -2,17 +2,33 @@
 '''
 Name: device_count.py
 Description: Print the number of devices matching a given query
+
+Multiple query parameters can be combined to and are boolean ANDed together for
+greater specificity.
+
+For example:
+
+(py310) netbox-tools % ./device_count.py --site SJC03-1-155 --role leaf --model N9K-C93108TC-FX
+Vault password: 
+"Query: {'role': 'leaf', 'site': 'SJC03-1-155', 'model': 'N9K-C93108TC-FX'}"
+Count: 1
+(py310) netbox-tools % ./device_count.py --site SJC03-1-155 --role leaf                        
+Vault password: 
+"Query: {'role': 'leaf', 'site': 'SJC03-1-155'}"
+Count: 10
+(py310) netbox-tools % 
+
 '''
-our_version = 100
+our_version = 101
 import argparse
 import pprint
 import pynetbox
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 help_role = 'Filter on role.'
 help_site = 'Filter on site.'
-help_model = 'Filter on model number (e.g. N9K-C93180YC-EX. Case insensitive, so n9k-c93180yc-ex works too...).'
+help_model = 'Filter on model number (e.g. N9K-C93180YC-EX).'
 
 ex_prefix     = 'Example: '
 ex_role = '{} --role leaf'.format(ex_prefix)
@@ -54,58 +70,69 @@ def get_args():
     if cfg.site != None:
         args['site'] = cfg.site
     if cfg.model != None:
-        args['model'] = cfg.model.lower()
+        args['model'] = cfg.model
     return args
 
 def verify_model():
+    # 'device_type' does not work with count() for some reason.  We're using device_type.id as a workaround for now.
+    models = dict()
     if cfg.model == None:
-        return
+        return models
     items = nb.dcim.device_types.all()
-    models = list()
     for item in items:
-        models.append(item.slug)
-    if cfg.model.lower() in models:
-        return
+        models[item.model] = item.id
+    if cfg.model in models.keys():
+        return models
     else:
         print('Exiting. Model {} is not present in Netbox. Valid models: {}'.format(cfg.model, ', '.join(sorted(models))))
         exit(1)
 def verify_role():
+    roles = dict()
     if cfg.role == None:
-        return
+        return roles
     items = nb.dcim.device_roles.all()
-    roles = list()
     for item in items:
-        roles.append(item.slug)
-    if cfg.role.lower() in roles:
-        return
+        roles[item.name] = item.name
+    if cfg.role in roles.keys():
+        return roles
     else:
-        print('Exiting. Role {} is not present in Netbox. Valid roles: {}'.format(cfg.role, ', '.join(sorted(roles))))
+        print('Exiting. Role {} is not present in Netbox. Valid roles: {}'.format(cfg.role, ', '.join(sorted(roles.keys()))))
         exit(1)
 def verify_site():
+    # 'site' does not work with count() for some reason.  We're using site.id as a workaround for now.
+    sites = dict()
     if cfg.site == None:
-        return
+        return sites
     items = nb.dcim.sites.all()
-    sites = list()
     for item in items:
-        sites.append(item.slug)
-    if cfg.site.lower() in sites:
-        return
+        sites[item.name] = item.id
+    if cfg.site in sites.keys():
+        return sites
     else:
-        print('Exiting. Site {} is not present in Netbox. Valid sites: {}'.format(cfg.site, ', '.join(sorted(sites))))
+        print('Exiting. Site {} is not present in Netbox. Valid sites: {}'.format(cfg.site, ', '.join(sorted(sites.keys()))))
         exit(1)
 
 def get_device_count():
     args = get_args()
-    verify_model()
-    verify_site()
-    verify_role()
+    models = verify_model()
+    roles = verify_role()
+    site_ids = verify_site()
+    new_args = dict()
     try:
-        return nb.dcim.devices.count(**args)
+        if len(site_ids) != 0:
+            new_args['site_id'] = site_ids[cfg.site]
+            # print('get_device_count: site_ids: new_args {}'.format(new_args))
+        if len(roles) != 0:
+            new_args['role'] = roles[cfg.role]
+            # print('get_device_count: role: new_args {}'.format(new_args))
+        if len(models.keys()) != 0:
+            new_args['device_type_id'] = models[cfg.model]
+            # print('get_device_count: models: new_args {}'.format(new_args))
+        return nb.dcim.devices.count(**new_args)
     except Exception as e:
         print('Unable to get count: {}'.format(e))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 count = get_device_count()
 pprint.pprint('Query: {}'.format(get_args()))
 print('Count: {}'.format(count))

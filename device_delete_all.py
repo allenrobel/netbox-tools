@@ -10,7 +10,7 @@ Be careful!  This will not ask for confirmation.
 our_version = 100
 import argparse
 import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.common import load_yaml
 from lib.device import Device
 
@@ -36,8 +36,7 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 info = load_yaml(cfg.yaml)
 for key in info['devices']:

@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 '''
 Name: device_types_print.py
-Description: Print information about all device types
+Description: Print summary information about all device types
 '''
-our_version = 100
+our_version = 101
 import argparse
-import json
-import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information about all device types')
+         description='DESCRIPTION: Print summary information about all device types')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
@@ -28,16 +26,11 @@ def get_device_types():
     except Exception as e:
         print('Could not retrieve device types. Error was {}'.format(e))
 
-def print_detail(device_type):
-    pretty = json.dumps(dict(device_type), indent=4, sort_keys=True)
-    print(pretty)
-
 def print_headers():
     print(fmt.format('id', 'name', 'device_count', 'manufacturer'))
     print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 20))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 device_types = get_device_types()
 fmt = '{:>5} {:<15} {:>12} {:<20}'

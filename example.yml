@@ -34,6 +34,21 @@ sites:
     status: Active
     description: This describes mysite
 
+# Prefixes
+# Mandatory keys:
+#   prefix: e.g. 192.168.1.0/24
+# Optional keys:
+#   site: The site in which the prefix resides (must match a site in the sites: section of this file)
+#   description: free-form description for the prefix
+#   status: Operational status of this prefix. Valid values: container, active, reserved, deprecated
+prefixes:
+  192.168.5.0/24:
+    prefix: 192.168.5.0/24
+    site: mysite
+    vlan: 5
+    status: active
+    description: Vlan5, row-a
+
 # Racks
 # Mandatory keys:
 #   name: Name of the rack

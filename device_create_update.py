@@ -12,11 +12,11 @@ Example usage:
         --site DC05 \
         --type N9K-C9336C-FX2
 '''
-our_version = 100
+our_version = 101
 import pynetbox
 import argparse
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.device import Device
 
 help_device = 'Name of the device to add.'
@@ -71,7 +71,6 @@ def get_info():
             exit(1)
     return info
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 d = Device(nb, get_info())
 d.create_or_update()

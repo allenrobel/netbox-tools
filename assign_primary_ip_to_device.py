@@ -9,7 +9,7 @@ Example Usage
 our_version = 100
 import pynetbox
 import argparse
-from lib.common import get_device, interface_id, ip_address_id
+from lib.common import get_device, interface_id, ip_address_id, netbox
 from lib.device import initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
 
 from lib.credentials import NetboxCredentials
@@ -67,6 +67,5 @@ def assign_primary_ip_to_device():
     map_device_primary_ip(nb, cfg.device, cfg.interface, cfg.ipv4)
     make_device_primary_ip(nb, cfg.device, cfg.ipv4)
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 assign_primary_ip_to_device()

@@ -3,11 +3,10 @@
 Name: site_delete.py
 Description: Delete site --site from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
-import pynetbox
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.site import Site
 
 help_site = 'Name of the site to delete.'
@@ -36,7 +35,6 @@ def get_info():
     info['name'] = cfg.site
     return info
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 d = Site(nb, get_info())
 d.delete()

@@ -25,8 +25,8 @@ class Tag(object):
 
     def delete(self):
         if self.tag == None:
-            print('exiting. Tag {} does not exist in netbox.'.format(self.name))
-            exit(1)
+            print('Nothing to do, tag {} does not exist in netbox.'.format(self.name))
+            return
         print('Tag.delete: {}'.format(self.name))
         try:
             self.tag.delete()

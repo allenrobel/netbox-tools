@@ -26,6 +26,9 @@ class Interface(object):
     def generate_args(self):
         self.args['name'] = self.name
         self.args['device'] = device_id(self.nb, self.device)
+        if self.args['device'] == None:
+            print('Interface.generate_args: exiting. Device {} does not exist in netbox'.format(self.device))
+            exit(1)
         if self.interface_type == None:
             self.args['type'] = self.default_interface_type
         else:
@@ -46,7 +49,7 @@ class Interface(object):
         try:
             self.nb.dcim.interfaces.create(self.args)
         except Exception as e:
-            print('Interface.create: Exiting. Unable to create interface {}.  Error was: {}'.format(self.name, e))
+            print('Interface.create: exiting. Unable to create interface {}.  Error was: {}'.format(self.name, e))
             exit(1)
 
     def update(self):

@@ -4,7 +4,7 @@ Name: device_choices_print.py
 Description: print choices associated with dcim.devices
 '''
 import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 def print_header():
     print(fmt.format(
@@ -20,10 +20,9 @@ def print_choices(items):
             choices.append(d['value'])
         print(fmt.format(item, ', '.join(choices)))
 
-nc = NetboxCredentials()
+nb = netbox()
 
-netbox = pynetbox.api(nc.url, token=nc.token)
-items = netbox.dcim.devices.choices()
+items = nb.dcim.devices.choices()
 
 fmt = '{:<15} {:<65}'
 print_header()

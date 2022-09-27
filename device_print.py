@@ -7,7 +7,7 @@ our_version = 100
 import argparse
 import json
 import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 help_name = 'Name of device to retrieve.'
 help_detail = 'Optional. If present, print detailed info about device.'
@@ -53,15 +53,14 @@ def print_detail():
     print(pretty)
 
 def print_headers():
-    print(fmt.format('id', 'device_name', 'description'))
+    print(fmt.format('id', 'device_name', 'comments'))
     print(fmt.format('-' * 5, '-' * 20, '-' * 30))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 device = get_device()
 if cfg.detail:
     print_detail()
 else:
     print_headers()
-    print(fmt.format(device.id, device.name, device.description))
+    print(fmt.format(device.id, device.name, device.comments))

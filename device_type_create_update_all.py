@@ -5,7 +5,6 @@ Description: Create or update device types in Netbox from information in a YAML 
 '''
 our_version = 101
 import argparse
-#import pynetbox
 from lib.common import netbox, load_yaml
 from lib.device_type import DeviceType
 

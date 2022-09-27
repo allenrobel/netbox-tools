@@ -112,7 +112,11 @@ def get_ip_address(nb, ip):
     Given netbox instance, and ip address with format A.B.C.D/E, return netbox ip address object.
     If address doesn't exist within netbox, return None
     '''
-    address,mask = ip.split('/')
+    try:
+        address,mask = ip.split('/')
+    except Exception as e:
+        print('exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {}'.format(ip))
+        exit(1)
     try:
         return nb.ipam.ip_addresses.get(address=address, mask=mask)
     except Exception as e:
@@ -124,7 +128,11 @@ def ip_address_id(nb, ip):
     Given netbox instance, and ip address with format A.B.C.D/E, return netbox ip address id.
     If ip address doesn't exist within netbox, return None
     '''
-    address,mask = ip.split('/')
+    try:
+        address,mask = ip.split('/')
+    except Exception as e:
+        print('exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {}'.format(ip))
+        exit(1)
     try:
         ip_address = nb.ipam.ip_addresses.get(address=address, mask=mask)
         return ip_address.id

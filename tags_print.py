@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 '''
 Name: tags_print.py
-Description: Display information about all tags
+Description: Print information about all tags
 '''
-our_version = 100
+our_version = 101
 import argparse
-import pynetbox
 
-from lib.credentials import NetboxCredentials
 from lib.colors import color
+from lib.common import netbox
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Print information about all tags')
@@ -36,8 +35,7 @@ def print_tags():
     for tag in tags:
         print(fmt.format(tag.id, tag.name, tag.tagged_items, tag.color, color(tag.color), tag.description))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 print_headers()
 print_tags()

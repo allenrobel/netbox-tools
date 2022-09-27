@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 '''
-Name: device_type_get.py
+Name: device_type_print.py
 Description: Print information about a Netbox device type.
 '''
-our_version = 100
+our_version = 101
 import argparse
 import json
-import pynetbox
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about device.'
 help_type = 'Retrieve and display information for device type.'
@@ -17,7 +16,7 @@ ex_detail = '{} --detail'.format(ex_prefix)
 ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information for device type (Netbox device type is roughly equivilent to model number)')
+         description='DESCRIPTION: Print information for a device type (Netbox device type is roughly equivilent to model number)')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
@@ -62,8 +61,7 @@ def print_headers():
     print(fmt.format('id', 'name', 'device_count', 'manufacturer'))
     print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 20))
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 device_type = get_device_type()
 if cfg.detail:

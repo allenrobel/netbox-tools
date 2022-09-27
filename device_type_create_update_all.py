@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 '''
-Name: device_type_create.py
+Name: device_type_create_update_all.py
 Description: Create or update device types in Netbox from information in a YAML file.
 '''
-our_version = 100
+our_version = 101
 import argparse
-import pynetbox
-from lib.credentials import NetboxCredentials
-from lib.common import load_yaml
+#import pynetbox
+from lib.common import netbox, load_yaml
 from lib.device_type import DeviceType
 
 help_yaml = 'YAML file containing device type information.'
@@ -32,8 +31,7 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 info = load_yaml(cfg.yaml)
 for key in info['device_types']:
     device_type = DeviceType(nb, info['device_types'][key])

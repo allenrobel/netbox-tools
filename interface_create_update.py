@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 '''
-Name: interface_create.py
-Description: create an interface in netbox
+Name: interface_create_update.py
+Description: create or update an interface in netbox
 Example Usage:
-./interface_create.py --device bgw_1 --name mgmt0 --type 1000base-t --mgmt_only --enabled --mac 0844.cc4c.ee51
+./interface_create_update.py --device bgw_1 --name mgmt0 --type 1000base-t --mgmt_only --enabled --mac 0844.cc4c.ee51
 '''
-our_version = 100
-import pynetbox
+our_version = 101
 import argparse
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 from lib.interface import Interface
 
 help_device = 'Device name to which the interface will be added.'
@@ -104,7 +103,7 @@ def get_args():
         args['mac_address'] = cfg.mac
     return args
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb= netbox()
+
 i = Interface(nb, get_args())
 i.create_or_update()

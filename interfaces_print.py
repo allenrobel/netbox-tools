@@ -3,10 +3,9 @@
 Name: interfaces_print.py
 Description: Print information about all interfaces
 '''
-import pynetbox
 import argparse
 
-from lib.credentials import NetboxCredentials
+from lib.common import netbox
 
 def get_fmt():
     return '{:>5} {:<20} {:<15} {:<17} {:<12} {:<7} {:<9}'
@@ -28,8 +27,8 @@ def get_interfaces():
         exit(1)
     return i
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
+
 response = get_interfaces()
 print_headers()
 print_items(response)

@@ -3,16 +3,17 @@
 Name: rack_print.py
 Description: Display information about a rack
 '''
-our_version = 100
+our_version = 101
 import argparse
-import pynetbox
+import json
+from lib.common import netbox
 
-from lib.credentials import NetboxCredentials
-
-help_name = 'Name of the rack.'
+help_detail = 'Optional. If present, print detailed info about device.'
+help_rack = 'Name of the rack.'
 
 ex_prefix     = 'Example: '
-ex_name = '{} --name V009'.format(ex_prefix)
+ex_detail = '{} --detail'.format(ex_prefix)
+ex_rack = '{} --rack V009'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Display information about a rack')
@@ -20,10 +21,16 @@ parser = argparse.ArgumentParser(
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--name',
-                     dest='name',
+default.add_argument('--detail',
+                     dest='detail',
+                     required=False,
+                     default=False,
+                     action='store_true',
+                     help=help_detail + ex_detail)
+mandatory.add_argument('--rack',
+                     dest='rack',
                      required=True,
-                     help=help_name + ex_name)
+                     help=help_rack + ex_rack)
 
 parser.add_argument('--version',
                     action='version',
@@ -40,10 +47,14 @@ def error():
     print('Rack {} does not exist in netbox.  Valid racks: {}'.format(cfg.rack, ', '.join(racks)))
     exit(1)
 def get_rack():
-    rack = nb.dcim.racks.get(name=cfg.name)
+    rack = nb.dcim.racks.get(name=cfg.rack)
     if rack == None:
         error()
     return rack
+
+def print_detail():
+    pretty = json.dumps(dict(rack), indent=4, sort_keys=True)
+    print(pretty)
 
 def print_headers():
     print(fmt.format('id', 'name', 'site'))
@@ -51,11 +62,12 @@ def print_headers():
 
 fmt = '{:>5} {:>15} {:>15}'
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 rack = get_rack()
-if rack != None:
-    print(dict(rack))
+if cfg.detail:
+    print_detail()
+    exit()
+
 print_headers()
 print(fmt.format(rack.id, rack.name, rack.site.name))

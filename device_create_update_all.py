@@ -28,7 +28,7 @@ import pynetbox
 import yaml
 from time import sleep
 # Local libraries
-from lib.common import device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
+from lib.common import netbox, device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
 from lib.common import load_yaml
 from lib.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
 from lib.device_type import DeviceType
@@ -79,8 +79,7 @@ def assign_primary_ip_to_device(info):
     map_device_primary_ip(nb, info['name'], info['mgmt_interface'], info['mgmt_ip'])
     make_device_primary_ip(nb, info['name'], info['mgmt_ip'])
 
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+nb = netbox()
 
 info = load_yaml(cfg.yaml)
 print('---')

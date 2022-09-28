@@ -6,24 +6,40 @@ class DeviceType(object):
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['manufacturer', 'model']
+        self.mandatory_create_update_keys = ['manufacturer', 'model']
+        self.mandatory_delete_keys = ['model']
         self.optional_keys = ['comments']
-        self.validate_keys()
-        self.generate_args()
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
+    def validate_delete_keys(self):
+        for key in self.mandatory_delete_keys:
             if key not in self.info:
-                print('DeviceType.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('DeviceType.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                exit(1)
+    def validate_create_update_keys(self):
+        for key in self.mandatory_create_update_keys:
+            if key not in self.info:
+                print('DeviceType.validate_create_update_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
-    def generate_args(self):
+    def generate_create_update_args(self):
         self.args['manufacturer'] = manufacturer_id(self.nb, self.manufacturer)
         self.args['model'] = self.model
         self.args['slug'] = self.slug
         for key in self.optional_keys:
             if key in self.info:
                 self.args[key] = self.info[key]
+
+    def delete(self):
+        self.validate_delete_keys()
+        if self.device_type == None:
+            print('DeviceType.delete: Nothing to do. device_type {} does not exist in netbox.'.format(self.model))
+            return
+        print('DeviceType.delete: {}'.format(self.model))
+        try:
+            self.device_type.delete()
+        except Exception as e:
+            print('DeviceType.delete: Error. Unable to delete device_type {}.  Error was: {}'.format(self.model, e))
+            return
 
     def create(self):
         print('DeviceType.create: {}'.format(self.model))
@@ -43,6 +59,8 @@ class DeviceType(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_create_update_keys()
+        self.generate_create_update_args()
         if self.device_type == None:
             self.create()
         else:

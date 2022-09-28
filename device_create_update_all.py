@@ -83,6 +83,9 @@ nb = netbox()
 
 info = load_yaml(cfg.yaml)
 print('---')
+for key in info['tags']:
+    t = Tag(nb, info['tags'][key])
+    t.create_or_update()
 for key in info['sites']:
     s = Site(nb, info['sites'][key])
     s.create_or_update()
@@ -107,9 +110,6 @@ for key in info['racks']:
     r = Rack(nb, info['racks'][key])
     r.create_or_update()
 print('---')
-for key in info['tags']:
-    t = Tag(nb, info['tags'][key])
-    t.create_or_update()
 for key in info['prefixes']:
     p = IpPrefix(nb, info['prefixes'][key])
     p.create_or_update()

@@ -1,28 +1,43 @@
 #!/usr/bin/env python3
 '''
-Name: device_type_create_update_all.py
-Description: Create or update device types in Netbox from information in a YAML file.
+Name: device_type_create_update.py
+Description: Create or update a Netbox device type.
 '''
-our_version = 101
+our_version = 102
 import argparse
 from lib.common import netbox, load_yaml
 from lib.device_type import DeviceType
 
-help_yaml = 'YAML file containing device type information.'
+help_comments = 'Freeform comments for this device type.'
+help_manufacturer = 'Who makes this device type'
+help_model = 'Typically, the product/model number for this device'
 
 ex_prefix     = 'Example: '
-ex_yaml = '{} --yaml ./device_types.yml'.format(ex_prefix)
+ex_comments = '{} --comments "36x40/100G QSFP28 Ethernet Module"'.format(ex_prefix)
+ex_manufacturer = '{} --manufacturer cisco'.format(ex_prefix)
+ex_model = '{} --model N9K-C9336C-FX2'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Create or update Netbox device types (Netbox device type is roughly equivilent to NX-OS model number)')
+         description='DESCRIPTION: Create or update a Netbox device type (Netbox device type is roughly equivilent to model number)')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+optional   = parser.add_argument_group(title='OPTIONAL SCRIPT ARGS')
 
-mandatory.add_argument('--yaml',
-                     dest='yaml',
+optional.add_argument('--comments',
+                     dest='comments',
+                     required=False,
+                     default=None,
+                     help=help_comments + ex_comments)
+
+mandatory.add_argument('--manufacturer',
+                     dest='manufacturer',
                      required=True,
-                     help=help_yaml + ex_yaml)
+                     help=help_manufacturer + ex_manufacturer)
+
+mandatory.add_argument('--model',
+                     dest='model',
+                     required=True,
+                     help=help_model + ex_model)
 
 parser.add_argument('--version',
                     action='version',
@@ -31,7 +46,13 @@ parser.add_argument('--version',
 cfg = parser.parse_args()
 
 nb = netbox()
-info = load_yaml(cfg.yaml)
-for key in info['device_types']:
-    device_type = DeviceType(nb, info['device_types'][key])
-    device_type.create_or_update()
+
+info = dict()
+info['manufacturer'] = cfg.manufacturer
+info['model'] = cfg.model
+if cfg.comments != None:
+    info['comments'] = cfg.comments
+
+d = DeviceType(nb, info)
+d.create_or_update()
+

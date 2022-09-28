@@ -1,5 +1,6 @@
 from lib.common import create_slug
 from lib.common import manufacturer_id
+from lib.common import get_tag, get_tags, tag_id
 
 class DeviceType(object):
     def __init__(self, nb, info):
@@ -8,7 +9,7 @@ class DeviceType(object):
         self.args = dict()
         self.mandatory_create_update_keys = ['manufacturer', 'model']
         self.mandatory_delete_keys = ['model']
-        self.optional_keys = ['comments']
+        self.optional_keys = ['comments', 'tags'] # this is FYI only and is not used below
 
     def validate_delete_keys(self):
         for key in self.mandatory_delete_keys:
@@ -25,9 +26,10 @@ class DeviceType(object):
         self.args['manufacturer'] = manufacturer_id(self.nb, self.manufacturer)
         self.args['model'] = self.model
         self.args['slug'] = self.slug
-        for key in self.optional_keys:
-            if key in self.info:
-                self.args[key] = self.info[key]
+        if self.comments != None:
+            self.args['comments'] = self.comments
+        if self.tags != None:
+            self.args['tags'] = self.tags
 
     def delete(self):
         self.validate_delete_keys()
@@ -67,6 +69,12 @@ class DeviceType(object):
             self.update()
 
     @property
+    def comments(self):
+        if 'comments' in self.info:
+            return self.info['comments']
+        else:
+            return None
+    @property
     def manufacturer(self):
         return self.info['manufacturer']
 
@@ -86,3 +94,16 @@ class DeviceType(object):
     def device_type_id(self):
         return self.device_type.id
 
+    @property
+    def tags(self):
+        if 'tags' in self.info:
+            tag_list = list()
+            for tag in self.info['tags']:
+                tag_obj = get_tag(self.nb, tag)
+                if tag_obj == None:
+                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    exit(1)
+                tag_list.append(tag_id(self.nb, tag))
+            return tag_list
+        else:
+            return None

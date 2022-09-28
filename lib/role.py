@@ -13,8 +13,6 @@ class Role(object):
         self.args = dict()
         self.mandatory_keys = ['color', 'name']
         self.optional_keys = ['description']
-        self.validate_keys()
-        self.generate_args()
 
     def validate_keys(self):
         for key in self.mandatory_keys:
@@ -29,6 +27,17 @@ class Role(object):
         for key in self.optional_keys:
             if key in self.info:
                 self.args[key] = self.info[key]
+
+    def delete(self):
+        if self.role == None:
+            print('Role.delete: Nothing to do. Role {} does not exist in netbox.'.format(self.name))
+            return
+        print('Role.delete: {}'.format(self.name))
+        try:
+            self.role.delete()
+        except Exception as e:
+            print('Role.delete: Error. Unable to delete role {}.  Error was: {}'.format(self.name, e))
+            return
 
     def create(self):
         print('Role.create: {}'.format(self.name))
@@ -48,6 +57,8 @@ class Role(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_keys()
+        self.generate_args()
         if self.role == None:
             self.create()
         else:

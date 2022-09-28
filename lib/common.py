@@ -236,6 +236,29 @@ def site_id(nb, name):
         return None
 
 # tag
+def get_tag(nb, name):
+    '''
+    Given netbox instance and tag name, return tag.
+    If tag doesn't exist within netbox, return None
+    '''
+    try:
+        tag = nb.extras.tags.get(name=name)
+        if tag == None:
+            print('common.get_tag: returning None. tag {} does not exist in netbox.'.format(name))
+        return tag
+    except Exception as e:
+        print('common.get_tag: returning None. exception was: {}'.format(e))
+        return None
+def get_tags(nb):
+    '''
+    Given netbox instance, return all tag names currently configured in netbox.
+    '''
+    try:
+        tags = nb.extras.tags.all()
+        return [tag.name for tag in tags]
+    except Exception as e:
+        print('common.get_tags: returning None. exception was: {}'.format(e))
+        return None
 def tag_id(nb, name):
     '''
     Given netbox instance and tag name, return tag id.

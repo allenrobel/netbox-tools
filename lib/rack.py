@@ -12,24 +12,40 @@ class Rack(object):
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['name', 'site', 'location']
+        self.mandatory_delete_keys = ['name']
+        self.mandatory_create_update_keys = ['name', 'site', 'location']
         self.optional_keys = ['u_height']
-        self.validate_keys()
-        self.generate_args()
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
+    def validate_delete_keys(self):
+        for key in self.mandatory_delete_keys:
             if key not in self.info:
-                print('Rack.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('Rack.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                exit(1)
+    def validate_create_update_keys(self):
+        for key in self.mandatory_create_update_keys:
+            if key not in self.info:
+                print('Rack.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
-    def generate_args(self):
+    def generate_create_update_args(self):
         self.args['name'] = self.name
         self.args['location'] = location_id(self.nb, self.location)
         self.args['site'] = site_id(self.nb, self.site)
         for key in self.optional_keys:
             if key in self.info:
                 self.args[key] = self.info[key]
+
+    def delete(self):
+        self.validate_delete_keys()
+        if self.rack == None:
+            print('Rack.delete: Nothing to do. Rack {} does not exist in netbox.'.format(self.name))
+            return
+        print('Rack.delete: {}'.format(self.name))
+        try:
+            self.rack.delete()
+        except Exception as e:
+            print('Rack.delete: Error. Unable to delete rack {}.  Error was: {}'.format(self.name, e))
+            return
 
     def create(self):
         print('Rack.create: {}'.format(self.name))
@@ -49,6 +65,8 @@ class Rack(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_create_update_keys()
+        self.generate_create_update_args()
         if self.rack == None:
             self.create()
         else:
@@ -64,7 +82,7 @@ class Rack(object):
 
     @property
     def rack(self):
-        return self.nb.dcim.racks.get(name=self.info['name'])
+        return self.nb.dcim.racks.get(name=self.name)
 
     @property
     def rack_id(self):

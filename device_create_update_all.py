@@ -21,12 +21,9 @@ See ./info.yml for the YAML structure this script assumes.
     8c. Make IPv4 address the primary_ip for device
 
 '''
-our_version = 100
+our_version = 101
 
 import argparse
-import pynetbox
-import yaml
-from time import sleep
 # Local libraries
 from lib.common import netbox, device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
 from lib.common import load_yaml
@@ -66,22 +63,32 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
+# Used for backward-compatibility. Remove after 2022-09-29
+def fix_deprecations():
+    if 'mgmt_interface' in info:
+        print('device_create_update_all.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
+        info['interface'] = info['mgmt_interface']
+    if 'name' in info:
+        print('device_create_update_all.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
+        info['device'] = info['name']
+
 def assign_primary_ip_to_device(info):
     ipv4_id = ip_address_id(nb, info['mgmt_ip'])
-    intf_id = interface_id(nb, info['name'], info['mgmt_interface'])
+    intf_id = interface_id(nb, info['device'], info['interface'])
     if ipv4_id == None:
         print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
         exit(1)
     if intf_id == None:
-        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['mgmt_interface']))
+        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
         exit(1)
-    initialize_device_primary_ip(nb, info['name'])
-    map_device_primary_ip(nb, info['name'], info['mgmt_interface'], info['mgmt_ip'])
-    make_device_primary_ip(nb, info['name'], info['mgmt_ip'])
+    initialize_device_primary_ip(nb, info['device'])
+    map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
+    make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
 
 nb = netbox()
 
 info = load_yaml(cfg.yaml)
+fix_deprecations()
 print('---')
 for key in info['tags']:
     t = Tag(nb, info['tags'][key])

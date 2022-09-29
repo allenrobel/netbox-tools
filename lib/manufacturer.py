@@ -10,23 +10,40 @@ class Manufacturer(object):
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['name']
+        self.mandatory_create_update_keys = ['name']
+        self.mandatory_delete_keys = ['name']
         self.optional_keys = []
-        self.validate_keys()
-        self.generate_args()
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
+    def validate_delete_keys(self):
+        for key in self.mandatory_delete_keys:
             if key not in self.info:
-                print('manufacturer.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('manufacturer.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
-    def generate_args(self):
+    def validate_create_update_keys(self):
+        for key in self.mandatory_create_update_keys:
+            if key not in self.info:
+                print('manufacturer.validate_create_update_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                exit(1)
+
+    def generate_create_update_args(self):
         self.args['name'] = self.name
         self.args['slug'] = create_slug(self.name)
         for key in self.optional_keys:
             if key in self.info:
                 self.args[key] = self.info[key]
+
+    def delete(self):
+        self.validate_delete_keys()
+        if self.manufacturer == None:
+            print('Manufacturer.delete: Nothing to do. Manufacturer {} does not exist in netbox.'.format(self.name))
+            return
+        print('Manufacturer.delete: {}'.format(self.name))
+        try:
+            self.manufacturer.delete()
+        except Exception as e:
+            print('Manufacturer.delete: Error. Unable to delete manufacturer {}.  Error was: {}'.format(self.name, e))
+            return
 
     def create(self):
         print('Manufacturer.create: {}'.format(self.name))
@@ -46,6 +63,8 @@ class Manufacturer(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_create_update_keys()
+        self.generate_create_update_args()
         if self.manufacturer == None:
             self.create()
         else:

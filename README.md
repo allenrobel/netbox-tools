@@ -6,7 +6,7 @@
 
 Recent news about changes that may affect you.
 
-1. 2022-098-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/device.py``, ``lib/interface.py``, ``lib/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
+1. 2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/device.py``, ``lib/interface.py``, ``lib/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
 
 ## Getting started
 

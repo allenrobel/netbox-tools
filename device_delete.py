@@ -34,7 +34,7 @@ cfg = parser.parse_args()
 
 def get_info():
     info = dict()
-    info['name'] = cfg.device
+    info['device'] = cfg.device
     return info
 
 nb = netbox()

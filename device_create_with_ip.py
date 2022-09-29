@@ -122,22 +122,21 @@ def get_info():
 
 def assign_primary_ip_to_device(info):
     ipv4_id = ip_address_id(nb, info['mgmt_ip'])
-    intf_id = interface_id(nb, info['name'], info['interface'])
+    intf_id = interface_id(nb, info['device'], info['interface'])
     if ipv4_id == None:
         print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
         exit(1)
     if intf_id == None:
         print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
         exit(1)
-    initialize_device_primary_ip(nb, info['name'])
-    map_device_primary_ip(nb, info['name'], info['interface'], info['mgmt_ip'])
-    make_device_primary_ip(nb, info['name'], info['mgmt_ip'])
+    initialize_device_primary_ip(nb, info['device'])
+    map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
+    make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
 
 nc = NetboxCredentials()
 nb = pynetbox.api(nc.url, token=nc.token)
 
 info = get_info()
-print('info: {}'.format(info))
 print('---')
 d = Device(nb, info)
 d.create_or_update()

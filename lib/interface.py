@@ -24,7 +24,7 @@ class Interface(object):
             print('Interface.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
             self.info['interface'] = self.info['mgmt_interface']
         if 'name' in self.info:
-            print('Interface.fix_deprecations: WARNING: devices: <device>: name is in your YAML file is deprecated. Use devices: <device>: device instead.')
+            print('Interface.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
             self.info['device'] = self.info['name']
 
     def validate_create_update_keys(self):

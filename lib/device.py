@@ -65,8 +65,17 @@ class Device(object):
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys_create_or_update = ['name', 'role', 'type']
-        self.mandatory_keys_delete = ['name']
+        self.mandatory_keys_create_or_update = ['device', 'role', 'type']
+        self.mandatory_keys_delete = ['device']
+        self.fix_deprecations()
+
+    def fix_deprecations(self):
+        if 'mgmt_interface' in self.info:
+            print('Device.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
+            self.info['interface'] = self.info['mgmt_interface']
+        if 'name' in self.info:
+            print('Device.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
+            self.info['device'] = self.info['name']
 
     def validate_keys_delete(self):
         for key in self.mandatory_keys_delete:
@@ -83,9 +92,9 @@ class Device(object):
     def generate_args_create_or_update(self):
         self.args['device_role'] = role_id(self.nb, self.device_role)
         self.args['device_type'] = device_type_id(self.nb, self.device_type)
-        self.args['name'] = self.info['name']
+        self.args['name'] = self.info['device']
         self.args['site'] = site_id(self.nb, self.site)
-        self.args['slug'] = create_slug(self.info['name'])
+        self.args['slug'] = create_slug(self.info['device'])
         if self.face != None:
             self.args['face'] = self.face
         if self.location != None:
@@ -100,49 +109,49 @@ class Device(object):
             self.args['tags'] = self.tags
 
     def create(self):
-        print('Device.create: {}'.format(self.name))
+        print('Device.create: {}'.format(self.device))
         try:
             self.nb.dcim.devices.create(self.args)
         except Exception as e:
-            print('Device.create: Exiting. Unable to create device {}.  Error was: {}'.format(self.name, e))
+            print('Device.create: Exiting. Unable to create device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def update(self):
-        print('Device.update: {}'.format(self.name))
+        print('Device.update: {}'.format(self.device))
         self.args['id'] = self.device_id
         try:
-            self.device.update(self.args)
+            self.device_object.update(self.args)
         except Exception as e:
-            print('Device.update: Exiting. Unable to update device {}.  Error was: {}'.format(self.name, e))
+            print('Device.update: Exiting. Unable to update device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def delete(self):
-        print('Device.delete: {}'.format(self.name))
+        print('Device.delete: {}'.format(self.device))
         self.validate_keys_delete()
-        if self.device == None:
-            print('Device.delete: Nothing to do, device {} does not exist in netbox.'.format(self.name))
+        if self.device_object == None:
+            print('Device.delete: Nothing to do, device {} does not exist in netbox.'.format(self.device))
             return
         try:
-            self.device.delete()
+            self.device_object.delete()
         except Exception as e:
-            print('Device.delete: Exiting. Unable to delete device {}.  Error was: {}'.format(self.name, e))
+            print('Device.delete: Exiting. Unable to delete device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def create_or_update(self):
         self.validate_keys_create_or_update()
         self.generate_args_create_or_update()
-        if self.device == None:
+        if self.device_object == None:
             self.create()
         else:
             self.update()
 
     @property
-    def device(self):
-        return self.nb.dcim.devices.get(name=self.name)
+    def device_object(self):
+        return self.nb.dcim.devices.get(name=self.device)
 
     @property
     def device_id(self):
-        return self.device.id
+        return self.device_object.id
 
     @property
     def device_role(self):
@@ -166,9 +175,14 @@ class Device(object):
         else:
             return None
 
+    # For backward-compatibility. Remove after 2023-09-29
     @property
     def name(self):
-        return self.info['name']
+        return self.info['device']
+
+    @property
+    def device(self):
+        return self.info['device']
 
     @property
     def position(self):

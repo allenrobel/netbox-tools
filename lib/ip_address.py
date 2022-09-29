@@ -8,31 +8,41 @@ from lib.common import interface_id
 
 class IpAddress(object):
     def __init__(self, nb, info):
+        self.version = 101
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['mgmt_interface', 'mgmt_ip', 'name']
+        self.mandatory_keys = ['interface', 'mgmt_ip', 'device']
         self.optional_keys = ['interface_description', 'interface_status']
         self.default_ip_address_type = '1000base-t'
         self.default_ip_address_enabled = True
+        self.fix_deprecations()
         self.validate_keys()
         self.generate_args()
         self.initialize_device_primary_ip()
 
+    def fix_deprecations(self):
+        if 'mgmt_interface' in self.info:
+            print('IpAddress.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
+            self.info['interface'] = self.info['mgmt_interface']
+        if 'name' in self.info:
+            print('IpAddress.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
+            self.info['device'] = self.info['name']
+
     def validate_keys(self):
         for key in self.mandatory_keys:
             if key not in self.info:
-                print('ip_address.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('IpAddress.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
     def generate_args(self):
         self.args['address'] = self.mgmt_ip
         self.args['assigned_object_id'] = device_id(self.nb, self.device)
-        self.args['interface'] = interface_id(self.nb, self.device, self.mgmt_interface)
+        self.args['interface'] = interface_id(self.nb, self.device, self.interface)
         if self.interface_description == None:
             self.args['description'] = '{} : {} : {}'.format(
                 self.device,
-                self.mgmt_interface,
+                self.interface,
                 self.mgmt_ip)
         else:
             self.args['description'] = self.interface_description
@@ -82,7 +92,7 @@ class IpAddress(object):
 
     @property
     def device(self):
-        return self.info['name']
+        return self.info['device']
 
     @property
     def interface_description(self):
@@ -100,7 +110,11 @@ class IpAddress(object):
 
     @property
     def ip_address(self):
-        address,mask = self.mgmt_ip.split('/')
+        try:
+            address,mask = self.mgmt_ip.split('/')
+        except Exception as e:
+            print('IpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.mgmt_ip, e))
+            exit(1)
         return self.nb.ipam.ip_addresses.get(
             address=address,
             mask=mask)
@@ -123,119 +137,15 @@ class IpAddress(object):
         else:
             return None
 
+    # Keeping for backward-compatibility. Remove after 2023-09-29.
     @property
     def mgmt_interface(self):
-        return self.info['mgmt_interface']
+        return self.info['interface']
+
+    @property
+    def interface(self):
+        return self.info['interface']
 
     @property
     def mgmt_ip(self):
         return self.info['mgmt_ip']
-
-# device_ip -----------------------------------------
-
-# def initialize_device_primary_ip(name):
-#     '''
-#     name is typically found in device_info['name']
-#     Initialize primary_ip4 and primary_ip to avoid errors in map_device_primary_ip()address.save()
-#     '''
-#     device = get_device(nb, name)
-#     device.primary_ip4 = None
-#     device.primary_ip = None
-#     device.save()
-#     print('initialize_device_primary_ip: device {} primary_ip and primary_ip4 DONE'.format(name))
-
-# def get_ip_address(ip):
-#     address,mask = ip.split('/')
-#     try:
-#         return nb.ipam.ip_addresses.get(address=address, mask=mask)
-#     except:
-#         return None
-
-# def get_ip_address_id(ip):
-#     address,mask = ip.split('/')
-#     try:
-#         ip_address = nb.ipam.ip_addresses.get(address=address, mask=mask)
-#         return ip_address.id
-#     except:
-#         print('get_ip_address_id: Exiting. Could not get ID for ip address {}'.format(ip))
-#         exit(1)
-
-# def get_ip_address_args(info):
-#     args = dict()
-#     args['address'] = info['mgmt_ip']
-#     if 'interface_status' in info:
-#         args['status'] = info['interface_status']
-#     else:
-#         args['status'] = 'active'
-#     if 'interface_description' in info:
-#         args['description'] = info['interface_description']
-#     else:
-#         args['description'] = '{} : {} : {}'.format(
-#             info['name'],
-#             info['mgmt_interface'],
-#             info['mgmt_ip'])
-#     args['interface'] = interface_id(nb, info['name'], info['mgmt_interface'])
-#     args['assigned_object_id'] = device_id(nb, info['name'])
-#     return args
-
-# def create_ip_address(info):
-#     args = get_ip_address_args(info)
-#     result = nb.ipam.ip_addresses.create(args)
-#     print('create_ip_address: device {} address {} result {}'.format(
-#         info['name'],
-#         info['mgmt_ip'],
-#         result))
-
-# def update_ip_address(info, ip_address):
-#     args = get_ip_address_args(info)
-#     result = ip_address.update(args)
-#     print('update_ip_address: device {} address {} result {}'.format(
-#         info['name'],
-#         info['mgmt_ip'],
-#         result))
-
-# def create_or_update_ip_address(info):
-#     ip_address = get_ip_address(info['mgmt_ip'])
-#     if ip_address  == None:
-#         create_ip_address(info)
-#     else:
-#         update_ip_address(info, ip_address)
-
-# def map_device_primary_ip(info):
-#     '''
-#     Map an existing IP address to an interface ID
-#     '''
-#     address = get_ip_address(info['mgmt_ip'])
-#     address.assigned_object_id = interface_id(nb, info['name'], info['mgmt_interface'])
-#     address.assigned_object_type = "dcim.interface"
-#     address.save()
-#     print('map_device_primary_ip: Map address {} to device {} interface {} DONE'.format(
-#         info['name'],
-#         info['mgmt_ip'],
-#         info['mgmt_interface']))
-
-# def make_device_primary_ip(info):
-#     '''
-#     Make an ip address the primary address for a device by mapping
-#     the address ID to a device's primary_ip and primary_ip4.
-#     '''
-#     device = get_device(nb, info['name'])
-#     ip_address_id = get_ip_address_id(info['mgmt_ip'])
-#     device.primary_ip = ip_address_id
-#     device.primary_ip4 = ip_address_id
-#     device.save()
-#     print('make_device_primary_ip: Make address {} (id {}) primary on device {} DONE'.format(
-#         info['mgmt_ip'], ip_address_id, info['name']))
-
-# def assign_primary_ip_to_device(info):
-#     ipv4_id = get_ip_address_id(info['mgmt_ip'])
-#     intf_id = interface_id(nb, info['name'], info['mgmt_interface'])
-#     if ipv4_id == None:
-#         print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
-#         exit(1)
-#     if intf_id == None:
-#         print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['mgmt_interface']))
-#         exit(1)
-#     initialize_device_primary_ip(info['name'])
-#     map_device_primary_ip(info)
-#     make_device_primary_ip(info)

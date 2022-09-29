@@ -3,7 +3,7 @@
 Name: interface_create_update.py
 Description: Netbox: Create or update an interface
 Example Usage:
-./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --enabled --mac 0844.cc4c.ee51
+./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51
 '''
 our_version = 103
 import argparse
@@ -12,15 +12,15 @@ from lib.common import netbox
 from lib.interface import Interface
 
 help_device = 'Device name to which the interface will be added.'
-help_enabled = 'Optional. Is the interface enabled or not. Default is True (enabled)'
+help_disabled = 'Optional. Is the interface disabled or not. Default is False (i.e. interface is enabled)'
 help_interface = 'Name of the interface to add.'
 help_mac = 'Optional. Mac address of the interface.'
 help_mgmt_only = 'Optional. If present, interface will be flagged as management only. Default is False (not mgmt only)'
 help_type = 'Type of interface to create (see http://<netbox_ip>/api/docs/ and look in POST /dcim/interfaces/ under type for valid types).'
 
-ex_prefix = 'Example: '
+ex_prefix = ' Example: '
 ex_device = '{} --device leaf_1'.format(ex_prefix)
-ex_enabled = '{} --enabled'.format(ex_prefix)
+ex_disabled = '{} --disabled'.format(ex_prefix)
 ex_interface = '{} --interface mgmt0'.format(ex_prefix)
 ex_mac = '{} --mac 00:01:00:00:bd:ff'.format(ex_prefix)
 ex_mgmt_only = '{} --mgmt_only'.format(ex_prefix)
@@ -48,12 +48,12 @@ mandatory.add_argument('--type',
                      default=None,
                      help=help_type + ex_type)
 
-default.add_argument('--enabled',
-                     dest='enabled',
+default.add_argument('--disabled',
+                     dest='disabled',
                      required=False,
                      default=False,
                      action='store_true',
-                     help=help_enabled + ex_enabled)
+                     help=help_disabled + ex_disabled)
 
 default.add_argument('--mac',
                      dest='mac',
@@ -88,8 +88,14 @@ def get_args():
     args = dict()
     args['device'] = cfg.device
     args['interface'] = cfg.interface
-    args['mgmt_only'] = cfg.mgmt_only
-    args['interface_enabled'] = cfg.enabled
+    if cfg.mgmt_only == True:
+        args['mgmt_only'] = True
+    else:
+        args['mgmt_only'] = False
+    if cfg.disabled == True:
+        args['interface_enabled'] = False
+    else:
+        args['interface_enabled'] = True
     if cfg.type != None:
         args['interface_type'] = cfg.type
     if cfg.mac != None:

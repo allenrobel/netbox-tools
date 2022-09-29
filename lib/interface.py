@@ -27,14 +27,19 @@ class Interface(object):
             print('Interface.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
             self.info['device'] = self.info['name']
 
+    def validate_delete_keys(self):
+        for key in self.mandatory_delete_keys:
+            if key not in self.info:
+                print('Interface.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                exit(1)
     def validate_create_update_keys(self):
         for key in self.mandatory_create_update_keys:
             if key not in self.info:
-                print('interface.validate_create_update_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('Interface.validate_create_update_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
     def generate_create_update_args(self):
-        self.args['name'] = self.interface_name
+        self.args['name'] = self.interface
         self.args['device'] = device_id(self.nb, self.device)
         if self.args['device'] == None:
             print('Interface.generate_create_update_args: exiting. Device {} does not exist in netbox'.format(self.device))
@@ -55,38 +60,38 @@ class Interface(object):
             self.args['enabled'] = self.interface_enabled
 
     def delete(self):
-        print('Interface.delete: {}'.format(self.interface_name))
+        print('Interface.delete: {}'.format(self.interface))
         self.validate_delete_keys()
-        if self.interface == None:
-            print('Interface.delete: Nothing to do, interface {} does not exist in netbox.'.format(self.interface_name))
+        if self.interface_object == None:
+            print('Interface.delete: Nothing to do, interface {} does not exist in netbox.'.format(self.interface))
             return
         try:
-            self.device.delete()
+            self.interface_object.delete()
         except Exception as e:
-            print('Interface.delete: Exiting. Unable to delete interface {}.  Error was: {}'.format(self.interface_name, e))
+            print('Interface.delete: Exiting. Unable to delete interface {}.  Error was: {}'.format(self.interface, e))
             exit(1)
 
     def create(self):
-        print('Interface.create: {}'.format(self.interface_name))
+        print('Interface.create: {}'.format(self.interface))
         try:
             self.nb.dcim.interfaces.create(self.args)
         except Exception as e:
-            print('Interface.create: exiting. Unable to create interface {}.  Error was: {}'.format(self.interface_name, e))
+            print('Interface.create: exiting. Unable to create interface {}.  Error was: {}'.format(self.interface, e))
             exit(1)
 
     def update(self):
-        print('Interface.update: {}'.format(self.interface_name))
+        print('Interface.update: {}'.format(self.interface))
         self.args['id'] = self.interface_id
         try:
-            self.interface.update(self.args)
+            self.interface_object.update(self.args)
         except Exception as e:
-            print('Interface.update: Exiting. Unable to update interface {}.  Error was: {}'.format(self.interface_name, e))
+            print('Interface.update: Exiting. Unable to update interface {}.  Error was: {}'.format(self.interface, e))
             exit(1)
 
     def create_or_update(self):
         self.validate_create_update_keys()
         self.generate_create_update_args()
-        if self.interface == None:
+        if self.interface_object == None:
             self.create()
         else:
             self.update()
@@ -97,9 +102,13 @@ class Interface(object):
 
     @property
     def interface(self):
+        return self.info['interface']
+
+    @property
+    def interface_object(self):
         return self.nb.dcim.interfaces.get(
             device=self.device,
-            name=self.interface_name)
+            name=self.interface)
 
     @property
     def interface_enabled(self):
@@ -110,7 +119,7 @@ class Interface(object):
 
     @property
     def interface_id(self):
-        return self.interface.id
+        return self.interface_object.id
 
     @property
     def interface_type(self):
@@ -118,10 +127,6 @@ class Interface(object):
             return self.info['interface_type']
         else:
             return None
-
-    @property
-    def interface_name(self):
-        return self.info['interface']
 
     @property
     def mac_address(self):

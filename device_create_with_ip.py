@@ -14,7 +14,7 @@ Example usage:
 
 ./device_create_2.py \
         --device foo \
-        --mgmt_interface mgmt0 \
+        --interface mgmt0 \
         --mgmt_ip 10.10.10.10/24 \
         --role lab_tor \
         --site SJC03-1-155 \
@@ -35,7 +35,7 @@ from lib.credentials import NetboxCredentials
 from lib.common import get_device
 
 help_device = 'Name of the device to add.'
-help_mgmt_interface = 'Management interface for the device.'
+help_interface = 'Management interface for the device.'
 help_mgmt_ip = 'Management IPv4 address for the device.'
 help_role = 'Role for the device. Role must already exist in netbox.'
 help_serial = 'Optional. Default: na. Serial number of the device.'
@@ -44,7 +44,7 @@ help_tags = 'Optional. Comma-separated list of pre-existing tags to associate wi
 help_type = 'Type of device (i.e. model number). model number must already exist in netbox'
 ex_prefix     = 'Example: '
 ex_device = '{} --device leaf_3'.format(ex_prefix)
-ex_mgmt_interface = '{} --mgmt_interface mgmt0'.format(ex_prefix)
+ex_interface = '{} --interface mgmt0'.format(ex_prefix)
 ex_mgmt_ip = '{} --mgmt_ip 192.168.1.5/24'.format(ex_prefix)
 ex_role = '{} --role leaf'.format(ex_prefix)
 ex_serial = '{} --serial CX045BN'.format(ex_prefix)
@@ -62,10 +62,10 @@ mandatory.add_argument('--device',
                      dest='device',
                      required=True,
                      help=help_device + ex_device)
-mandatory.add_argument('--mgmt_interface',
-                     dest='mgmt_interface',
+mandatory.add_argument('--interface',
+                     dest='interface',
                      required=True,
-                     help=help_mgmt_interface + ex_mgmt_interface)
+                     help=help_interface + ex_interface)
 mandatory.add_argument('--mgmt_ip',
                      dest='mgmt_ip',
                      required=True,
@@ -107,8 +107,8 @@ def get_tags():
 def get_info():
     info = dict()
     info['mgmt_ip'] = cfg.mgmt_ip
-    info['mgmt_interface'] = cfg.mgmt_interface
-    info['name'] = cfg.device
+    info['interface'] = cfg.interface
+    info['device'] = cfg.device
     info['role'] = cfg.role
     if cfg.serial != None:
         info['serial'] = cfg.serial
@@ -122,15 +122,15 @@ def get_info():
 
 def assign_primary_ip_to_device(info):
     ipv4_id = ip_address_id(nb, info['mgmt_ip'])
-    intf_id = interface_id(nb, info['name'], info['mgmt_interface'])
+    intf_id = interface_id(nb, info['name'], info['interface'])
     if ipv4_id == None:
         print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
         exit(1)
     if intf_id == None:
-        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['mgmt_interface']))
+        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
         exit(1)
     initialize_device_primary_ip(nb, info['name'])
-    map_device_primary_ip(nb, info['name'], info['mgmt_interface'], info['mgmt_ip'])
+    map_device_primary_ip(nb, info['name'], info['interface'], info['mgmt_ip'])
     make_device_primary_ip(nb, info['name'], info['mgmt_ip'])
 
 nc = NetboxCredentials()

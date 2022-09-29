@@ -219,17 +219,17 @@ device_roles:
 
 # Devices
 # Mandatory keys
-#   name: Name of the device
+#   device: Name of the device
 #   site: The site in which the device is located (could be a fabric name, testbed, or physical location, etc)
-#   mgmt_ip: The IP address of mgmt_interface
-#   mgmt_interface: The interface used to manage the device, e.g. mgmt0 for NX-OS
+#   mgmt_ip: The IP address of interface used to manage the device
+#   interface: The interface used to manage the device, e.g. mgmt0 for NX-OS
 #   role: The device's functional role e.g. spine.
 #   type: The hardware device type which defines the device's make & model.
 #
 # Optional keys
 #   interface_type: The type of interface (pertains to mgmt0). If not present, mgmt0 interface_type defaults
 #                   to 1000base-t
-#   mac_address: The mac address of the mgmt_interface e.g. from 'show interface mgmt0'
+#   mac_address: The mac address of the interface e.g. from 'show interface mgmt0'
 #   rack: The rack in which device resides (rack must be present in racks section of this file)
 #   position: The bottom-most position (RU) in the rack that the device occupies (e.g. for a 3-RU
 #             unit taking spaces 1-3, you would list 1 as the position).  If rack is specified,
@@ -251,9 +251,9 @@ device_roles:
 
 devices:
   lab_gateway_167_1:
-    name: lab_gateway_1
+    device: lab_gateway_1
     mgmt_ip: 192.168.1.1/24
-    mgmt_interface: mgmt0
+    interface: mgmt0
     role: lab_gateway
     type: CISCO-UNKNOWN
     serial: na

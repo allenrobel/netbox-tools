@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 '''
 Name: interface_create_update.py
-Description: create or update an interface in netbox
+Description: Netbox: Create or update an interface
 Example Usage:
-./interface_create_update.py --device bgw_1 --name mgmt0 --type 1000base-t --mgmt_only --enabled --mac 0844.cc4c.ee51
+./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --enabled --mac 0844.cc4c.ee51
 '''
-our_version = 101
+our_version = 103
 import argparse
 
 from lib.common import netbox
@@ -13,7 +13,7 @@ from lib.interface import Interface
 
 help_device = 'Device name to which the interface will be added.'
 help_enabled = 'Optional. Is the interface enabled or not. Default is True (enabled)'
-help_name = 'Name of the interface to add.'
+help_interface = 'Name of the interface to add.'
 help_mac = 'Optional. Mac address of the interface.'
 help_mgmt_only = 'Optional. If present, interface will be flagged as management only. Default is False (not mgmt only)'
 help_type = 'Type of interface to create (see http://<netbox_ip>/api/docs/ and look in POST /dcim/interfaces/ under type for valid types).'
@@ -21,13 +21,13 @@ help_type = 'Type of interface to create (see http://<netbox_ip>/api/docs/ and l
 ex_prefix = 'Example: '
 ex_device = '{} --device leaf_1'.format(ex_prefix)
 ex_enabled = '{} --enabled'.format(ex_prefix)
-ex_name = '{} --name mgmt0'.format(ex_prefix)
+ex_interface = '{} --interface mgmt0'.format(ex_prefix)
 ex_mac = '{} --mac 00:01:00:00:bd:ff'.format(ex_prefix)
 ex_mgmt_only = '{} --mgmt_only'.format(ex_prefix)
 ex_type = '{} --type 1000base-t'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Add a device')
+         description='DESCRIPTION: Netbox: Create or update an interface')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
@@ -37,10 +37,10 @@ mandatory.add_argument('--device',
                      required=True,
                      help=help_device + ex_device)
 
-mandatory.add_argument('--name',
-                     dest='name',
+mandatory.add_argument('--interface',
+                     dest='interface',
                      required=True,
-                     help=help_name + ex_name)
+                     help=help_interface + ex_interface)
 
 mandatory.add_argument('--type',
                      dest='type',
@@ -74,18 +74,11 @@ parser.add_argument('--version',
 
 cfg = parser.parse_args()
 
-def get_device_id():
-    response = nb.dcim.devices.get(name=cfg.device)
-    if response == None:
-        print('Exiting. device {} not defined in netbox'.format(cfg.device))
-        exit(1)
-    return response.id
-
 def get_args():
     '''
     Mandatory keys:
-       name: name of the device
-       mgmt_interface: name of the management interface
+       device: name of the device
+       interface: name of the interface
     Optional keys:
         interface_type: Netbox type of this interface (default is 1000base-t)
         mac_address: Mac address of this interface
@@ -93,8 +86,8 @@ def get_args():
         interface_enabled: If True, Netbox will set its internal interface state to enabled
     '''
     args = dict()
-    args['name'] = cfg.device
-    args['mgmt_interface'] = cfg.name
+    args['device'] = cfg.device
+    args['interface'] = cfg.interface
     args['mgmt_only'] = cfg.mgmt_only
     args['interface_enabled'] = cfg.enabled
     if cfg.type != None:

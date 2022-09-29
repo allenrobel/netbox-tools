@@ -80,30 +80,30 @@ def device_type_id(nb, model):
         return None
 
 # interface
-def get_interface(nb, device, name):
+def get_interface(nb, device, interface):
     '''
     Given netbox instance, device name, interface name, return interface object
     If interface does not exist in netbox, return None
     '''
     try:
-        interface = nb.dcim.interfaces.get(
-            name=name,
+        interface_object = nb.dcim.interfaces.get(
+            name=interface,
             device=device)
-        return interface
+        return interface_object
     except Exception as e:
         print('common.get_interface: returning None. exception was: {}'.format(e))
         return None
 
-def interface_id(nb, device, name):
+def interface_id(nb, device, interface):
     '''
     Given netbox instance, device name, interface name, return interface id
     If interface does not exist in netbox, return None
     '''
     try:
-        interface = nb.dcim.interfaces.get(
-            name=name,
+        interface_object = nb.dcim.interfaces.get(
+            name=interface,
             device=device)
-        return interface.id
+        return interface_object.id
     except Exception as e:
         print('common.interface_id: returning None. exception was: {}'.format(e))
         return None

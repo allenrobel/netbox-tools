@@ -25,7 +25,7 @@ help_site = 'Site in which device will reside.'
 help_type = 'Type of device (e.g. model number).'
 
 ex_prefix = 'Example: '
-ex_device = '{} --name leaf_3'.format(ex_prefix)
+ex_device = '{} --device leaf_3'.format(ex_prefix)
 ex_role = '{} --role leaf'.format(ex_prefix)
 ex_site = '{} --site f1'.format(ex_prefix)
 ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)

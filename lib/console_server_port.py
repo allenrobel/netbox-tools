@@ -41,7 +41,7 @@ class ConsoleServerPort(object):
         try:
             self.manufacturer.delete()
         except Exception as e:
-            print('ConsoleServerPort.delete: Error. Unable to delete device {} console_server_port {}.  Error was: {}'.format(self.device, self.port, e))
+            print('ConsoleServerPort.delete: Error. Unable to delete device {} console_server_port {}. Error was: {}'.format(self.device, self.port, e))
             return
 
     def create(self):
@@ -49,28 +49,27 @@ class ConsoleServerPort(object):
         try:
             self.nb.dcim.console_server_ports.create(self.args)
         except Exception as e:
-            print('ConsoleServerPort.create: Exiting. Unable to create device {} port {}.  Error was: {}'.format(self.device, self.port, e))
+            print('ConsoleServerPort.create: Exiting. Unable to create device {} port {}. Error was: {}'.format(self.device, self.port, e))
             exit(1)
 
     def update(self):
         print('ConsoleServerPort.update: device {} port {}'.format(self.device, self.port))
-        self.args['id'] = self.manufacturer_id
         try:
-            self.console_port_object.update(self.args)
+            self.console_server_port_object.update(self.args)
         except Exception as e:
-            print('ConsoleServerPort.update: Exiting. Unable to update device {} port {}.  Error was: {}'.format(self.device, self.port, e))
+            print('ConsoleServerPort.update: Exiting. Unable to update device {} port {}. Error was: {}'.format(self.device, self.port, e))
             exit(1)
 
     def create_or_update(self):
         self.validate_create_update_keys()
         self.generate_create_update_args()
-        if self.console_port_object == None:
+        if self.console_server_port_object == None:
             self.create()
         else:
             self.update()
 
     @property
-    def console_port_object(self):
+    def console_server_port_object(self):
         return self.nb.dcim.console_server_ports.get(device=self.device, name=self.port)
 
     @property

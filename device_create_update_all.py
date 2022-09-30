@@ -27,6 +27,7 @@ import argparse
 # Local libraries
 from lib.common import netbox, device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
 from lib.common import load_yaml
+from lib.console_server_port import ConsoleServerPort
 from lib.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
 from lib.device_type import DeviceType
 from lib.interface import Interface
@@ -90,6 +91,9 @@ nb = netbox()
 info = load_yaml(cfg.yaml)
 fix_deprecations()
 print('---')
+for key in info['console_server_ports']:
+    c = ConsoleServerPort(nb, info['console_server_ports'][key])
+    c.create_or_update()
 for key in info['tags']:
     t = Tag(nb, info['tags'][key])
     t.create_or_update()

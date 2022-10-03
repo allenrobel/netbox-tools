@@ -20,6 +20,59 @@
 # gray
 # gray_dark
 
+# Tags
+# Mandatory keys
+#   - name: name of the tag
+#   - color: color from the color choices at the top of this file
+#
+# Optional keys
+#   - description: describes what the tag signifies
+# Below are some suggested tags.
+# Use the script ./device_print_filtered.py with the --tags argument to filter
+# on tags.  Example:
+# ./device_print_filtered.py --tags cleanup,lab_tor
+# The above would filter one all lab_tor devices that need to be cleaned up (if any)
+tags:
+  # TODO/Action tags
+  cleanup:
+    name: cleanup
+    color: yellow
+    description: Items to be cleaned up
+  # Usage tags
+  lab_tor:
+    name: lab_tor
+    color: teal
+    description: lab L2 switches for mgmt vlans
+  lab_gateway:
+    name: lab_gateway
+    color: green_dark
+    description: lab gateways (typically host 1 on each vlan)
+  lab_ts:
+    name: lab_ts
+    color: orange
+    description: lab terminal servers
+  tgen:
+    name: tgen
+    color: purple
+    description: traffic generators
+  # People (I use color blue for people and use their email alias for name)
+  c3po:
+    name: c3po
+    color: blue
+  yoda:
+    name: yoda
+    color: blue
+  # projects (I use color red)
+  starbase_nw:
+    name: starbase
+    color: red
+    description: Build starbase in the northwest quadrant
+  # Lab Admin (I use color gray)
+  infra:
+    name: infra
+    color: gray
+    description: any lab infra devices e.g. terminal servers, gateways, etc
+
 # Sites
 # Mandatory keys:
 #   name: name of the site
@@ -56,12 +109,17 @@ prefixes:
 #   site: Site in which rack is installed. Must be present in the 
 #         sites section of this file.
 # Optional keys:
+#   comments: Free-form comment for this rack
+#   tags: yaml list of tags for this rack. Tags must already exist in Netbox.
 #   u_height: How many RU are in this rack (typically 42 or 48)
 racks:
   rack_1:
     name: rack_1
     location: row-a
     site: mysite
+    tags:
+      - infra
+      - admin
     u_height: 48
 
 # Locations
@@ -261,55 +319,3 @@ devices:
     tags:
       - infra
 
-# Tags
-# Mandatory keys
-#   - name: name of the tag
-#   - color: color from the color choices at the top of this file
-#
-# Optional keys
-#   - description: describes what the tag signifies
-# Below are some suggested tags.
-# Use the script ./device_print_filtered.py with the --tags argument to filter
-# on tags.  Example:
-# ./device_print_filtered.py --tags cleanup,lab_tor
-# The above would filter one all lab_tor devices that need to be cleaned up (if any)
-tags:
-  # TODO/Action tags
-  cleanup:
-    name: cleanup
-    color: yellow
-    description: Items to be cleaned up
-  # Usage tags
-  lab_tor:
-    name: lab_tor
-    color: teal
-    description: lab L2 switches for mgmt vlans
-  lab_gateway:
-    name: lab_gateway
-    color: green_dark
-    description: lab gateways (typically host 1 on each vlan)
-  lab_ts:
-    name: lab_ts
-    color: orange
-    description: lab terminal servers
-  tgen:
-    name: tgen
-    color: purple
-    description: traffic generators
-  # People (I use color blue for people and use their email alias for name)
-  c3po:
-    name: c3po
-    color: blue
-  yoda:
-    name: yoda
-    color: blue
-  # projects (I use color red)
-  starbase_nw:
-    name: starbase
-    color: red
-    description: Build starbase in the northwest quadrant
-  # Lab Admin (I use color gray)
-  infra:
-    name: infra
-    color: gray
-    description: any lab infra devices e.g. terminal servers, gateways, etc

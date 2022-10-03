@@ -3,9 +3,7 @@ Name: rack.py
 Description: Class for create and update operations on netbox rack
 '''
 
-from lib.common import create_slug
-from lib.common import site_id
-from lib.common import location_id
+from lib.common import create_slug, get_tag, get_tags, location_id, site_id, tag_id
 
 class Rack(object):
     def __init__(self, nb, info):
@@ -14,7 +12,7 @@ class Rack(object):
         self.args = dict()
         self.mandatory_delete_keys = ['name']
         self.mandatory_create_update_keys = ['name', 'site', 'location']
-        self.optional_keys = ['u_height']
+        self.optional_keys = ['u_height', 'comments'] # these are FYI only i.e. not used in this class
 
     def validate_delete_keys(self):
         for key in self.mandatory_delete_keys:
@@ -31,9 +29,12 @@ class Rack(object):
         self.args['name'] = self.name
         self.args['location'] = location_id(self.nb, self.location)
         self.args['site'] = site_id(self.nb, self.site)
-        for key in self.optional_keys:
-            if key in self.info:
-                self.args[key] = self.info[key]
+        if self.u_height != None:
+            self.args['u_height'] = self.u_height
+        if self.comments != None:
+            self.args['comments'] = self.comments
+        if self.tags != None:
+            self.args['tags'] = self.tags
 
     def delete(self):
         self.validate_delete_keys()
@@ -73,6 +74,13 @@ class Rack(object):
             self.update()
 
     @property
+    def comments(self):
+        if 'comments' in self.info:
+            return self.info['comments']
+        else:
+            return None
+
+    @property
     def name(self):
         return self.info['name']
 
@@ -91,3 +99,24 @@ class Rack(object):
     @property
     def site(self):
         return self.info['site']
+
+    @property
+    def tags(self):
+        if 'tags' in self.info:
+            tag_list = list()
+            for tag in self.info['tags']:
+                tag_obj = get_tag(self.nb, tag)
+                if tag_obj == None:
+                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    exit(1)
+                tag_list.append(tag_id(self.nb, tag))
+            return tag_list
+        else:
+            return None
+
+    @property
+    def u_height(self):
+        if 'u_height' in self.info:
+            return self.info['u_height']
+        else:
+            return None

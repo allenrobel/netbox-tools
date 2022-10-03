@@ -115,6 +115,7 @@ prefixes:
 racks:
   rack_1:
     name: rack_1
+    comments: This is a comment for rack_1
     location: row-a
     site: mysite
     tags:

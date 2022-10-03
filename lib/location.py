@@ -11,17 +11,15 @@ class Location(object):
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['name', 'site']
-        self.validate_keys()
-        self.generate_args()
+        self.mandatory_keys_create_update = ['name', 'site']
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
+    def validate_keys_create_update(self):
+        for key in self.mandatory_keys_create_update:
             if key not in self.info:
-                print('Location.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                print('Location.validate_keys_create_update: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
-    def generate_args(self):
+    def generate_args_create_update(self):
         self.args['name'] = self.info['name']
         self.args['site'] = site_id(self.nb, self.info['site'])
         self.args['slug'] = create_slug(self.info['name'])
@@ -29,6 +27,14 @@ class Location(object):
             self.args['tags'] = list()
             for tag in self.info['tags']:
                 self.args['tags'].append(self.get_tag_id(tag))
+
+    def delete(self):
+        print('Location.delete: {}'.format(self.info['name']))
+        try:
+            self.location.delete()
+        except Exception as e:
+            print('Location.delete: WARNING. Unable to delete location {}.  Error was: {}'.format(self.info['name'], e))
+            return
 
     def create(self):
         print('Location.create: {}'.format(self.info['name']))
@@ -48,6 +54,8 @@ class Location(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_keys_create_update()
+        self.generate_args_create_update()
         if self.location == None:
             self.create()
         else:

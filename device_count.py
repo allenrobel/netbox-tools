@@ -113,22 +113,18 @@ def verify_site():
         exit(1)
 
 def get_device_count():
-    args = get_args()
     models = verify_model()
     roles = verify_role()
     site_ids = verify_site()
-    new_args = dict()
+    args = dict()
     try:
         if len(site_ids) != 0:
-            new_args['site_id'] = site_ids[cfg.site]
-            # print('get_device_count: site_ids: new_args {}'.format(new_args))
+            args['site_id'] = site_ids[cfg.site]
         if len(roles) != 0:
-            new_args['role'] = roles[cfg.role]
-            # print('get_device_count: role: new_args {}'.format(new_args))
+            args['role'] = roles[cfg.role]
         if len(models.keys()) != 0:
-            new_args['device_type_id'] = models[cfg.model]
-            # print('get_device_count: models: new_args {}'.format(new_args))
-        return nb.dcim.devices.count(**new_args)
+            args['device_type_id'] = models[cfg.model]
+        return nb.dcim.devices.count(**args)
     except Exception as e:
         print('Unable to get count: {}'.format(e))
 

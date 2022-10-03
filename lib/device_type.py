@@ -40,7 +40,7 @@ class DeviceType(object):
         try:
             self.device_type.delete()
         except Exception as e:
-            print('DeviceType.delete: Error. Unable to delete device_type {}.  Error was: {}'.format(self.model, e))
+            print('DeviceType.delete: WARNING. Unable to delete device_type {}.  Error was: {}'.format(self.model, e))
             return
 
     def create(self):

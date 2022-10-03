@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
 '''
 Name: device_print_filtered.py
-Summary: Print devices filtered by tags or model
+Summary: Print devices filtered by tags and/or model
 Description:
 
-If the --tags or --model arguments are not provided, print information for all devices
+If the --tags or --model arguments are not provided, print information for all devices.
 If the --tags argument is provided, print information for devices that match the boolean ANDed set of tags.
 If the --model argument is provided, print information for devices that match model number.
+If both --tags and --model arguments are provided, print information for devices that match model AND boolean ANDed set of tags.
 
 For example:
 
-   --tags foo,bar,baz
+   --tags foo,bar,baz --model N9K-C9336C-FX2
 
-Would match devices that contain all three tags foo, bar, and baz.
-
-Or:
-
-   --model N9K-C9336C-FX2
-
-Would match devices with model number N9K-C9336C-FX2
-
---tags and --model are mutually-exclusive
+Would match N9K-C9336C-FX2 that contain all three tags foo, bar, and baz.
 '''
 import argparse
 import pynetbox
@@ -36,7 +29,7 @@ ex_tags = '{} --tags deathstar,admin'.format(ex_prefix)
 ex_model = '{} --model N9K-C9336C-FX2'
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Filter devices by tag')
+         description='DESCRIPTION: Netbox: Print list of devices filtered by tag and/or model')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
@@ -64,7 +57,8 @@ def print_header():
         'serial',
         'primary_ip4',
         'ip4_id',
-        'status'))
+        'status',
+        'tags'))
     print(fmt.format(
         '-' * 9,
         '-' * 18,
@@ -72,7 +66,8 @@ def print_header():
         '-' * 12,
         '-' * 22,
         '-' * 6,
-        '-' * 10))
+        '-' * 10,
+        '-' * 15))
 
 def get_primary_ip(device):
     if device.primary_ip4 == None:
@@ -86,7 +81,14 @@ def get_primary_ip_id(device):
     else:
         return device.primary_ip4.id
 
+def get_tags(device):
+    tags = device.tags
+    if tags == None:
+        return ""
+    return ','.join([tag.name for tag in device.tags])
+
 def print_matches(matches):
+    print_header()
     for device_name in matches:
         if matches[device_name] == False:
             continue
@@ -98,45 +100,45 @@ def print_matches(matches):
             device.serial,
             get_primary_ip(device),
             get_primary_ip_id(device),
-            str(device.status)))
-
-def filtered_on_model(devices):
-    matches = dict()
-    for device in devices:
-        if device.device_type.model != cfg.model:
-            matches[device.name] = False
-        else:
-            matches[device.name] = device
-    print_matches(matches)
-
-def filtered_on_tag(devices):
-    tags = cfg.tags.split(',')
-    matches = dict()
-    for device in devices:
-        matches[device.name] = device
-        for tag in tags:
-            if tag not in [tag.name for tag in device.tags]:
-                matches[device.name] = False
-    print_matches(matches)
+            str(device.status),
+            get_tags(device)))
 
 def unfiltered(devices):
     matches = dict()
     for device in devices:
         matches[device.name] = device
-    print_matches(matches)
+    return matches
+def filtered_on_tag(matches):
+    user_tags = set(cfg.tags.split(','))
+    for device in matches:
+        if matches[device] == False:
+            continue
+        device_tag_objects = matches[device].tags
+        device_tags = set()
+        for device_tag_object in device_tag_objects:
+            device_tags.add(device_tag_object.name)
+        if user_tags.issubset(device_tags):
+            continue
+        matches[device] = False
+    return matches
+def filtered_on_model(matches):
+    for device in matches:
+        if matches[device] == False:
+            continue
+        if matches[device].device_type.model != cfg.model:
+            matches[device] = False
+    return matches
 
-fmt = '{:<9} {:<18} {:<18} {:<12} {:<22} {:<6} {:<10}'
+
+fmt = '{:<9} {:<18} {:<18} {:<12} {:<22} {:<6} {:<10} {:<15}'
 
 nb = netbox()
 devices = nb.dcim.devices.all()
 
-if cfg.tags != None and cfg.model != None:
-    print('exiting. --tags and --model are currently mutually-exclusive. Use one or the other, but not both. We\'ll fix this soon...')
-    exit(1)
-print_header()
+matches = unfiltered(devices)
 if cfg.tags != None:
-    filtered_on_tag(devices)
-elif cfg.model != None:
-    filtered_on_model(devices)
-else:
-    unfiltered(devices)
+    matches = filtered_on_tag(matches)
+if cfg.model != None:
+    matches = filtered_on_model(matches)
+
+print_matches(matches)

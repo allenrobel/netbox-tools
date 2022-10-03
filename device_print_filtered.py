@@ -103,9 +103,10 @@ def print_matches(matches):
 def filtered_on_model(devices):
     matches = dict()
     for device in devices:
-        matches[device.name] = device
         if device.device_type.model != cfg.model:
             matches[device.name] = False
+        else:
+            matches[device.name] = device
     print_matches(matches)
 
 def filtered_on_tag(devices):

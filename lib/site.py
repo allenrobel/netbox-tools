@@ -1,5 +1,5 @@
 from lib.common import tag_id
-from lib.common import create_slug
+from lib.common import create_slug, get_tag, get_tags
 
 class Site(object):
     def __init__(self, nb, info):
@@ -7,8 +7,7 @@ class Site(object):
         self.info = info
         self.args = dict()
         self.mandatory_keys = ['name']
-        self.validate_keys()
-        self.generate_args()
+        self.optional_keys = ['description', 'tags'] # FYI only.  Not used in this class.
 
     def validate_keys(self):
         for key in self.mandatory_keys:
@@ -25,15 +24,15 @@ class Site(object):
             self.args['tags'] = self.tags
         
     def delete(self):
-        if self.site == None:
-            print('exiting. Site {} does not exist in netbox.'.format(self.name))
-            exit(1)
         print('Site.delete: {}'.format(self.name))
+        if self.site == None:
+            print('Site.delete: Nothing to do. Site {} does not exist in netbox.'.format(self.name))
+            return
         try:
             self.site.delete()
         except Exception as e:
-            print('Site.delete: Exiting. Unable to delete site {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            print('Site.delete: WARNING. Unable to delete site {}.  Error was: {}'.format(self.name, e))
+            return
 
     def create(self):
         print('Site.create: {}'.format(self.name))
@@ -53,6 +52,8 @@ class Site(object):
             exit(1)
 
     def create_or_update(self):
+        self.validate_keys()
+        self.generate_args()
         if self.site == None:
             self.create()
         else:
@@ -82,6 +83,10 @@ class Site(object):
         if 'tags' in self.info:
             tag_list = list()
             for tag in self.info['tags']:
+                tag_obj = get_tag(self.nb, tag)
+                if tag_obj == None:
+                    print('Site.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    exit(1)
                 tag_list.append(tag_id(self.nb, tag))
             return tag_list
         else:

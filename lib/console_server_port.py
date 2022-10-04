@@ -3,7 +3,7 @@ Name: console_server_port.py
 Description: Create, update, delete operations on netbox /dcim/console-server-ports/ endpoint
 '''
 
-from lib.common import device_id
+from lib.common import device_id, get_tag, get_tags, tag_id
 
 class ConsoleServerPort(object):
     def __init__(self, nb, info):
@@ -31,6 +31,9 @@ class ConsoleServerPort(object):
         self.args['device'] = device_id(self.nb, self.device)
         if self.description != None:
             self.args['description'] = self.description
+        tags = self.tags
+        if tags != None:
+            self.args['tags'] = tags
 
     def delete(self):
         self.validate_delete_keys()
@@ -70,7 +73,21 @@ class ConsoleServerPort(object):
 
     @property
     def console_server_port_object(self):
-        return self.nb.dcim.console_server_ports.get(device=self.device, name=self.port)
+        try:
+            return self.nb.dcim.console_server_ports.get(device=self.device, name=self.port)
+        except Exception as e:
+            print('ConsoleServerPort: console_server_port_object: Exiting. dcim.console_server_ports.get() failed for device {} port {}.  Specific error was: {}'.format(
+                self.device,
+                self.port,
+                e))
+            exit(1)
+
+    @property
+    def description(self):
+        if 'description' in self.info:
+            return self.info['description']
+        else:
+            return None
 
     @property
     def device(self):
@@ -81,9 +98,15 @@ class ConsoleServerPort(object):
         return self.info['port']
 
     @property
-    def description(self):
-        if 'description' in self.info:
-            return self.info['description']
+    def tags(self):
+        if 'tags' in self.info:
+            tag_list = list()
+            for tag in self.info['tags']:
+                tag_obj = get_tag(self.nb, tag)
+                if tag_obj == None:
+                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    exit(1)
+                tag_list.append(tag_id(self.nb, tag))
+            return tag_list
         else:
             return None
-

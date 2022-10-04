@@ -1,30 +1,39 @@
 #!/usr/bin/env python3
 '''
-Name: interface_create_update.py
-Description: Netbox: Create or update an interface
+Name: console_server_port_create_update.py
+Description: Netbox: Create or update a console server port
 Example Usage:
-./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51
+./console_server_port_create_update.py --device ts_1 --port 2003 --description "a special port" --tags admin,infra
 '''
-our_version = 103
+our_version = 104
 import argparse
+import re
 
 from lib.common import netbox
 from lib.console_server_port import ConsoleServerPort
 
+help_description = 'Optional. Description of the console_server_port.'
 help_device = 'Device name to which the console_server_port (--port) will be added.'
 help_port = 'Console server port to create or update'
-help_description = 'Optional. Description of the console_server_port.'
+help_tags = 'Optional. Comma-separated (no spaces) list of tags to associate with the console server port'
 
 ex_prefix = ' Example: '
-ex_device = '{} --device leaf_1'.format(ex_prefix)
-ex_port = '{} --port'.format(ex_prefix)
 ex_description = '{} --description "this is a very special console server port"'.format(ex_prefix)
+ex_device = '{} --device ts_1'.format(ex_prefix)
+ex_port = '{} --port'.format(ex_prefix)
+ex_tags = '{} --tags admin,infra'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Netbox: Create or update a console server port')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 optional   = parser.add_argument_group(title='OPTIONAL SCRIPT ARGS')
+
+optional.add_argument('--description',
+                     dest='description',
+                     required=False,
+                     default=None,
+                     help=help_description + ex_description)
 
 mandatory.add_argument('--device',
                      dest='device',
@@ -36,11 +45,11 @@ mandatory.add_argument('--port',
                      required=True,
                      help=help_port + ex_port)
 
-optional.add_argument('--description',
-                     dest='description',
+optional.add_argument('--tags',
+                     dest='tags',
                      required=False,
                      default=None,
-                     help=help_description + ex_description)
+                     help=help_tags + ex_tags)
 
 parser.add_argument('--version',
                     action='version',
@@ -55,12 +64,15 @@ def get_args():
        port: name of the console port e.g. for Cisco terminal servers: 2005
     Optional keys:
         description: Free-form description for the console server port
+        tags: Python list of tags to associate with the console server port
     '''
     args = dict()
     args['device'] = cfg.device
     args['port'] = cfg.port
     if cfg.description != None:
         args['description'] = cfg.description
+    if cfg.tags != None:
+        args['tags'] = re.split(',', cfg.tags)
     return args
 
 nb= netbox()

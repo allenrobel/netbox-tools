@@ -27,6 +27,9 @@ def netbox():
 
 # console_server_port
 
+def get_console_server_ports(nb):
+    return nb.dcim.console_server_ports.all()
+
 def get_console_server_port(nb, device, port):
     '''
     Given netbox instance, device name, and port, return console_server_port object.

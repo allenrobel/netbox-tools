@@ -3,7 +3,7 @@ Name: role.py
 Description: Class for create and update operations on netbox device roles
 '''
 
-from lib.common import create_slug
+from lib.common import create_slug, get_tag, get_tags, tag_id
 from lib.colors import color_to_rgb
 
 class Role(object):
@@ -12,7 +12,7 @@ class Role(object):
         self.info = info
         self.args = dict()
         self.mandatory_keys = ['color', 'name']
-        self.optional_keys = ['description']
+        self.optional_keys = ['description', 'tags,'] # FYI only.  Not used in this class.
 
     def validate_keys(self):
         for key in self.mandatory_keys:
@@ -24,9 +24,10 @@ class Role(object):
         self.args['name'] = self.name
         self.args['color'] = self.rgb
         self.args['slug'] = create_slug(self.name)
-        for key in self.optional_keys:
-            if key in self.info:
-                self.args[key] = self.info[key]
+        if self.description != None:
+            self.args['description'] = self.description
+        if self.tags != None:
+            self.args['tags'] = self.tags
 
     def delete(self):
         if self.role == None:
@@ -67,7 +68,14 @@ class Role(object):
     @property
     def color(self):
         return self.info['color']
-    
+
+    @property
+    def description(self):
+        if 'description' in self.info:
+            return self.info['description']
+        else:
+            return None
+
     @property
     def name(self):
         return self.info['name']
@@ -88,36 +96,16 @@ class Role(object):
     def slug(self):
         return create_slug(self.name)
 
-# # device role
-
-# def get_device_role_args(info):
-#     mandatory_keys = ['color', 'name']
-#     for key in mandatory_keys:
-#         if key not in info:
-#             print('get_device_role_args: exiting. mandatory key {} not found in info {}'.format(key, info))
-#             exit(1)
-#     args = dict()
-#     args['color'] = color_to_rgb(info['color'])
-#     if 'description' in info:
-#         args['description'] = info['description']
-#     args['name'] = info['name']
-#     args['slug'] = create_slug(info['name'])
-#     return args
-
-# def update_device_role(info, role):
-#     print('update_device_role: {}'.format(info['name']))
-#     args = get_device_role_args(info)
-#     # print(dict(role))
-#     role.update(args)
-
-# def create_device_role(info):
-#     print('create_device_role: {}'.format(info['name']))
-#     args = get_device_role_args(info)
-#     nb.dcim.device_roles.create(args)
-
-# def create_or_update_device_role(info):
-#     role = nb.dcim.device_roles.get(name=info['name'])
-#     if role == None:
-#         create_device_role(info)
-#     else:
-#         update_device_role(info, role)
+    @property
+    def tags(self):
+        if 'tags' in self.info:
+            tag_list = list()
+            for tag in self.info['tags']:
+                tag_obj = get_tag(self.nb, tag)
+                if tag_obj == None:
+                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    exit(1)
+                tag_list.append(tag_id(self.nb, tag))
+            return tag_list
+        else:
+            return None

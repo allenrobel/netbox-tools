@@ -247,19 +247,26 @@ device_types:
 #
 # Optional keys
 #   description : free-form description
+#   tags: yaml list of tags. Tags must already be present in Netbox.
 device_roles:
   lab_gateway:
     name: lab_gateway
     color: gray
     description: lab mgmt vlan gateways
+    tags:
+      - infra
   lab_tor:
     name: lab_tor
     color: gray
     description: lab mgmt vlan L2 tor
+    tags:
+      - infra
   mgmt:
     name: mgmt
     color: gray
     description: top of rack L2 switches for management vlans
+    tags:
+      - infra
   na:
     name: na
     color: gray_light
@@ -271,6 +278,8 @@ device_roles:
   traffic_generator:
     name: traffic_generator
     color: purple
+    tags:
+      - tgen
   unknown:
     name: unknown
     color: gray_dark

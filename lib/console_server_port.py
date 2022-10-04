@@ -34,14 +34,14 @@ class ConsoleServerPort(object):
 
     def delete(self):
         self.validate_delete_keys()
-        if self.manufacturer == None:
+        if self.console_server_port_object == None:
             print('ConsoleServerPort.delete: Nothing to do. Device {} port {} does not exist in netbox.'.format(self.device, self.port))
             return
-        print('ConsoleServerPort.delete: {}'.format(self.name))
+        print('ConsoleServerPort.delete: device {} port {}'.format(self.device, self.port))
         try:
-            self.manufacturer.delete()
+            self.console_server_port_object.delete()
         except Exception as e:
-            print('ConsoleServerPort.delete: Error. Unable to delete device {} console_server_port {}. Error was: {}'.format(self.device, self.port, e))
+            print('ConsoleServerPort.delete: Error. Unable to delete device {} port {}. Error was: {}'.format(self.device, self.port, e))
             return
 
     def create(self):

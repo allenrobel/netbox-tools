@@ -14,8 +14,9 @@ class Interface(object):
         self.mandatory_create_update_keys = ['interface', 'device']
         self.mandatory_delete_keys = ['interface', 'device']
         # optional_keys is just FYI.  It's not referenced anywhere.
-        self.optional_keys = ['interface_type', 'mac_address', 'mgmt_only', 'interface_enabled']
+        self.optional_keys = ['description', 'interface_enabled', 'interface_mode', 'interface_type', 'mac_address', 'mgmt_only', 'mtu']
         self.default_interface_type = '1000base-t'
+        self.default_interface_mode = 'access' # options are access, tagged, tagged-all
         self.default_interface_enabled = True
         self.fix_deprecations()
 
@@ -44,6 +45,14 @@ class Interface(object):
         if self.args['device'] == None:
             print('Interface.generate_create_update_args: exiting. Device {} does not exist in netbox'.format(self.device))
             exit(1)
+        if self.description != None:
+            self.args['description'] = self.description
+        if self.untagged_vlan != None:
+            self.args['untagged_vlan'] = self.untagged_vlan
+        if self.interface_mode == None:
+            self.args['mode'] = self.default_interface_mode
+        else:
+            self.args['mode'] = self.interface_mode
         if self.interface_type == None:
             self.args['type'] = self.default_interface_type
         else:
@@ -58,6 +67,8 @@ class Interface(object):
             self.args['enabled'] = self.default_interface_enabled
         else:
             self.args['enabled'] = self.interface_enabled
+        if self.mtu != None:
+            self.args['mtu'] = self.mtu
 
     def delete(self):
         print('Interface.delete: {}'.format(self.interface))
@@ -97,6 +108,13 @@ class Interface(object):
             self.update()
 
     @property
+    def description(self):
+        if 'description' in self.info:
+            return self.info['description']
+        else:
+            return None
+
+    @property
     def device(self):
         return self.info['device']
 
@@ -122,6 +140,13 @@ class Interface(object):
         return self.interface_object.id
 
     @property
+    def interface_mode(self):
+        if 'interface_mode' in self.info:
+            return self.info['interface_mode']
+        else:
+            return None
+
+    @property
     def interface_type(self):
         if 'interface_type' in self.info:
             return self.info['interface_type']
@@ -139,5 +164,19 @@ class Interface(object):
     def mgmt_only(self):
         if 'mgmt_only' in self.info:
             return self.info['mgmt_only']
+        else:
+            return None
+
+    @property
+    def mtu(self):
+        if 'mtu' in self.info:
+            return self.info['mtu']
+        else:
+            return None
+
+    @property
+    def untagged_vlan(self):
+        if 'untagged_vlan' in self.info:
+            return self.info['untagged_vlan']
         else:
             return None

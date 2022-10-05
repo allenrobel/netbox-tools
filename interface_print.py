@@ -57,9 +57,9 @@ def print_detail(interface):
 
 def print_headers():
     print(fmt.format(   'id', 'device_name', 'interface', 'mac_address',       'type',    'enabled', 'mgmt_only'))
-    print(fmt.format('-' * 5,      '-' * 20,    '-' * 15,     '-' * 17,      '-' * 12,      '-' * 7,     '-' * 9))
+    print(fmt.format('-' * 5,      '-' * 20,    '-' * 15,     '-' * 17,      '-' * 15,      '-' * 7,     '-' * 9))
 
-fmt = '{:>5} {:<20} {:<15} {:<17} {:<12} {:<7} {:<9}'
+fmt = '{:>5} {:<20} {:<15} {:<17} {:<15} {:<7} {:<9}'
 
 nb = netbox()
 
@@ -68,4 +68,4 @@ if cfg.detail:
     print_detail(interface)
 else:
     print_headers()
-    print(fmt.format(interface.id, interface.device.name, interface.name, interface.mac_address, interface.type.value, interface.enabled, interface.mgmt_only))
+    print(fmt.format(interface.id, interface.device.name, interface.name, str(interface.mac_address), interface.type.value, str(interface.enabled), str(interface.mgmt_only)))

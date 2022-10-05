@@ -285,6 +285,46 @@ device_roles:
     color: gray_dark
     description: unknown role for device
 
+# Interfaces
+# Mandatory keys
+#   device: Name of the device that contains this interface
+#   interface: Name of the interface e.g. Ethernet1/1
+# Optional keys
+#   description: Free-form description for the Console Server Port
+#   interface_enabled: True or False.  If True, interface is enabled.  If False, interface is disabled.
+#   interface_mode: Mode of the interface.  Valid values: access, tagged, tagged-all
+#   interface_type: PHY type of the interface. Common values: 1000base-t, 10gbase-t, 1000base-x-sfp.  See Netbox docs for full list.
+#   mac_address: The mac address of the interface.
+#   mgmt_only: True or False. If True, the interface is used only for device management.
+#   mtu: Maximum transfer unit, in bytes, of the interface
+#   untagged_vlan: Vlan ID for access mode interfaces
+
+interfaces:
+  cvd_leaf_1_e_1_1:
+    device: cvd_leaf_1
+    interface: Ethernet1/1
+    interface_mode: access
+    interface_type: 10gbase-x-sfpp
+    mac_address: 00a3.8ebf.eaf6
+    untagged_vlan: 10
+
+# Console Server Ports
+# Mandatory keys
+#   device: Name of the device that contains this port
+#   port: Name of the port
+#
+# Optional keys
+#   description: Free-form description for the Console Server Port
+#   tags: A YAML list of tags to associate with the VlanGroup to enable filtering based on tag.
+
+console_server_ports:
+  ts_1_2003:
+    device: ts_1
+    port: 2003
+    description: bgw_3
+    tags:
+      - admin
+
 # Devices
 # Mandatory keys
 #   device: Name of the device
@@ -329,3 +369,20 @@ devices:
     tags:
       - infra
 
+# VlanGroup
+# Mandatory fields
+#   vlan_group: The vlan group name
+# Optional fields
+#   min_vid: Minimum vlan id for this VlanGroup
+#   max_vid: Maximum vlan id for this VlanGroup
+#   description: Free-form description for this VlanGroup
+#   tags: A YAML list of tags to associate with the VlanGroup to enable filtering based on tag.
+vlan_groups:
+  AdminServers:
+    vlan_group: AdminServers
+    min_vid: 2
+    max_vid: 16
+    description: Administration Servers
+    tags:
+      - admin
+      - infra

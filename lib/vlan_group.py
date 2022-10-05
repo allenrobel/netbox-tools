@@ -50,7 +50,7 @@ class VlanGroup(object):
         print('VlanGroup.update: {}'.format(self.vlan_group_name))
         self.args['id'] = self.vlan_group_id
         try:
-            self.site.update(self.args)
+            self.vlan_group_object.update(self.args)
         except Exception as e:
             print('VlanGroup.update: Exiting. Unable to update VlanGroup {}.  Error was: {}'.format(self.vlan_group_name, e))
             exit(1)
@@ -103,7 +103,7 @@ class VlanGroup(object):
             for tag in self.info['tags']:
                 tag_obj = get_tag(self.nb, tag)
                 if tag_obj == None:
-                    print('Site.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    print('VlanGroup.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
                     exit(1)
                 tag_list.append(tag_id(self.nb, tag))
             return tag_list

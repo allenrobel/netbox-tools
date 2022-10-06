@@ -175,6 +175,18 @@ def ip_address_id(nb, ip):
         print('common.ip_address_id: returning None. exception was: {}'.format(e))
         return None
 
+def netbox_id_untagged_vlan(nb, vid):
+    '''
+    Given netbox instance and vid (vlan id), return netbox id for vlan.
+    If vlan does not exist in netbox, return None
+    '''
+    try:
+        vlan_object = nb.ipam.vlans.get(vid=vid)
+        return vlan_object.id
+    except Exception as e:
+        print('common.netbox_id_untagged_vlan: returning None. exception was: {}'.format(e))
+        return None
+
 def vlan_group_id(nb, vlan_group_name):
     '''
     Given netbox instance and VlanGroup name, return vlan_group_id.

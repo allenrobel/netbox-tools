@@ -3,7 +3,7 @@ Name: interface.py
 Description: Create, update, delete operations on netbox interfaces
 '''
 
-from lib.common import device_id
+from lib.common import device_id, netbox_id_untagged_vlan
 
 class Interface(object):
     def __init__(self, nb, info):
@@ -14,7 +14,7 @@ class Interface(object):
         self.mandatory_create_update_keys = ['interface', 'device']
         self.mandatory_delete_keys = ['interface', 'device']
         # optional_keys is just FYI.  It's not referenced anywhere.
-        self.optional_keys = ['description', 'interface_enabled', 'interface_mode', 'interface_type', 'mac_address', 'mgmt_only', 'mtu']
+        self.optional_keys = ['description', 'interface_enabled', 'interface_mode', 'interface_type', 'mac_address', 'mgmt_only', 'mtu', 'untagged_vlan']
         self.default_interface_type = '1000base-t'
         self.default_interface_mode = 'access' # options are access, tagged, tagged-all
         self.default_interface_enabled = True
@@ -48,7 +48,7 @@ class Interface(object):
         if self.description != None:
             self.args['description'] = self.description
         if self.untagged_vlan != None:
-            self.args['untagged_vlan'] = self.untagged_vlan
+            self.args['untagged_vlan'] = netbox_id_untagged_vlan(self.nb, self.untagged_vlan)
         if self.interface_mode == None:
             self.args['mode'] = self.default_interface_mode
         else:

@@ -141,7 +141,6 @@ def interface_id(nb, device, interface):
         print('common.interface_id: returning None. exception was: {}'.format(e))
         return None
 
-
 # ip address
 def get_ip_address(nb, ip):
     '''
@@ -174,6 +173,18 @@ def ip_address_id(nb, ip):
         return ip_address.id
     except Exception as e:
         print('common.ip_address_id: returning None. exception was: {}'.format(e))
+        return None
+
+def vlan_group_id(nb, vlan_group_name):
+    '''
+    Given netbox instance and VlanGroup name, return vlan_group_id.
+    If vlan_group does not exist in netbox, return None
+    '''
+    try:
+        vlan_group_object = nb.ipam.vlan_groups.get(name=vlan_group_name)
+        return vlan_group_object.id
+    except Exception as e:
+        print('common.vlan_group_id: returning None. exception was: {}'.format(e))
         return None
 
 # location

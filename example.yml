@@ -386,3 +386,27 @@ vlan_groups:
     tags:
       - admin
       - infra
+
+# Vlans
+# Mandatory fields
+#   vlan_name: The vlan name
+#   vid: The vlan ID of the vlan
+# Optional fields
+#   description: Free-form description for the vlan
+#   group: The vlan_group the vlan belongs to.  Must already exist in Netbox. See vlan_groups above. Mutually-exclusive with site.
+#   role: The role the vlan serves
+#   site: The site that contains the vlan.  Mutually-exclusive with group.
+#   status: The status of the vlan. Valid values: active, reserved, deprecated
+#   tags: YAML list of tags to associate with the vlan
+#
+# NOTES:
+#   1. group and site are mutually-exclusive.  If one is set, the other cannot be set.
+vlans:
+  Vlan10:
+    vlan_name: WebServers
+    vid: 10
+    site: mysite
+  Vlan20:
+    vlan_name: DBServers
+    vid: 20
+    group: AdminServers

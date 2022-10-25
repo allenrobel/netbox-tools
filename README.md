@@ -194,5 +194,6 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [device_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/device_choices_print.py
 [device_count]: https://github.com/allenrobel/netbox-tools/blob/master/device_count.py
 [device_type_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_create_update.py
+[device_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_create_update_all.py
 [device_type_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_delete_all.py
 [entity_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/entity_create_update_all.py

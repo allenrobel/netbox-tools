@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
-Name: device_create_all.py
-Summary: Create all devices from info in YAML file.
+Name: entity_create_all.py
+Summary: Create/update all Netbox entities (console server ports, device types, etc) from information in a YAML file.
 Description:
 
 This script does the following, using the YAML contained in --yaml

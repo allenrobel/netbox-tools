@@ -164,10 +164,14 @@ Below is a complete list. (TODO add the other scripts...)
 
 Script                         | Description
 ------------                   | -----------
+[console_server_port_create_update_all] | Create or update a console server port from information in a YAML file
+[console_server_port_create_update] | Create or update a console server port using command line options
+[console_server_port_delete] | Delete console_server_port ``--port`` from netbox
+[console_server_ports_print] | Display information about all console server ports
 [device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
+[device_choices_print] | Display choices associated with Netbox endpoint dcim.devices
 [device_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
-
-[device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py
+[device_count] | Print the number of devices matching a given query
 
 ### Code of Conduct
 
@@ -179,5 +183,11 @@ GNU General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 
+[console_server_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_port_create_update_all.py
+[console_server_port_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_port_create_update.py
+[console_server_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_port_delete.py
+[console_server_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_ports_print.py
 [device_assign_primary_ip.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_assign_primary_ip.py
+[device_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/device_choices_print.py
+[device_count]: https://github.com/allenrobel/netbox-tools/blob/master/device_count.py
 [device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py

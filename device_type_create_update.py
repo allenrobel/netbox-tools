@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_type_create_update.py
-Description: Create or update a Netbox device type.
+Description: Create or update a Netbox device type from command line options
 '''
 our_version = 102
 import argparse

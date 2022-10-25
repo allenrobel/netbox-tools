@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_choices_print.py
-Description: print choices associated with dcim.devices
+Description: Display choices associated with Netbox endpoint dcim.devices
 '''
 import pynetbox
 from lib.common import netbox

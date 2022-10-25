@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_type_create_update_all.py
-Description: Create or update device types in Netbox from information in a YAML file.
+Description: Create/update device types from information in a YAML file
 '''
 our_version = 101
 import argparse

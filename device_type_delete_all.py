@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_type_delete_all.py
-Summary: Delete all device types contained in the YAML file pointed to with --yaml
+Summary: Delete all device types contained in the YAML file ``--yaml``
 
 Be careful!  This will not ask for confirmation. 
 

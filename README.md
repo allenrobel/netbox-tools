@@ -165,7 +165,7 @@ Below is a complete list. (TODO add the other scripts...)
 Script                         | Description
 ------------                   | -----------
 [device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
-[device_create__update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
+[device_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
 
 [device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py
 
@@ -180,4 +180,4 @@ GNU General Public License v3.0 or later.
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 
 [device_assign_primary_ip.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_assign_primary_ip.py
-[device_create__update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create__update_all.py
+[device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py

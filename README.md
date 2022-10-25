@@ -2,6 +2,10 @@
 
 # netbox-tools
 
+This repo contains python classes and scripts that implement CRUD operations on Netbox using the excellent [pynetbox](https://github.com/netbox-community/pynetbox) library.
+
+Below, you'll find a quick-start setup guide and listing of all the scripts and what they do.
+
 ## News
 
 Recent news about changes that may affect you.
@@ -9,10 +13,6 @@ Recent news about changes that may affect you.
 1. 2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/device.py``, ``lib/interface.py``, ``lib/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
 
 ## Getting started
-
-This repo contains python classes and scripts that implement CRUD operations on Netbox using the excellent [pynetbox](https://github.com/netbox-community/pynetbox) library.
-
-Below, you'll find a quick-start setup guide and listing of all the scripts and what they do.
 
 ## To clone this repo
 
@@ -164,8 +164,8 @@ Below is a complete list. (TODO add the other scripts...)
 
 Script                         | Description
 ------------                   | -----------
+[device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
 [device_create__update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
-
 
 [device_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create_update_all.py
 
@@ -178,3 +178,6 @@ This repository follows the Contributor Covenant [Code of Conduct](https://githu
 GNU General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
+
+[device_assign_primary_ip.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_assign_primary_ip.py
+[device_create__update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_create__update_all.py

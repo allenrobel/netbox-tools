@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 '''
-Name: assign_primary_ip_to_device.py
+Name: device_assign_primary_ip.py
 Description: Assign an ip address to a device and make this address the primary ip for the device
 
 Example Usage
-./assign_primary_ip_to_device.py --device bgw_1 --ipv4 192.168.1.6/24 --status active
+./device_assign_primary_ip.py --device bgw_1 --ipv4 192.168.1.6/24 --status active
 '''
-our_version = 100
-import pynetbox
+our_version = 101
 import argparse
-from lib.common import get_device, interface_id, ip_address_id, netbox
+from lib.common import interface_id, ip_address_id, netbox
 from lib.device import initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
 
 from lib.credentials import NetboxCredentials

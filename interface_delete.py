@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: interface_delete.py
-Description: Delete interface --interface from netbox
+Description: Delete interface ``--interface`` from netbox
 '''
 our_version = 100
 import argparse
@@ -16,7 +16,7 @@ ex_prefix = ' Example: '
 ex_device = '{} --device leaf_3'.format(ex_prefix)
 ex_interface = '{} --interface mgmt0'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete an interface')
+parser = argparse.ArgumentParser(description='DESCRIPTION: Delete interface --interface from netbox')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

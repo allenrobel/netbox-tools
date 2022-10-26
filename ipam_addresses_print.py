@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ipam_addresses_print.py
-Description: Print all ip addresses
+Description: Display all ip addresses
 '''
 from lib.common import netbox
 

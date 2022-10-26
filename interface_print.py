@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 '''
 Name: interface_print.py
-Description: Print information about an interface
+Description: Display interface information for ``--device`` ``--interface``
 '''
 our_version = 100
 import argparse
-import json # json provides better output than pprint, IMHO...
+import json
 from lib.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about device.'

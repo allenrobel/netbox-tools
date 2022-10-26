@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
-Name: roles_create_update.py
-Description: Create or update the Netbox device roles described in YAML file --yaml
+Name: role_create_update_all.py
+Description: Create/update device roles defined in ``--yaml``
 
 If the roles already exist in netbox, they will be updated with the current information in the YAML file.
 If the roles do not already exist in netbox, they will be created

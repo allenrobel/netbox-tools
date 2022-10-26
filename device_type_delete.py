@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_type_delete.py
-Description: Delete device_type from netbox
+Description: Delete device_type ``--model`` from netbox
 '''
 our_version = 100
 import argparse

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ip_prefix_delete.py
-Summary: Delete ip prefix
-Description: Delete ip prefix --prefix from netbox
+Description: Delete ip prefix ``--prefix`` from netbox
 '''
 our_version = 100
 import argparse
@@ -15,7 +14,7 @@ help_prefix = 'IP prefix to delete. Specify with format A.B.C.D/E'
 ex_pfx = ' Example: '
 ex_prefix = '{} --prefix 192.168.0.0/24'.format(ex_pfx)
 
-parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a prefix')
+parser = argparse.ArgumentParser(description='DESCRIPTION: Delete ip prefix')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

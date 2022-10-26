@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: role_create_update.py
-Description: Create or update a Netbox role.
+Description: Create/update device role using command line options ``--color``, ``--description``, ``--role``, ``--tags``
 Example Usage:
 
 ./role_create_update.py --role leaf --color green_dark --description "leaf switches" --tags ecmp_16,500w

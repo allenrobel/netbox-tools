@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 '''
 Name: location_delete_all.py
-Summary: Delete all locations contained in the YAML file pointed to with --yaml
+Description: Delete all locations defined in ``--yaml``
 
-Be careful!  This will not ask for confirmation. 
-
+Be careful!  This will not ask for confirmation.
 '''
 our_version = 100
 import argparse

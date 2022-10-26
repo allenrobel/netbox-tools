@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: rack_create_update.py
-Description: Create or update a Netbox rack.
+Description: Create/update using command line options ``--comments``, ``--location``, ``--rack``, ``--site``, ``--tags``, ``--u_height``
 Example Usage:
 
 ./rack_create_update.py --rack A001 --location row-a --site volcano --u_height 48 --comments "a comment" --tags infra,admin
@@ -12,8 +12,8 @@ from lib.common import netbox, load_yaml
 from lib.rack import Rack
 import re
 
-help_location = 'Location of --rack'
 help_comments = 'Free-form comment for --rack'
+help_location = 'Location of --rack'
 help_rack = 'Rack name'
 help_site = 'Site containing --rack'
 help_tags = 'Comma-separated list of tags (no spaces) to apply to this rack. All tags must already exist in Netbox.'
@@ -26,9 +26,9 @@ ex_rack = '{} --rack C004'.format(ex_prefix)
 ex_site = '{} --site mysite'.format(ex_prefix)
 ex_tags = '{} --tags admin,infra'.format(ex_prefix)
 ex_u_height = '{} --u_height 48'.format(ex_prefix)
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Create or update a Netbox rack')
 
+parser = argparse.ArgumentParser(
+         description='DESCRIPTION: Create/update a rack using command line options')
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 optional   = parser.add_argument_group(title='OPTIONAL SCRIPT ARGS')
 

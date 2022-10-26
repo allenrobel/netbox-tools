@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: role_print.py
-Description: Print information about a device role
+Description: Display information about device role ``--role``
 '''
 our_version = 101
 import argparse

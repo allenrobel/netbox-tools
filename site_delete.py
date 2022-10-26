@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: site_delete.py
-Description: Delete site --site from netbox
+Description: Delete site ``--site``
 '''
 our_version = 101
 import argparse

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: rack_print.py
-Description: Display information about a rack
+Description: Display information about ``--rack``
 '''
 our_version = 101
 import argparse

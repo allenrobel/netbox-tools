@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: site_print.py
-Description: Print information about a site
+Description: Display information about ``--site``
 '''
 our_version = 101
 import argparse

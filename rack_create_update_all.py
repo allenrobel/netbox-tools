@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: rack_create_update_all.py
-Description: Create or update racks in Netbox from information in a YAML file.
+Description: Create/update racks defined in ``--yaml``
 '''
 our_version = 100
 import argparse

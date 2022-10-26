@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ip_prefix_create_update.py
-Description: Create or update an ip prefix in netbox
+Description: Create/update an ip prefix using command line options
 '''
 our_version = 101
 import argparse

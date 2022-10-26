@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: rack_delete.py
-Description: Delete rack --rack from netbox
+Description: Delete rack ``--rack``
 '''
 our_version = 100
 import argparse

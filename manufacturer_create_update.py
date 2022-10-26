@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: manufacturer_create_update.py
-Description: Create or update a Netbox manufacturer.
+Description: Create/update manufacturer ``--manufacturer``
 '''
 our_version = 100
 import argparse

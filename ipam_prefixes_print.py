@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ipam_prefixes_print.py
-Description: print all ip prefixes
+Description: Display all ip prefixes
 '''
 from lib.common import netbox
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
-Name: role_delete.py
-Description: Delete manufacturer --manufacturer from netbox
+Name: manufacturer_delete.py
+Description: Delete manufacturer ``--manufacturer``
 '''
 our_version = 100
 import argparse

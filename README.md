@@ -168,13 +168,47 @@ Script                         | Description
 [console_server_port_create_update] | Create/update a console server port using command line options
 [console_server_port_delete] | Delete console_server_port ``--port`` from netbox
 [console_server_ports_print] | Display information about all console server ports
+[credentials_example] | Demonstrates usage for the netbox credentials library in this repo
 [device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
 [device_choices_print] | Display choices associated with Netbox endpoint dcim.devices
 [device_count] | Print the number of devices matching a given query
 [device_type_create_update] | Create/update a Netbox device type using command line options
 [device_type_create_update_all] | Create/update device types from information in a YAML file
 [device_type_delete_all] | Delete all device types contained in the YAML file ``--yaml``
+[device_type_delete] | Delete device_type ``--model`` from netbox
+[device_type_print] | Display information about a device type
+[device_types_print] | Display summary information about all device types
 [entity_create_update_all.py] | Create/update all Netbox entities (console server ports, device types, etc) from information in a YAML file
+[interface_create_update] | Create/update an interface using command line options
+[interface_delete] | Delete interface ``--interface`` from netbox
+[interface_print] | Display interface information for ``--device`` ``--interface`
+[interfaces_print] | Display information about all interfaces
+[ip_choices_print] | Display choices associated with endpoint ipam.ip_addresses
+[ip_prefix_create_update_all] | Create/update all ip prefixes defined in ``--yaml``
+[ip_prefix_create_update] | Create/update an ip prefix using command line options
+[ip_prefix_delete] | Delete ip prefix ``--prefix`` from netbox
+[ipam_addresses_print] | Display all ip addresses
+[ipam_prefixes_print] | Display all ip prefixes
+[location_create_update_all] | Create/update locations defined in ``--yaml``.
+[location_delete_all] | Delete all locations defined in ``--yaml``
+[location_delete] | Delete location ``--location`` from netbox
+[manufacturer_create_update_all] | Create/update manufacturers defined in ``--yaml``
+[manufacturer_create_update] | Create/update manufacturer ``--manufacturer``
+[manufacturer_delete] | Delete manufacturer ``--manufacturer``
+[rack_create_update_all] | Create/update racks defined in ``--yaml``
+[rack_create_update] | Create/update using command line options ``--comments``, ``--location``, ``--rack``, ``--site``, ``--tags``, ``--u_height``
+[rack_delete] | Delete rack ``--rack``
+[rack_print] | Display information about ``--rack``
+[racks_print] | Display information about all racks
+[role_create_update_all] | Create/update device roles defined in ``--yaml``
+[role_create_update] | Create/update device role using command line options ``--color``, ``--description``, ``--role``, ``--tags``
+[role_delete] | Delete role ``--role``
+[role_print] | Display information about device role ``--role``
+[roles_print] | Display information about all device roles
+[site_delete] | Delete site ``--site``
+[site_print] | Display information about ``--site``
+[sites_print] | Display information about all sites
+
 
 ### Code of Conduct
 
@@ -190,10 +224,43 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [console_server_port_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_port_create_update.py
 [console_server_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_port_delete.py
 [console_server_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/console_server_ports_print.py
+[credentials_example]: https://github.com/allenrobel/netbox-tools/blob/master/credentials_example.py
 [device_assign_primary_ip.py]: https://github.com/allenrobel/netbox-tools/blob/master/device_assign_primary_ip.py
 [device_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/device_choices_print.py
 [device_count]: https://github.com/allenrobel/netbox-tools/blob/master/device_count.py
 [device_type_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_create_update.py
 [device_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_create_update_all.py
 [device_type_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/device_type_delete_all.py
+[device_type_delete]:  https://github.com/allenrobel/netbox-tools/blob/master/device_type_delete.py
+[device_type_print]:  https://github.com/allenrobel/netbox-tools/blob/master/device_type_print.py
+[device_types_print]:  https://github.com/allenrobel/netbox-tools/blob/master/device_types_print.py
 [entity_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/entity_create_update_all.py
+[interface_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/interface_create_update.py
+[interface_delete]: https://github.com/allenrobel/netbox-tools/blob/master/interface_delete.py
+[interface_print]: https://github.com/allenrobel/netbox-tools/blob/master/interface_print.py
+[interfaces_print]: https://github.com/allenrobel/netbox-tools/blob/master/interfaces_print.py
+[ip_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/ip_choices_print.py
+[ip_prefix_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/ip_prefix_create_update_all.py
+[ip_prefix_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/ip_prefix_create_update.py
+[ip_prefix_delete]: https://github.com/allenrobel/netbox-tools/blob/master/ip_prefix_delete.py
+[ipam_addresses_print]: https://github.com/allenrobel/netbox-tools/blob/master/ipam_addresses_print.py
+[ipam_prefixes_print]: https://github.com/allenrobel/netbox-tools/blob/master/ipam_prefixes_print.py
+[location_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/location_create_update_all.py
+[location_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/location_delete_all.py
+[location_delete]: https://github.com/allenrobel/netbox-tools/blob/master/location_delete.py
+[manufacturer_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/manufacturer_create_update_all.py
+[manufacturer_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/manufacturer_create_update.py
+[manufacturer_delete]: https://github.com/allenrobel/netbox-tools/blob/master/manufacturer_delete.py
+[rack_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/rack_create_update_all.py
+[rack_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/rack_create_update.py
+[rack_delete]: https://github.com/allenrobel/netbox-tools/blob/master/rack_delete.py
+[rack_print]: https://github.com/allenrobel/netbox-tools/blob/master/rack_print.py
+[racks_print]: https://github.com/allenrobel/netbox-tools/blob/master/racks_print.py
+[role_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/role_create_update_all.py
+[role_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/role_create_update.py
+[role_delete]: https://github.com/allenrobel/netbox-tools/blob/master/role_delete.py
+[role_print]: https://github.com/allenrobel/netbox-tools/blob/master/role_print.py
+[roles_print]: https://github.com/allenrobel/netbox-tools/blob/master/roles_print.py
+[site_delete]: https://github.com/allenrobel/netbox-tools/blob/master/site_delete.py
+[site_print]: https://github.com/allenrobel/netbox-tools/blob/master/site_print.py
+[sites_print]: https://github.com/allenrobel/netbox-tools/blob/master/sites_print.py

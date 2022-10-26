@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: location_delete.py
-Description: Delete location --location from netbox
+Description: Delete location ``--location`` from netbox
 '''
 our_version = 100
 import argparse
@@ -14,7 +14,7 @@ help_location = 'Name of the location to delete.'
 ex_prefix = ' Example: '
 ex_location = '{} --location mylocation'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a location')
+parser = argparse.ArgumentParser(description='DESCRIPTION: Delete location --location from netbox')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

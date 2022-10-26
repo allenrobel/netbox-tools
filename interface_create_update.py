@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: interface_create_update.py
-Description: Netbox: Create or update an interface
+Description: Create/update an interface
 Example Usage:
 ./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51 --description "My interface"
 '''

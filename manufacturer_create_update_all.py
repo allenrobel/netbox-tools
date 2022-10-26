@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: manufacturer_create_update_all.py
-Description: Create or update manufacturers in Netbox from information in a YAML file.
+Description: Create/update manufacturers defined in ``--yaml``
 '''
 our_version = 100
 import argparse

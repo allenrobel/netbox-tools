@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_types_print.py
-Description: Print summary information about all device types
+Description: Display summary information about all device types
 '''
 our_version = 101
 import argparse

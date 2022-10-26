@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ip_prefix_create_update_all.py
-Description: Create or update all ip prefixes defined in --yaml
+Description: Create/update all ip prefixes defined in ``--yaml``
 '''
 our_version = 101
 import argparse

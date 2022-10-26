@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 '''
 Name: sites_print.py
-Description: Print information about all sites
+Description: Display information about all sites
 '''
 our_version = 101
 import argparse
 from lib.common import netbox
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information about all sites')
+         description='DESCRIPTION: Display information about all sites')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

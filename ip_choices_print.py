@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: ip_choices_print.py
-Description: print choices associated with ipam.ip_addresses
+Description: Display choices associated with endpoint ipam.ip_addresses
 '''
 from lib.common import netbox
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: location_create_update_all.py
-Description: Create or update locations in Netbox from information in a YAML file.
+Description: Create/update locations defined in ``--yaml``.
 '''
 our_version = 100
 import argparse

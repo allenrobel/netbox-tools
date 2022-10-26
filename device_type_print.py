@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: device_type_print.py
-Description: Print information about a Netbox device model.
+Description: Display information about a device type
 '''
 our_version = 101
 import argparse

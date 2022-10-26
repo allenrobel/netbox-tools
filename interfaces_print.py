@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: interfaces_print.py
-Description: Print information about all interfaces
+Description: Display information about all interfaces
 '''
 import argparse
 

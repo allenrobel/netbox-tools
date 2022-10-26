@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: role_delete.py
-Description: Delete role --role from netbox
+Description: Delete role ``--role``
 '''
 our_version = 100
 import argparse

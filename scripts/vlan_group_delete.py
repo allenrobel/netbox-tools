@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_group_delete.py
-Description: Delete vlan_group --vlan_group from netbox
+Description: Delete vlan_group ``--vlan_group``
 '''
 our_version = 101
 import argparse

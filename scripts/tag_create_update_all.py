@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: tag_create_update_all.py
-Description: Create or update tags in Netbox from information in a YAML file.
+Description: Create/update tags defined in ``--yaml``
 '''
 our_version = 100
 import argparse

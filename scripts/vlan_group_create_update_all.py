@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_group_create_update_all.py
-Description: Create or update vlan_groups in Netbox from information in a YAML file.
+Description: Create/update vlan_groups defined in ``--yaml``
 '''
 our_version = 100
 import argparse

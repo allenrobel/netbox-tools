@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: tag_delete.py
-Description: Delete tag --tag from netbox
+Description: Delete tag ``--tag``
 '''
 our_version = 103
 import argparse

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_group_print.py
-Description: Display information about a vlan_group
+Description: Display information about vlan_group ``--vlan_group``
 '''
 our_version = 101
 import argparse

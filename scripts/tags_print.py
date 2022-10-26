@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: tags_print.py
-Description: Print information about all tags
+Description: Display information about all tags
 '''
 our_version = 101
 import argparse
@@ -10,7 +10,7 @@ from lib.colors import color
 from lib.common import netbox
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information about all tags')
+         description='DESCRIPTION: Display information about all tags')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

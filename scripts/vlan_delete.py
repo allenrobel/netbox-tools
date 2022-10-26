@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_delete.py
-Description: Delete vlan --vlan from netbox
+Description: Delete vlan ``--vlan``
 '''
 our_version = 100
 import argparse

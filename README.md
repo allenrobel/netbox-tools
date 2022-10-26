@@ -208,6 +208,15 @@ Script                         | Description
 [site_delete] | Delete site ``--site``
 [site_print] | Display information about ``--site``
 [sites_print] | Display information about all sites
+[tag_create_update_all] | Create/update tags defined in ``--yaml``
+[tag_delete] | Delete tag ``--tag``
+[tags_print] | Display information about all tags
+[vlan_create_update_all] | Create/update vlans defined in ``--yaml``
+[vlan_delete] | Delete vlan ``--vlan``
+[vlan_group_create_update_all] | Create/update vlan_groups defined in ``--yaml``
+[vlan_group_create_update] | Create/update a vlan_group with command line options ``--description``, ``--max_vid``, ``--min_vid``, ``--tags``, ``--vlan_group``
+[vlan_group_delete] | Delete vlan_group ``--vlan_group``
+[vlan_group_print] | Display information about vlan_group ``--vlan_group``
 
 
 ### Code of Conduct
@@ -264,3 +273,12 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [site_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/site_delete.py
 [site_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/site_print.py
 [sites_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/sites_print.py
+[tag_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tag_create_update_all.py
+[tag_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tag_delete.py
+[tags_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tags_print.py
+[vlan_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_create_update_all.py
+[vlan_delete]:  https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_delete.py
+[vlan_group_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_create_update_all.py
+[vlan_group_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_create_update.py
+[vlan_group_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_delete.py
+[vlan_group_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_print.py

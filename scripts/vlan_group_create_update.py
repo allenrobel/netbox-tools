@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_group_create_update.py
-Description: Create or update a Netbox vlan_group.
+Description: Create/update a vlan_group with command line options ``--description``, ``--max_vid``, ``--min_vid``, ``--tags``, ``--vlan_group``
 Example Usage:
 
 ./vlan_group_create_update.py --vlan_group AdminServers --min_vid 1 --max_vid 15 --description "Admin Server Vlans" --tags server,admin
@@ -26,7 +26,7 @@ ex_min_vid = '{} --min_vid 2'.format(ex_prefix)
 ex_tags = '{} --tags admin,infra'.format(ex_prefix)
 ex_vlan_group = '{} --vlan_group AdminServers'.format(ex_prefix)
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Create or update a Netbox VlanGroup')
+         description='DESCRIPTION: Create/update a vlan_group with command line options')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 optional   = parser.add_argument_group(title='OPTIONAL SCRIPT ARGS')

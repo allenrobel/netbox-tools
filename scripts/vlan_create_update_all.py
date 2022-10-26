@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: vlan_create_update_all.py
-Description: Create or update vlans in Netbox from information in a YAML file.
+Description: Create/update vlans defined in ``--yaml``
 '''
 our_version = 100
 import argparse
@@ -14,7 +14,7 @@ ex_prefix     = 'Example: '
 ex_yaml = '{} --yaml ./vlans.yml'.format(ex_prefix)
 
 parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Create or update vlans in Netbox from information in a YAML file')
+         description='DESCRIPTION: Create/update vlans in Netbox from information in a YAML file')
 
 mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
 default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

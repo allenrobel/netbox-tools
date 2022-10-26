@@ -158,7 +158,7 @@ The first script you should look at is:
 
 Script                        | Description
 ------------                  | -----------
-[device_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
+[entity_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
 
 Below is a complete list. (TODO add the other scripts...)
 

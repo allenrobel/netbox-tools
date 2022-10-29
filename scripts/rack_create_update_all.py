@@ -3,10 +3,10 @@
 Name: rack_create_update_all.py
 Description: Create/update racks defined in ``--yaml``
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.rack import Rack
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.rack import Rack
 
 help_yaml = 'YAML file containing device type information.'
 

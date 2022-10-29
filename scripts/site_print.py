@@ -3,10 +3,10 @@
 Name: site_print.py
 Description: Display information about ``--site``
 '''
-our_version = 101
+our_version = 102
 import argparse
 import json
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about role.'
 help_site = 'Retrieve information for site'

@@ -3,11 +3,11 @@
 Name: location_delete.py
 Description: Delete location ``--location`` from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.location import Location
+from netbox_tools.common import netbox
+from netbox_tools.location import Location
 
 help_location = 'Name of the location to delete.'
 

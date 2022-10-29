@@ -3,8 +3,8 @@ Name: location.py
 Description: Class for create and update operations on netbox location
 '''
 
-from lib.common import create_slug
-from lib.common import site_id
+from netbox_tools.common import create_slug
+from netbox_tools.common import site_id
 
 class Location(object):
     def __init__(self, nb, info):

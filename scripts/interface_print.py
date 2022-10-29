@@ -3,10 +3,10 @@
 Name: interface_print.py
 Description: Display interface information for ``--device`` ``--interface``
 '''
-our_version = 100
+our_version = 101
 import argparse
 import json
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about device.'
 help_device = 'Name of the device on which interface resides.'

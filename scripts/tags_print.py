@@ -3,11 +3,11 @@
 Name: tags_print.py
 Description: Display information about all tags
 '''
-our_version = 101
+our_version = 102
 import argparse
 
-from lib.colors import color
-from lib.common import netbox
+from netbox_tools.colors import color
+from netbox_tools.common import netbox
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Display information about all tags')

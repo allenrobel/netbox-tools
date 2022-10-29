@@ -3,9 +3,9 @@
 Name: device_types_print.py
 Description: Display summary information about all device types
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Print summary information about all device types')

@@ -3,11 +3,11 @@
 Name: device_print.py
 Description: Print information about a device
 '''
-our_version = 100
+our_version = 101
 import argparse
 import json
 import pynetbox
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_name = 'Name of device to retrieve.'
 help_detail = 'Optional. If present, print detailed info about device.'

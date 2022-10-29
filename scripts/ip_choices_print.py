@@ -3,7 +3,7 @@
 Name: ip_choices_print.py
 Description: Display choices associated with endpoint ipam.ip_addresses
 '''
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 def print_header():
     print(fmt.format(

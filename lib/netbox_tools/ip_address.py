@@ -3,8 +3,8 @@ Name: ip_address.py
 Description: Class for create and update operations on netbox ip_addresss
 '''
 
-from lib.common import device_id, get_device
-from lib.common import interface_id
+from netbox_tools.common import device_id, get_device
+from netbox_tools.common import interface_id
 
 class IpAddress(object):
     def __init__(self, nb, info):

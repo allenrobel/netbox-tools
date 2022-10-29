@@ -6,12 +6,12 @@ Description: Assign an ip address to a device and make this address the primary 
 Example Usage
 ./device_assign_primary_ip.py --device bgw_1 --ipv4 192.168.1.6/24 --status active
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import interface_id, ip_address_id, netbox
-from lib.device import initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
+from netbox_tools.common import interface_id, ip_address_id, netbox
+from netbox_tools.device import initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
 
-from lib.credentials import NetboxCredentials
+from netbox_tools.credentials import NetboxCredentials
 
 help_device = 'Device name to which the interface is bound.'
 help_interface = 'Name of the interface to which ipv4 address will be bound.'

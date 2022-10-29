@@ -3,10 +3,10 @@
 Name: console_server_port_create_update_all.py
 Description: Create or update operations on Netbox endpoint /dcim/console-server-ports/ from information in a YAML file.
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.console_server_port import ConsoleServerPort
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.console_server_port import ConsoleServerPort
 
 help_yaml = 'YAML file containing console_server_ports information.'
 

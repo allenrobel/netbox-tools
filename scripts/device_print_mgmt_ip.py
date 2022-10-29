@@ -11,11 +11,11 @@ SCRIPT="${HOME}/netbox-tools/device_print_mgmt_ip.py"
 ssh admin@`${SCRIPT} --device $1`
 
 '''
-our_version = 100
+our_version = 101
 import argparse
 import json
 import pynetbox
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_device = 'Name of device for which ipv4 address is to be printed.'
 

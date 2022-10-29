@@ -3,11 +3,11 @@
 Name: tag_delete.py
 Description: Delete tag ``--tag``
 '''
-our_version = 103
+our_version = 104
 import argparse
 
-from lib.common import netbox
-from lib.tag import Tag
+from netbox_tools.common import netbox
+from netbox_tools.tag import Tag
 
 help_tag = 'Name of the tag to delete.'
 

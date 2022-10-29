@@ -3,10 +3,10 @@
 Name: device_type_print.py
 Description: Display information about a device type
 '''
-our_version = 101
+our_version = 102
 import argparse
 import json
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about the device_type (aka model).'
 help_model = 'Retrieve and display information for model.'

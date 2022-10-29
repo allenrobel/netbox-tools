@@ -10,7 +10,9 @@ Below, you'll find a quick-start setup guide and listing of all the scripts and 
 
 Recent news about changes that may affect you.
 
-1. 2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/device.py``, ``lib/interface.py``, ``lib/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
+1. 2022-10-08 BREAKING CHANGE: The library location has changed.  Due to conflicts with libraries in other namespaces, we've moved the libraries under ./lib/netbox_tools/ and changed the imports to ``from netbox_tools.<library> import foo``.  We've also updated the Getting Started section of this README below with suggested PYTHONPATH addition.
+
+2. 2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/netbox_tools/device.py``, ``lib/netbox_tools/interface.py``, ``lib/netbox_tools/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
 
 ## Getting started
 
@@ -42,21 +44,21 @@ pip install ansible
 
 netbox-tools uses a python script (netbox_config.py) to load a config file (config.yml) that currently just points your ansible vault file so that the various scripts in this repo have a standard way of finding and reading this file.
 
-1. Edit ./lib/config/netbox_config.py
+1. Edit ./lib/netbox_tools/config/netbox_config.py
 
-In this file, edit the line that starts with ``config_file`` and change config_file to point to config.yml (it's also located in lib/config, but you can move it somewhere else if you'd like):
+In this file, edit the line that starts with ``config_file`` and change config_file to point to config.yml (it's also located in lib/netbox_tools/config, but you can move it somewhere else if you'd like):
 
 ```python
 # EDIT THIS LINE TO POINT TO YOUR CONFIG FILE
-config_file = '/home/myaccount/netbox-tools/lib/config/config.yml'
+config_file = '/home/myaccount/netbox-tools/lib/netbox_tools/config/config.yml'
 ```
 
-2. Edit ./lib/config/config.yml
+2. Edit ./lib/netbox_tools/config/config.yml
 
 Among other things, config.yml points to your Ansible vault with the line below (in this case, it points to an Ansible vault file named ``secrets``).  Edit this to point to your Ansible vault file.  If you don't have a vault file, we're going to create one in the next step.  There are a couple other options in this file related to SSL certificates which we don't cover here, but which are described in the comments in this file.  If you encounter any urllib3 errors related to SSL certificates, have a look here and play with these options.
 
 ```yaml
-vault: '/home/myaccount/netbox-tools/lib/config/secrets'
+vault: '/home/myaccount/netbox-tools/lib/netbox_tools/config/secrets'
 ```
 
 3. Create an Ansible vault file.
@@ -80,11 +82,11 @@ Where:
 url: https://mynetbox.foo.com:8000
 ```
 
-If you care about security, then you'll want to encrypt these.  As follows (replacing ``/home/myaccount/netbox-tools/lib/config/secrets``, with the location you specified in step 2 above)
+If you care about security, then you'll want to encrypt these.  As follows (replacing ``/home/myaccount/netbox-tools/lib/netbox_tools/config/secrets``, with the location you specified in step 2 above)
 
 ```bash
-ansible-vault encrypt_string 'mytoken' --name 'token' >> /home/myaccount/netbox-tools/lib/config/secrets
-ansible-vault encrypt_string 'myurl' --name 'url' >> /home/myaccount/netbox-tools/lib/config/secrets
+ansible-vault encrypt_string 'mytoken' --name 'token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
+ansible-vault encrypt_string 'myurl' --name 'url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 ```
 
 If you encrypt these items, then ansible-vault will prompt you for a vault password.  You'll use this password later when you run each of the scripts in this repo.
@@ -92,13 +94,13 @@ If you encrypt these items, then ansible-vault will prompt you for a vault passw
 Example:
 
 ```bash
-% ansible-vault encrypt_string '0123456789abcdef0123456789abcdef11133333' --name 'token' >> /home/myaccount/netbox-tools/lib/config/secrets
+% ansible-vault encrypt_string '0123456789abcdef0123456789abcdef11133333' --name 'token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 New Vault password: 
 Confirm New Vault password: 
-% ansible-vault encrypt_string 'https://mynetbox.foo.com:8080' --name 'url' >> /home/myaccount/netbox-tools/lib/config/secrets
+% ansible-vault encrypt_string 'https://mynetbox.foo.com:8080' --name 'url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 New Vault password: 
 Confirm New Vault password: 
-% cat /home/myaccount/netbox-tools/lib/config/secrets
+% cat /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 token: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           62653864393663336334643664356430633961633534396262353136643039363761323831393965
@@ -116,7 +118,11 @@ url: !vault |
           62656663613739356362386530376330313663343030373165366461626165373232
 ```
 
-4. Copy netbox-tools/example.yml and edit it to include the information about your equipment.
+4. Append the path to this repo's lib directory to your PYTHONPATH, for example:
+
+export PYTHONPATH=$PYTHONPATH:/home/myaccount/repos/netbox-tools/lib
+
+5. Copy netbox-tools/example.yml and edit it to include the information about your equipment.
 
 There are example entries for sites, racks, locations, manufacturers, device types, devices, device roles, and tags.
 
@@ -141,7 +147,7 @@ When prompted, enter the password you used in response to the ansible-vault comm
 Example:
 
 ```bash
-% ./device_create_all.py --yaml ./info.yml
+% ./device_create_all.py --yaml ../info.yml
 Vault password: 
 ---
 Site.update: mysite
@@ -160,7 +166,7 @@ Script                        | Description
 ------------                  | -----------
 [entity_create_update_all.py] | Creates all sites, locations, manufacturers, device types, devices, device roles, and tags.  Pretty much the main script to get started. 
 
-Below is a complete list. (TODO add the other scripts...)
+Below is a complete list.
 
 Script                         | Description
 ------------                   | -----------

@@ -3,10 +3,10 @@
 Name: device_type_create_update_all.py
 Description: Create/update device types from information in a YAML file
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import netbox, load_yaml
-from lib.device_type import DeviceType
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.device_type import DeviceType
 
 help_yaml = 'YAML file containing device type information.'
 

@@ -5,7 +5,7 @@ Description: Display information about all interfaces
 '''
 import argparse
 
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 def get_fmt():
     return '{:>5} {:<20} {:<15} {:<17} {:<15} {:<7} {:<9}'

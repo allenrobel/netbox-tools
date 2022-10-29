@@ -3,8 +3,8 @@ Name: ip_prefix.py
 Description: Class for create, update, delete operations on netbox ip_prefix
 '''
 
-from lib.common import device_id, get_device
-from lib.common import site_id
+from netbox_tools.common import device_id, get_device
+from netbox_tools.common import site_id
 
 class IpPrefix(object):
     def __init__(self, nb, info):

@@ -3,10 +3,10 @@
 Name: location_create_update_all.py
 Description: Create/update locations defined in ``--yaml``.
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.location import Location
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.location import Location
 
 help_yaml = 'YAML file containing device type information.'
 

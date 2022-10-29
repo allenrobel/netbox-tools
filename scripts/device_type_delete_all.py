@@ -6,12 +6,12 @@ Summary: Delete all device types contained in the YAML file ``--yaml``
 Be careful!  This will not ask for confirmation. 
 
 '''
-our_version = 100
+our_version = 101
 import argparse
 import pynetbox
-from lib.common import netbox
-from lib.common import load_yaml
-from lib.device_type import DeviceType
+from netbox_tools.common import netbox
+from netbox_tools.common import load_yaml
+from netbox_tools.device_type import DeviceType
 
 help_yaml = 'Name of yaml file containing device types to delete.'
 

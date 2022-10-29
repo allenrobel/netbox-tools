@@ -3,11 +3,11 @@
 Name: ip_prefix_create_update.py
 Description: Create/update an ip prefix using command line options
 '''
-our_version = 101
+our_version = 102
 import argparse
 
-from lib.common import netbox
-from lib.ip_prefix import IpPrefix
+from netbox_tools.common import netbox
+from netbox_tools.ip_prefix import IpPrefix
 
 help_description = 'Optional. Quoted free-form description for this prefix'
 help_prefix = 'Prefix to create'

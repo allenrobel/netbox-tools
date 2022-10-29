@@ -8,8 +8,8 @@ def netbox():
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
     import pynetbox
 
-    from lib.config.netbox_config import LoadConfig
-    from lib.credentials import NetboxCredentials
+    from netbox_tools.config.netbox_config import LoadConfig
+    from netbox_tools.credentials import NetboxCredentials
 
     cfg = LoadConfig()
     nc = NetboxCredentials()

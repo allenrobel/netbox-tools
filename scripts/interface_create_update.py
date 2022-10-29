@@ -5,11 +5,11 @@ Description: Create/update an interface
 Example Usage:
 ./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51 --description "My interface"
 '''
-our_version = 104
+our_version = 105
 import argparse
 
-from lib.common import netbox
-from lib.interface import Interface
+from netbox_tools.common import netbox
+from netbox_tools.interface import Interface
 
 help_device = 'Device name to which the interface will be added.'
 help_description = 'Optional. Free-form description to associate with the interface.'

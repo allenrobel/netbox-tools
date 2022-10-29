@@ -21,26 +21,26 @@ See ./info.yml for the YAML structure this script assumes.
     8c. Make IPv4 address the primary_ip for device
 
 '''
-our_version = 101
+our_version = 102
 
 import argparse
-# Local libraries
-from lib.common import netbox, device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
-from lib.common import load_yaml
-from lib.console_server_port import ConsoleServerPort
-from lib.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
-from lib.device_type import DeviceType
-from lib.interface import Interface
-from lib.ip_address import IpAddress
-from lib.ip_prefix import IpPrefix
-from lib.location import Location
-from lib.manufacturer import Manufacturer
-from lib.rack import Rack
-from lib.role import Role
-from lib.site import Site
-from lib.tag import Tag
+# local libraries
+from netbox_tools.common import netbox, device_id, get_device, interface_id, ip_address_id, get_ip_address, location_id, get_manufacturer, rack_id
+from netbox_tools.common import load_yaml
+from netbox_tools.console_server_port import ConsoleServerPort
+from netbox_tools.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
+from netbox_tools.device_type import DeviceType
+from netbox_tools.interface import Interface
+from netbox_tools.ip_address import IpAddress
+from netbox_tools.ip_prefix import IpPrefix
+from netbox_tools.location import Location
+from netbox_tools.manufacturer import Manufacturer
+from netbox_tools.rack import Rack
+from netbox_tools.role import Role
+from netbox_tools.site import Site
+from netbox_tools.tag import Tag
 
-from lib.credentials import NetboxCredentials
+from netbox_tools.credentials import NetboxCredentials
 
 help_yaml = 'JSON file to open (contains testbed info)'
 

@@ -3,7 +3,7 @@ Name: console_server_port.py
 Description: Create, update, delete operations on netbox /dcim/console-server-ports/ endpoint
 '''
 
-from lib.common import device_id, get_tag, get_tags, tag_id
+from netbox_tools.common import device_id, get_tag, get_tags, tag_id
 
 class ConsoleServerPort(object):
     def __init__(self, nb, info):

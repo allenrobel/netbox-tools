@@ -3,7 +3,7 @@ Name: manufacturer.py
 Description: Class for create and update operations on netbox manufacturer
 '''
 
-from lib.common import create_slug
+from netbox_tools.common import create_slug
 
 class Manufacturer(object):
     def __init__(self, nb, info):

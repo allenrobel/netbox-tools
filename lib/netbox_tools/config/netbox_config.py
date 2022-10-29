@@ -7,7 +7,7 @@ Load YAML file pointed to by the config_file variable, and return the contents a
 
 Usage:
 
-from lib.netbox_config import LoadConfig
+from netbox_tools.netbox_config import LoadConfig
 
 c = LoadConfig()
 print('c.vault {}'.format(c.config['vault']))
@@ -19,7 +19,7 @@ Allen Robel (arobel@cisco.com)
 import yaml
 
 # EDIT THIS LINE TO POINT TO YOUR CONFIG FILE
-config_file = '/home/myaccount/netbox-tools/lib/config/config.yml'
+config_file = '/home/myaccount/netbox-tools-prod/lib/netbox_tools/config/config.yml'
 class LoadConfig(object):
     def __init__(self):
         self.properties = dict()

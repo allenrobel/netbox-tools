@@ -3,15 +3,15 @@ Name: device.py
 Description: Class for create, update, and delete operations on netbox device
 '''
 
-from lib.common import create_slug
-from lib.common import device_type_id, get_device
-from lib.common import interface_id
-from lib.common import ip_address_id, get_ip_address
-from lib.common import location_id
-from lib.common import rack_id
-from lib.common import role_id
-from lib.common import site_id
-from lib.common import tag_id
+from netbox_tools.common import create_slug
+from netbox_tools.common import device_type_id, get_device
+from netbox_tools.common import interface_id
+from netbox_tools.common import ip_address_id, get_ip_address
+from netbox_tools.common import location_id
+from netbox_tools.common import rack_id
+from netbox_tools.common import role_id
+from netbox_tools.common import site_id
+from netbox_tools.common import tag_id
 
 def initialize_device_primary_ip(nb, device_name):
     '''

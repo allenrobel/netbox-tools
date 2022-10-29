@@ -1,5 +1,5 @@
-from lib.colors import color_to_rgb
-from lib.common import create_slug
+from netbox_tools.colors import color_to_rgb
+from netbox_tools.common import create_slug
 
 class Tag(object):
     def __init__(self, nb, info):

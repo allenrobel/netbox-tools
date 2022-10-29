@@ -31,7 +31,7 @@ from ansible import constants as C
 from ansible.cli import CLI
 from ansible.parsing.dataloader import DataLoader
 
-from lib.config.netbox_config import LoadConfig
+from netbox_tools.config.netbox_config import LoadConfig
 
 class NetboxCredentials(object):
     def __init__(self):

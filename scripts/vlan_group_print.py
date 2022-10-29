@@ -3,10 +3,10 @@
 Name: vlan_group_print.py
 Description: Display information about vlan_group ``--vlan_group``
 '''
-our_version = 101
+our_version = 102
 import argparse
 import json
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_detail = 'Optional. If present, print detailed info about VlanGroup.'
 help_vlan_group = 'Name of the VlanGroup.'

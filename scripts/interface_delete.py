@@ -3,11 +3,11 @@
 Name: interface_delete.py
 Description: Delete interface ``--interface`` from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.interface import Interface
+from netbox_tools.common import netbox
+from netbox_tools.interface import Interface
 
 help_device = 'Name of the device associated with --interface'
 help_interface = 'Name of the interface to delete.'

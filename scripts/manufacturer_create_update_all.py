@@ -3,10 +3,10 @@
 Name: manufacturer_create_update_all.py
 Description: Create/update manufacturers defined in ``--yaml``
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.manufacturer import Manufacturer
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.manufacturer import Manufacturer
 
 help_yaml = 'YAML file containing device type information.'
 

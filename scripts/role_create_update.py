@@ -8,10 +8,10 @@ Example Usage:
 
 NOTE: --color is currently limited to the set of colors defined in colors.py
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.role import Role
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.role import Role
 import re
 
 help_color = 'Color to associate with --role'

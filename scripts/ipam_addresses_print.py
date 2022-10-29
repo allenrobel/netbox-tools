@@ -3,7 +3,7 @@
 Name: ipam_addresses_print.py
 Description: Display all ip addresses
 '''
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 def get_fmt():
     return '{:>5} {:<18} {:<18} {:<30}'

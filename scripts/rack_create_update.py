@@ -6,10 +6,10 @@ Example Usage:
 
 ./rack_create_update.py --rack A001 --location row-a --site volcano --u_height 48 --comments "a comment" --tags infra,admin
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.rack import Rack
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.rack import Rack
 import re
 
 help_comments = 'Free-form comment for --rack'

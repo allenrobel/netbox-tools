@@ -7,10 +7,10 @@ Example Usage:
 ./vlan_group_create_update.py --vlan_group AdminServers --min_vid 1 --max_vid 15 --description "Admin Server Vlans" --tags server,admin
 
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.vlan_group import VlanGroup
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.vlan_group import VlanGroup
 import re
 
 help_description = 'Optional. Free-form description for this VlanGroup. '

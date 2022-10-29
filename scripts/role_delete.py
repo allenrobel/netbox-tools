@@ -3,11 +3,11 @@
 Name: role_delete.py
 Description: Delete role ``--role``
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.role import Role
+from netbox_tools.common import netbox
+from netbox_tools.role import Role
 
 help_role = 'Name of the role to delete.'
 

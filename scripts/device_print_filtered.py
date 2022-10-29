@@ -17,9 +17,9 @@ Would match N9K-C9336C-FX2 that contain all three tags foo, bar, and baz.
 '''
 import argparse
 import pynetbox
-from lib.common import netbox
+from netbox_tools.common import netbox
 
-our_version = 100
+our_version = 101
 
 help_tags = 'Comma-separated list of tags (no spaces). If present, only devices containing tag(s) are printed.  Else, all devices are printed.'
 help_model = 'Device model number'

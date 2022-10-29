@@ -3,10 +3,10 @@
 Name: vlan_create_update_all.py
 Description: Create/update vlans defined in ``--yaml``
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.vlan import Vlan
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.vlan import Vlan
 
 help_yaml = 'YAML file containing Vlan information.'
 

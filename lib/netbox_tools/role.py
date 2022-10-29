@@ -3,8 +3,8 @@ Name: role.py
 Description: Class for create and update operations on netbox device roles
 '''
 
-from lib.common import create_slug, get_tag, get_tags, tag_id
-from lib.colors import color_to_rgb
+from netbox_tools.common import create_slug, get_tag, get_tags, tag_id
+from netbox_tools.colors import color_to_rgb
 
 class Role(object):
     def __init__(self, nb, info):

@@ -3,9 +3,9 @@
 Name: sites_print.py
 Description: Display information about all sites
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: Display information about all sites')

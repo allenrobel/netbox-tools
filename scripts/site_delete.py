@@ -3,11 +3,11 @@
 Name: site_delete.py
 Description: Delete site ``--site``
 '''
-our_version = 101
+our_version = 102
 import argparse
 
-from lib.common import netbox
-from lib.site import Site
+from netbox_tools.common import netbox
+from netbox_tools.site import Site
 
 help_site = 'Name of the site to delete.'
 

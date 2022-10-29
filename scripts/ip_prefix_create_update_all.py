@@ -3,11 +3,11 @@
 Name: ip_prefix_create_update_all.py
 Description: Create/update all ip prefixes defined in ``--yaml``
 '''
-our_version = 101
+our_version = 102
 import argparse
 
-from lib.common import netbox, load_yaml
-from lib.ip_prefix import IpPrefix
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.ip_prefix import IpPrefix
 
 help_yaml = 'YAML file in which prefix information can be found.'
 

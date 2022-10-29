@@ -40,14 +40,14 @@ device_roles:
 
 
 '''
-our_version = 101
+our_version = 102
 import argparse
 # import re
 # from string import punctuation
 # import yaml
-from lib.common import netbox, load_yaml
-# from lib.colors import color, color_to_rgb
-from lib.role import Role
+from netbox_tools.common import netbox, load_yaml
+# from netbox_tools.colors import color, color_to_rgb
+from netbox_tools.role import Role
 
 help_yaml = 'YAML file containing device_roles'
 

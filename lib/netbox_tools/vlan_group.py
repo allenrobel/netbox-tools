@@ -1,5 +1,5 @@
-from lib.common import tag_id
-from lib.common import create_slug, get_tag, get_tags
+from netbox_tools.common import tag_id
+from netbox_tools.common import create_slug, get_tag, get_tags
 
 class VlanGroup(object):
     def __init__(self, nb, info):

@@ -7,12 +7,12 @@ Description: Delete all devices in YAML file
 Be careful!  This will not ask for confirmation. 
 
 '''
-our_version = 100
+our_version = 101
 import argparse
 import pynetbox
-from lib.common import netbox
-from lib.common import load_yaml
-from lib.device import Device
+from netbox_tools.common import netbox
+from netbox_tools.common import load_yaml
+from netbox_tools.device import Device
 
 help_yaml = 'Name of yaml file containing devices to delete.'
 

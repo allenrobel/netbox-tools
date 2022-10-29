@@ -3,11 +3,11 @@
 Name: role_print.py
 Description: Display information about device role ``--role``
 '''
-our_version = 101
+our_version = 102
 import argparse
 import json
-from lib.common import netbox
-from lib.colors import rgb_to_color
+from netbox_tools.common import netbox
+from netbox_tools.colors import rgb_to_color
 
 help_detail = 'Optional. If present, print detailed info about role.'
 help_role = 'Role for the device.'

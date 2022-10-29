@@ -3,11 +3,11 @@
 Name: vlan_delete.py
 Description: Delete vlan ``--vlan``
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.vlan import Vlan
+from netbox_tools.common import netbox
+from netbox_tools.vlan import Vlan
 
 help_vlan_name = 'Name of the vlan to delete.'
 

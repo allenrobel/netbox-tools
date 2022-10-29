@@ -1,6 +1,6 @@
-from lib.common import create_slug
-from lib.common import manufacturer_id
-from lib.common import get_tag, get_tags, tag_id
+from netbox_tools.common import create_slug
+from netbox_tools.common import manufacturer_id
+from netbox_tools.common import get_tag, get_tags, tag_id
 
 class DeviceType(object):
     def __init__(self, nb, info):

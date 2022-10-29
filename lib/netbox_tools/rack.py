@@ -3,7 +3,7 @@ Name: rack.py
 Description: Class for create and update operations on netbox rack
 '''
 
-from lib.common import create_slug, get_tag, get_tags, location_id, site_id, tag_id
+from netbox_tools.common import create_slug, get_tag, get_tags, location_id, site_id, tag_id
 
 class Rack(object):
     def __init__(self, nb, info):

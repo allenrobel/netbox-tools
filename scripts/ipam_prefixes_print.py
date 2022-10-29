@@ -3,7 +3,7 @@
 Name: ipam_prefixes_print.py
 Description: Display all ip prefixes
 '''
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 def get_fmt():
     return '{id:>6} {prefix:<18} {status:<10} {site:<15} {vrf:<10} {description:<25}'

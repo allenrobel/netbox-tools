@@ -3,10 +3,10 @@
 Name: roles_print.py
 Description: Display information about all device roles
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import netbox
-from lib.colors import rgb_to_color
+from netbox_tools.common import netbox
+from netbox_tools.colors import rgb_to_color
 
 parser = argparse.ArgumentParser(
          description='DESCRIPTION: retrieve and print information about all device roles')

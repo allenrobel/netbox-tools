@@ -3,11 +3,11 @@
 Name: ip_prefix_delete.py
 Description: Delete ip prefix ``--prefix`` from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.ip_prefix import IpPrefix
+from netbox_tools.common import netbox
+from netbox_tools.ip_prefix import IpPrefix
 
 help_prefix = 'IP prefix to delete. Specify with format A.B.C.D/E'
 

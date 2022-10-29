@@ -3,11 +3,11 @@
 Name: vlan_group_delete.py
 Description: Delete vlan_group ``--vlan_group``
 '''
-our_version = 101
+our_version = 102
 import argparse
 
-from lib.common import netbox
-from lib.vlan_group import VlanGroup
+from netbox_tools.common import netbox
+from netbox_tools.vlan_group import VlanGroup
 
 help_vlan_group = 'Name of the VlanGroup to delete.'
 

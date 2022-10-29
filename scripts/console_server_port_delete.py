@@ -3,11 +3,11 @@
 Name: console_server_port_delete.py
 Description: Delete console_server_port --port from netbox
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.console_server_port import ConsoleServerPort
+from netbox_tools.common import netbox
+from netbox_tools.console_server_port import ConsoleServerPort
 
 help_device = 'Device containing the console_server_port to delete.'
 help_port = 'Name of the console_server_port to delete.'

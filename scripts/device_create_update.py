@@ -12,12 +12,12 @@ Example usage:
         --site DC05 \
         --type N9K-C9336C-FX2
 '''
-our_version = 101
+our_version = 102
 import pynetbox
 import argparse
 
-from lib.common import netbox
-from lib.device import Device
+from netbox_tools.common import netbox
+from netbox_tools.device import Device
 
 help_device = 'Name of the device to add.'
 help_role = 'Role for the device.'

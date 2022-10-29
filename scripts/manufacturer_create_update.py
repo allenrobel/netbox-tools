@@ -3,10 +3,10 @@
 Name: manufacturer_create_update.py
 Description: Create/update manufacturer ``--manufacturer``
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.manufacturer import Manufacturer
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.manufacturer import Manufacturer
 
 help_manufacturer = 'Who makes this product'
 ex_prefix     = 'Example: '

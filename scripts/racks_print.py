@@ -3,9 +3,9 @@
 Name: racks_print.py
 Description: Display information about all racks
 '''
-our_version = 101
+our_version = 102
 import argparse
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 
 parser = argparse.ArgumentParser(

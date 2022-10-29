@@ -3,11 +3,11 @@
 Name: device_type_delete.py
 Description: Delete device_type ``--model`` from netbox
 '''
-our_version = 100
+our_version = 102
 import argparse
 
-from lib.common import netbox
-from lib.device_type import DeviceType
+from netbox_tools.common import netbox
+from netbox_tools.device_type import DeviceType
 
 help_model = 'Model number for the device type.'
 

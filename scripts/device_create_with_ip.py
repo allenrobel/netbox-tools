@@ -23,16 +23,16 @@ Example usage:
         --type CISCO-2600
 '''
 
-our_version = 100
-from lib.common import ip_address_id, interface_id
-from lib.device import Device, initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
-from lib.interface import Interface
-from lib.ip_address import IpAddress
+our_version = 101
+from netbox_tools.common import ip_address_id, interface_id
+from netbox_tools.device import Device, initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
+from netbox_tools.interface import Interface
+from netbox_tools.ip_address import IpAddress
 import pynetbox
 import argparse
 
-from lib.credentials import NetboxCredentials
-from lib.common import get_device
+from netbox_tools.credentials import NetboxCredentials
+from netbox_tools.common import get_device
 
 help_device = 'Name of the device to add.'
 help_interface = 'Management interface for the device.'

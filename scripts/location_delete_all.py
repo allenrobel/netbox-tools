@@ -5,12 +5,12 @@ Description: Delete all locations defined in ``--yaml``
 
 Be careful!  This will not ask for confirmation.
 '''
-our_version = 100
+our_version = 101
 import argparse
 import pynetbox
-from lib.common import netbox
-from lib.common import load_yaml
-from lib.location import Location
+from netbox_tools.common import netbox
+from netbox_tools.common import load_yaml
+from netbox_tools.location import Location
 
 help_yaml = 'Name of yaml file containing locations to delete.'
 

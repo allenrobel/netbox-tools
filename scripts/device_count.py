@@ -19,12 +19,12 @@ Count: 10
 (py310) netbox-tools % 
 
 '''
-our_version = 101
+our_version = 102
 import argparse
 import pprint
 import pynetbox
 
-from lib.common import netbox
+from netbox_tools.common import netbox
 
 help_role = 'Filter on role.'
 help_site = 'Filter on site.'

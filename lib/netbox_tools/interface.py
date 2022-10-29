@@ -3,7 +3,7 @@ Name: interface.py
 Description: Create, update, delete operations on netbox interfaces
 '''
 
-from lib.common import device_id, netbox_id_untagged_vlan
+from netbox_tools.common import device_id, netbox_id_untagged_vlan
 
 class Interface(object):
     def __init__(self, nb, info):

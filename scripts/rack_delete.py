@@ -3,11 +3,11 @@
 Name: rack_delete.py
 Description: Delete rack ``--rack``
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.rack import Rack
+from netbox_tools.common import netbox
+from netbox_tools.rack import Rack
 
 help_rack = 'Name of the rack to delete.'
 

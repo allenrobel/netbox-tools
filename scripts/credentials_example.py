@@ -3,7 +3,7 @@
 Name: credentials_example.py
 Description: Demonstrates usage for the netbox credentials library in this repo
 '''
-from lib.credentials import NetboxCredentials
+from netbox_tools.credentials import NetboxCredentials
 
 nc = NetboxCredentials()
 

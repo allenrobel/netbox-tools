@@ -3,11 +3,11 @@
 Name: manufacturer_delete.py
 Description: Delete manufacturer ``--manufacturer``
 '''
-our_version = 100
+our_version = 101
 import argparse
 
-from lib.common import netbox
-from lib.manufacturer import Manufacturer
+from netbox_tools.common import netbox
+from netbox_tools.manufacturer import Manufacturer
 
 help_manufacturer = 'Name of the manufacturer to delete.'
 

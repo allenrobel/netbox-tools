@@ -3,11 +3,11 @@
 Name: device_type_create_update.py
 Description: Create or update a Netbox device type using command line options
 '''
-our_version = 102
+our_version = 103
 import argparse
 import re
-from lib.common import netbox, load_yaml
-from lib.device_type import DeviceType
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.device_type import DeviceType
 
 help_comments = 'Freeform comments for this device type.'
 help_manufacturer = 'Who makes this device type'

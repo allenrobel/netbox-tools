@@ -3,10 +3,10 @@
 Name: tag_create_update_all.py
 Description: Create/update tags defined in ``--yaml``
 '''
-our_version = 100
+our_version = 101
 import argparse
-from lib.common import netbox, load_yaml
-from lib.tag import Tag
+from netbox_tools.common import netbox, load_yaml
+from netbox_tools.tag import Tag
 
 help_yaml = 'YAML file containing device type information.'
 

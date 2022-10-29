@@ -5,12 +5,12 @@ Description: Netbox: Create or update a console server port
 Example Usage:
 ./console_server_port_create_update.py --device ts_1 --port 2003 --description "a special port" --tags admin,infra
 '''
-our_version = 104
+our_version = 105
 import argparse
 import re
 
-from lib.common import netbox
-from lib.console_server_port import ConsoleServerPort
+from netbox_tools.common import netbox
+from netbox_tools.console_server_port import ConsoleServerPort
 
 help_description = 'Optional. Description of the console_server_port.'
 help_device = 'Device name to which the console_server_port (--port) will be added.'

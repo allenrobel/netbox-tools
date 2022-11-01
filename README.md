@@ -211,6 +211,7 @@ Script                         | Description
 [role_delete] | Delete role ``--role``
 [role_print] | Display information about device role ``--role``
 [roles_print] | Display information about all device roles
+[site_create_update_all] | Create/update sites defined in ``--yaml``
 [site_delete] | Delete site ``--site``
 [site_print] | Display information about ``--site``
 [sites_print] | Display information about all sites
@@ -276,6 +277,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [role_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/role_delete.py
 [role_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/role_print.py
 [roles_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/roles_print.py
+[site_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/site_create_update_all.py
 [site_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/site_delete.py
 [site_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/site_print.py
 [sites_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/sites_print.py

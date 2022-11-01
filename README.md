@@ -10,9 +10,11 @@ Below, you'll find a quick-start setup guide and listing of all the scripts and 
 
 Recent news about changes that may affect you.
 
-1. 2022-10-08 BREAKING CHANGE: The library location has changed.  Due to conflicts with libraries in other namespaces, we've moved the libraries under ./lib/netbox_tools/ and changed the imports to ``from netbox_tools.<library> import foo``.  We've also updated the Getting Started section of this README below with suggested PYTHONPATH addition.
+2022-11-01 DEPRECATION: We've changed the keys ``token`` and ``url`` in the secrets file to ``netbox_token`` and ``netbox_url`` to align with other netbox repos we maintain which use ``netbox_token`` and ``netbox_url``.  You'll see a deprecation warning when using the older key names, but things will still work until 2023-11-01.  Please change your keys when you get a free moment.
 
-2. 2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/netbox_tools/device.py``, ``lib/netbox_tools/interface.py``, ``lib/netbox_tools/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
+2022-10-08 BREAKING CHANGE: The library location has changed.  Due to conflicts with libraries in other namespaces, we've moved the libraries under ./lib/netbox_tools/ and changed the imports to ``from netbox_tools.<library> import foo``.  We've also updated the Getting Started section of this README below with suggested PYTHONPATH addition.
+
+2022-09-29 BREAKING CHANGE: The devices data structure has changed.  Specifically, the ``name`` key was changed to ``device`` and the ``mgmt_interface`` key was changed to ``interface``.  We've added code to ``lib/netbox_tools/device.py``, ``lib/netbox_tools/interface.py``, ``lib/netbox_tools/ip_address.py`` that modifies these keys to the new names, and prints a deprecation warning for each.  To avoid these warnings, update your YAML file(s).  We've modified script args for a few scripts to use the new key names: ``device_create_update.py``, ``device_create_with_ip.py``, ``interface_create_update.py``.
 
 ## Getting started
 
@@ -68,25 +70,25 @@ It is recommended (but not mandatory) that you encrypt your netbox token and url
 If you don't care about security, then the file need only contain, e.g.:
 
 ```yaml
-token: mytoken
-url: https://mynetbox.foo.com
+netbox_token: mytoken
+netbox_url: https://mynetbox.foo.com
 ```
 
 Where:
 
-- ``mytoken`` comes from your Netbox installation.  In netbox, go to the upper-right corner where there's a dropdown menu that usually says ``Admin`` but may contain your netbox username if you're logged in as someone other than Admin.  Click that, and select ``API Tokens``.  Select one of the tokens on this screen, and paste it into the ``token`` field.
+- ``netbox_token`` comes from your Netbox installation.  In netbox, go to the upper-right corner where there's a dropdown menu that usually says ``Admin`` but may contain your netbox username if you're logged in as someone other than Admin.  Click that, and select ``API Tokens``.  Select one of the tokens on this screen, and replace ``mytoken`` with it.
 
-- ``url`` is the base url of your netbox installation, including the port number, if you're using a port other than 80 or 443.  E.g.:
+- ``netbox_url`` is the base url of your netbox installation, including the port number, if you're using a port other than 80 or 443.  E.g.:
 
 ```yaml
-url: https://mynetbox.foo.com:8000
+netbox_url: https://mynetbox.foo.com:8000
 ```
 
 If you care about security, then you'll want to encrypt these.  As follows (replacing ``/home/myaccount/netbox-tools/lib/netbox_tools/config/secrets``, with the location you specified in step 2 above)
 
 ```bash
-ansible-vault encrypt_string 'mytoken' --name 'token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
-ansible-vault encrypt_string 'myurl' --name 'url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
+ansible-vault encrypt_string 'mytoken' --name 'netbox_token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
+ansible-vault encrypt_string 'myurl' --name 'netbox_url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 ```
 
 If you encrypt these items, then ansible-vault will prompt you for a vault password.  You'll use this password later when you run each of the scripts in this repo.
@@ -94,14 +96,14 @@ If you encrypt these items, then ansible-vault will prompt you for a vault passw
 Example:
 
 ```bash
-% ansible-vault encrypt_string '0123456789abcdef0123456789abcdef11133333' --name 'token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
+% ansible-vault encrypt_string '0123456789abcdef0123456789abcdef11133333' --name 'netbox_token' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 New Vault password: 
 Confirm New Vault password: 
-% ansible-vault encrypt_string 'https://mynetbox.foo.com:8080' --name 'url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
+% ansible-vault encrypt_string 'https://mynetbox.foo.com:8080' --name 'netbox_url' >> /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
 New Vault password: 
 Confirm New Vault password: 
 % cat /home/myaccount/netbox-tools/lib/netbox_tools/config/secrets
-token: !vault |
+netbox_token: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           62653864393663336334643664356430633961633534396262353136643039363761323831393965
           6536353038326234656639646332363266356532326663660a333865323331633237393230646538
@@ -109,7 +111,7 @@ token: !vault |
           3738363662333638310a633163396266613836376135356236663132343737333465386632343938
           36333332323465346434346235393766643630366366316530383238313238396239396239646266
           6634323838313232616263353332356232626439323437313831
-url: !vault |
+netbox_url: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           31353832386139656434633734366635646631613839376537643263623139636133356161336632
           6564333230633730363237306564396138383165313834650a623361316337373631613763643531
@@ -122,32 +124,20 @@ url: !vault |
 
 export PYTHONPATH=$PYTHONPATH:/home/myaccount/repos/netbox-tools/lib
 
-5. Copy netbox-tools/example.yml and edit it to include the information about your equipment.
+5. Copy netbox-tools/example.yml and edit it to include the information about your network environment.
 
-There are example entries for sites, racks, locations, manufacturers, device types, devices, device roles, and tags.
+There are example entries for sites, racks, locations, manufacturers, device types, devices, device roles, tags, etc.
 
 Follow the comments in this file and create your first device.  Then use the script below to add it to netbox (it adds all the other items as well):
 
-./device_create_all.py --yaml /path/to/your/edited.yml
+./entity_create_update_all.py --yaml /path/to/your/edited.yml
 
-If you encrypted your token and url, you'll be asked for the ansible vault password you created in step 3 above.
-
-We'll be adding additional things like console ports, etc, as we update this repo.
-
-
-#### Now you can try
-
-```bash
-cd /top/level/directory/for/this/repo
-ansible-playbook example_ndfc_rest_fabric_switch_create_f1.yml --ask-vault-pass -i inventory
-```
-
-When prompted, enter the password you used in response to the ansible-vault command in step 1 above.
+If you encrypted ``netbox_token`` and ``netbox_url``, you'll be asked for the ansible vault password you created in step 3 above.
 
 Example:
 
 ```bash
-% ./device_create_all.py --yaml ../info.yml
+% ./entity_create_update_all.py --yaml ../info.yml
 Vault password: 
 ---
 Site.update: mysite
@@ -157,6 +147,8 @@ Location.update: row-b
 Location.update: row-c
 etc...
 ```
+
+We'll be adding additional things like console ports, etc, as we update this repo.
 
 ## Scripts
 

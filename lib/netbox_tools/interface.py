@@ -83,7 +83,7 @@ class Interface(object):
             exit(1)
 
     def create(self):
-        print('Interface.create: {}'.format(self.interface))
+        print('Interface.create: {} {}'.format(self.device, self.interface))
         try:
             self.nb.dcim.interfaces.create(self.args)
         except Exception as e:
@@ -91,7 +91,7 @@ class Interface(object):
             exit(1)
 
     def update(self):
-        print('Interface.update: {}'.format(self.interface))
+        print('Interface.update: {} {}'.format(self.device, self.interface))
         self.args['id'] = self.interface_id
         try:
             self.interface_object.update(self.args)

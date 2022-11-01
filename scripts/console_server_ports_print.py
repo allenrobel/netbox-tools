@@ -3,22 +3,22 @@
 Name: console_server_ports_print.py
 Description: Display information about all console_server_ports
 '''
-our_version = 101
+our_version = 102
 import argparse
 from netbox_tools.common import netbox, get_console_server_ports
 
+def get_parser():
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Display information about all console_server_ports')
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Display information about all console_server_ports')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
-
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def print_headers():
     print(fmt.format('id',    'device', 'port',   'tags',   'description'))
@@ -32,12 +32,12 @@ def get_tag_names(tags_list):
         
 fmt = '{:>4} {:<15} {:<15} {:<15} {:<15}'
 
+cfg = get_parser()
 nb = netbox()
 
 console_server_ports = get_console_server_ports(nb)
 print_headers()
 for console_server_port in console_server_ports:
-    #print('port {}'.format(dict(console_server_port)))
     print(fmt.format(
         console_server_port.id,
         console_server_port.device.name,

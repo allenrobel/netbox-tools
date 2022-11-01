@@ -3,7 +3,6 @@
 Name: device_choices_print.py
 Description: Display choices associated with Netbox endpoint dcim.devices
 '''
-import pynetbox
 from netbox_tools.common import netbox
 
 def print_header():

@@ -21,7 +21,7 @@ See ./info.yml for the YAML structure this script assumes.
     8c. Make IPv4 address the primary_ip for device
 
 '''
-our_version = 102
+our_version = 103
 
 import argparse
 # local libraries
@@ -40,29 +40,28 @@ from netbox_tools.role import Role
 from netbox_tools.site import Site
 from netbox_tools.tag import Tag
 
-from netbox_tools.credentials import NetboxCredentials
+def get_parser():
+    help_yaml = 'JSON file to open (contains testbed info)'
 
-help_yaml = 'JSON file to open (contains testbed info)'
+    ex_prefix     = 'Example: '
+    ex_yaml = '{} --yaml /my/yaml/file.yml'.format(ex_prefix)
 
-ex_prefix     = 'Example: '
-ex_yaml = '{} --yaml /my/yaml/file.yml'.format(ex_prefix)
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Netbox: Delete a device')
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Delete a device')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory.add_argument('--yaml',
+                        dest='yaml',
+                        required=True,
+                        help=help_yaml + ex_yaml)
 
-mandatory.add_argument('--yaml',
-                     dest='yaml',
-                     required=True,
-                     help=help_yaml + ex_yaml)
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
-
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 # Used for backward-compatibility. Remove after 2022-09-29
 def fix_deprecations():
@@ -86,6 +85,7 @@ def assign_primary_ip_to_device(info):
     map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
     make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
 
+cfg = get_parser()
 nb = netbox()
 
 info = load_yaml(cfg.yaml)

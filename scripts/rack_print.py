@@ -3,41 +3,41 @@
 Name: rack_print.py
 Description: Display information about ``--rack``
 '''
-our_version = 102
+our_version = 103
 import argparse
 import json
 from netbox_tools.common import netbox
 
-help_detail = 'Optional. If present, print detailed info about device.'
-help_rack = 'Name of the rack.'
+def get_parser():
+    help_detail = 'Optional. If present, print detailed info about device.'
+    help_rack = 'Name of the rack.'
 
-ex_prefix     = 'Example: '
-ex_detail = '{} --detail'.format(ex_prefix)
-ex_rack = '{} --rack V009'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_detail = '{} --detail'.format(ex_prefix)
+    ex_rack = '{} --rack V009'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Display information about a rack')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Display information about a rack')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-default.add_argument('--detail',
-                     dest='detail',
-                     required=False,
-                     default=False,
-                     action='store_true',
-                     help=help_detail + ex_detail)
-mandatory.add_argument('--rack',
-                     dest='rack',
-                     required=True,
-                     help=help_rack + ex_rack)
+    default.add_argument('--detail',
+                        dest='detail',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help=help_detail + ex_detail)
+    mandatory.add_argument('--rack',
+                        dest='rack',
+                        required=True,
+                        help=help_rack + ex_rack)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
-
+    return parser.parse_args()
 
 def error():
     racks = list()
@@ -46,6 +46,7 @@ def error():
         racks.append(item.name)
     print('Rack {} does not exist in netbox.  Valid racks: {}'.format(cfg.rack, ', '.join(racks)))
     exit(1)
+
 def get_rack():
     rack = nb.dcim.racks.get(name=cfg.rack)
     if rack == None:
@@ -60,11 +61,12 @@ def print_headers():
     print(fmt.format('id', 'name', 'site'))
     print(fmt.format('-' * 5, '-' * 15, '-' * 15))
 
+cfg = get_parser()
+nb = netbox()
+rack = get_rack()
+
 fmt = '{:>5} {:>15} {:>15}'
 
-nb = netbox()
-
-rack = get_rack()
 if cfg.detail:
     print_detail()
     exit()

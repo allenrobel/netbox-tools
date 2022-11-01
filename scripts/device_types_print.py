@@ -3,21 +3,22 @@
 Name: device_types_print.py
 Description: Display summary information about all device types
 '''
-our_version = 102
+our_version = 103
 import argparse
 from netbox_tools.common import netbox
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print summary information about all device types')
+def get_parser():
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Print summary information about all device types')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_device_types():
     try:
@@ -30,6 +31,7 @@ def print_headers():
     print(fmt.format('id', 'name', 'device_count', 'manufacturer'))
     print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 20))
 
+cfg = get_parser()
 nb = netbox()
 
 device_types = get_device_types()

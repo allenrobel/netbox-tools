@@ -4,39 +4,40 @@ Name: device_create_all.py
 Summary: Delete all devices contained in the YAML file pointed to with --yaml
 Description: Delete device --device from netbox
 '''
-our_version = 101
+our_version = 102
 import argparse
-import pynetbox
 
-from netbox_tools.common import netbox
-from netbox_tools.device import Device
+def get_parser():
+    from netbox_tools.common import netbox
+    from netbox_tools.device import Device
 
-help_device = 'Name of the device to delete.'
+    help_device = 'Name of the device to delete.'
 
-ex_prefix = ' Example: '
-ex_device = '{} --device leaf_3'.format(ex_prefix)
+    ex_prefix = ' Example: '
+    ex_device = '{} --device leaf_3'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a device')
+    parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a device')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--device',
-                     dest='device',
-                     required=True,
-                     help=help_device + ex_device)
+    mandatory.add_argument('--device',
+                        dest='device',
+                        required=True,
+                        help=help_device + ex_device)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_info():
     info = dict()
     info['device'] = cfg.device
     return info
 
+cfg = get_parser()
 nb = netbox()
 d = Device(nb, get_info())
 d.delete()

@@ -19,49 +19,49 @@ Count: 10
 (py310) netbox-tools % 
 
 '''
-our_version = 102
+our_version = 103
 import argparse
 import pprint
-import pynetbox
 
 from netbox_tools.common import netbox
 
-help_role = 'Filter on role.'
-help_site = 'Filter on site.'
-help_model = 'Filter on model number (e.g. N9K-C93180YC-EX).'
+def get_parser():
+    help_role = 'Filter on role.'
+    help_site = 'Filter on site.'
+    help_model = 'Filter on model number (e.g. N9K-C93180YC-EX).'
 
-ex_prefix     = 'Example: '
-ex_role = '{} --role leaf'.format(ex_prefix)
-ex_site = '{} --site f1'.format(ex_prefix)
-ex_model = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_role = '{} --role leaf'.format(ex_prefix)
+    ex_site = '{} --site f1'.format(ex_prefix)
+    ex_model = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Count devices matching filters [role, site, model].  If no filter is provided, all devices are counted.  Filters are boolean ANDed together.')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Netbox: Count devices matching filters [role, site, model].  If no filter is provided, all devices are counted.  Filters are boolean ANDed together.')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-default.add_argument('--role',
-                     dest='role',
-                     required=False,
-                     default=None,
-                     help=help_role + ex_role)
-default.add_argument('--site',
-                     dest='site',
-                     required=False,
-                     default=None,
-                     help=help_site + ex_site)
-default.add_argument('--model',
-                     dest='model',
-                     required=False,
-                     default=None,
-                     help=help_model + ex_model)
+    default.add_argument('--role',
+                        dest='role',
+                        required=False,
+                        default=None,
+                        help=help_role + ex_role)
+    default.add_argument('--site',
+                        dest='site',
+                        required=False,
+                        default=None,
+                        help=help_site + ex_site)
+    default.add_argument('--model',
+                        dest='model',
+                        required=False,
+                        default=None,
+                        help=help_model + ex_model)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_args():
     args = dict()
@@ -128,6 +128,7 @@ def get_device_count():
     except Exception as e:
         print('Unable to get count: {}'.format(e))
 
+cfg = get_parser()
 nb = netbox()
 count = get_device_count()
 pprint.pprint('Query: {}'.format(get_args()))

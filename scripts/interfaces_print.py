@@ -3,8 +3,6 @@
 Name: interfaces_print.py
 Description: Display information about all interfaces
 '''
-import argparse
-
 from netbox_tools.common import netbox
 
 def get_fmt():

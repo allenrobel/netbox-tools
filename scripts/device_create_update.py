@@ -12,52 +12,52 @@ Example usage:
         --site DC05 \
         --type N9K-C9336C-FX2
 '''
-our_version = 102
-import pynetbox
+our_version = 103
 import argparse
 
 from netbox_tools.common import netbox
 from netbox_tools.device import Device
 
-help_device = 'Name of the device to add.'
-help_role = 'Role for the device.'
-help_site = 'Site in which device will reside.'
-help_type = 'Type of device (e.g. model number).'
+def get_parser():
+    help_device = 'Name of the device to add.'
+    help_role = 'Role for the device.'
+    help_site = 'Site in which device will reside.'
+    help_type = 'Type of device (e.g. model number).'
 
-ex_prefix = 'Example: '
-ex_device = '{} --device leaf_3'.format(ex_prefix)
-ex_role = '{} --role leaf'.format(ex_prefix)
-ex_site = '{} --site f1'.format(ex_prefix)
-ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
+    ex_prefix = 'Example: '
+    ex_device = '{} --device leaf_3'.format(ex_prefix)
+    ex_role = '{} --role leaf'.format(ex_prefix)
+    ex_site = '{} --site f1'.format(ex_prefix)
+    ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Add a device')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Netbox: Add a device')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--device',
-                     dest='device',
-                     required=True,
-                     help=help_device + ex_device)
-mandatory.add_argument('--role',
-                     dest='role',
-                     required=True,
-                     help=help_role + ex_role)
-mandatory.add_argument('--site',
-                     dest='site',
-                     required=True,
-                     help=help_site + ex_site)
-mandatory.add_argument('--type',
-                     dest='type',
-                     required=True,
-                     help=help_type + ex_type)
+    mandatory.add_argument('--device',
+                        dest='device',
+                        required=True,
+                        help=help_device + ex_device)
+    mandatory.add_argument('--role',
+                        dest='role',
+                        required=True,
+                        help=help_role + ex_role)
+    mandatory.add_argument('--site',
+                        dest='site',
+                        required=True,
+                        help=help_site + ex_site)
+    mandatory.add_argument('--type',
+                        dest='type',
+                        required=True,
+                        help=help_type + ex_type)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_info():
     info = dict()
@@ -71,6 +71,7 @@ def get_info():
             exit(1)
     return info
 
+cfg = get_parser()
 nb = netbox()
 d = Device(nb, get_info())
 d.create_or_update()

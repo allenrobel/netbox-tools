@@ -3,46 +3,47 @@
 Name: interface_print.py
 Description: Display interface information for ``--device`` ``--interface``
 '''
-our_version = 101
+our_version = 102
 import argparse
 import json
 from netbox_tools.common import netbox
 
-help_detail = 'Optional. If present, print detailed info about device.'
-help_device = 'Name of the device on which interface resides.'
-help_interface = 'Name of the interface.'
+def get_parser():
+    help_detail = 'Optional. If present, print detailed info about device.'
+    help_device = 'Name of the device on which interface resides.'
+    help_interface = 'Name of the interface.'
 
-ex_prefix     = 'Example: '
-ex_detail = '{} --detail'.format(ex_prefix)
-ex_device = '{} --device leaf_3'.format(ex_prefix)
-ex_interface = '{} --interface mgmt0'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_detail = '{} --detail'.format(ex_prefix)
+    ex_device = '{} --device leaf_3'.format(ex_prefix)
+    ex_interface = '{} --interface mgmt0'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information about an interfaces')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Print information about an interfaces')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-default.add_argument('--detail',
-                     dest='detail',
-                     required=False,
-                     default=False,
-                     action='store_true',
-                     help=help_detail + ex_detail)
-mandatory.add_argument('--device',
-                     dest='device',
-                     required=True,
-                     help=help_device + ex_device)
-mandatory.add_argument('--interface',
-                     dest='interface',
-                     required=True,
-                     help=help_interface + ex_interface)
+    default.add_argument('--detail',
+                        dest='detail',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help=help_detail + ex_detail)
+    mandatory.add_argument('--device',
+                        dest='device',
+                        required=True,
+                        help=help_device + ex_device)
+    mandatory.add_argument('--interface',
+                        dest='interface',
+                        required=True,
+                        help=help_interface + ex_interface)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_interface():
     interface = nb.dcim.interfaces.get(device=cfg.device, name=cfg.interface)
@@ -59,11 +60,12 @@ def print_headers():
     print(fmt.format(   'id', 'device_name', 'interface', 'mac_address',       'type',    'enabled', 'mgmt_only'))
     print(fmt.format('-' * 5,      '-' * 20,    '-' * 15,     '-' * 17,      '-' * 15,      '-' * 7,     '-' * 9))
 
+cfg = get_parser()
+nb = netbox()
+interface = get_interface()
+
 fmt = '{:>5} {:<20} {:<15} {:<17} {:<15} {:<7} {:<9}'
 
-nb = netbox()
-
-interface = get_interface()
 if cfg.detail:
     print_detail(interface)
 else:

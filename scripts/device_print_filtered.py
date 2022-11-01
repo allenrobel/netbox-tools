@@ -16,38 +16,38 @@ For example:
 Would match N9K-C9336C-FX2 that contain all three tags foo, bar, and baz.
 '''
 import argparse
-import pynetbox
 from netbox_tools.common import netbox
 
-our_version = 101
+our_version = 102
 
-help_tags = 'Comma-separated list of tags (no spaces). If present, only devices containing tag(s) are printed.  Else, all devices are printed.'
-help_model = 'Device model number'
+def get_parser():
+    help_tags = 'Comma-separated list of tags (no spaces). If present, only devices containing tag(s) are printed.  Else, all devices are printed.'
+    help_model = 'Device model number'
 
-ex_prefix     = ' Example: '
-ex_tags = '{} --tags deathstar,admin'.format(ex_prefix)
-ex_model = '{} --model N9K-C9336C-FX2'
+    ex_prefix     = ' Example: '
+    ex_tags = '{} --tags deathstar,admin'.format(ex_prefix)
+    ex_model = '{} --model N9K-C9336C-FX2'
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Print list of devices filtered by tag and/or model')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Netbox: Print list of devices filtered by tag and/or model')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-default.add_argument('--tags',
-                     dest='tags',
-                     required=False,
-                     help=help_tags + ex_tags)
-default.add_argument('--model',
-                     dest='model',
-                     required=False,
-                     help=help_model + ex_model)
+    default.add_argument('--tags',
+                        dest='tags',
+                        required=False,
+                        help=help_tags + ex_tags)
+    default.add_argument('--model',
+                        dest='model',
+                        required=False,
+                        help=help_model + ex_model)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def print_header():
     print(fmt.format(
@@ -132,6 +132,7 @@ def filtered_on_model(matches):
 
 fmt = '{:<9} {:<18} {:<18} {:<12} {:<22} {:<6} {:<10} {:<15}'
 
+cfg = get_parser()
 nb = netbox()
 devices = nb.dcim.devices.all()
 

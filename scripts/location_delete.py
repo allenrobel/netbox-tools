@@ -3,38 +3,40 @@
 Name: location_delete.py
 Description: Delete location ``--location`` from netbox
 '''
-our_version = 101
+our_version = 102
 import argparse
 
 from netbox_tools.common import netbox
 from netbox_tools.location import Location
 
-help_location = 'Name of the location to delete.'
+def get_parser():
+    help_location = 'Name of the location to delete.'
 
-ex_prefix = ' Example: '
-ex_location = '{} --location mylocation'.format(ex_prefix)
+    ex_prefix = ' Example: '
+    ex_location = '{} --location mylocation'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(description='DESCRIPTION: Delete location --location from netbox')
+    parser = argparse.ArgumentParser(description='DESCRIPTION: Delete location --location from netbox')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--location',
-                     dest='location',
-                     required=True,
-                     help=help_location + ex_location)
+    mandatory.add_argument('--location',
+                        dest='location',
+                        required=True,
+                        help=help_location + ex_location)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_info():
     info = dict()
     info['name'] = cfg.location
     return info
 
+cfg = get_parser()
 nb = netbox()
 l = Location(nb, get_info())
 l.delete()

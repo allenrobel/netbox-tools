@@ -3,21 +3,22 @@
 Name: sites_print.py
 Description: Display information about all sites
 '''
-our_version = 102
+our_version = 103
 import argparse
 from netbox_tools.common import netbox
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Display information about all sites')
+def get_parser():
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Display information about all sites')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_fmt():
     return '{:>5} {:<15} {:>12} {:>12} {:>12} {:<10} {:<30}'
@@ -35,6 +36,7 @@ def print_sites():
     for site in sites:
         print(fmt.format(site.id, site.name, site.device_count, site.rack_count, site.prefix_count, site.status.value, site.description))
 
+cfg = get_parser()
 nb = netbox()
 print_headers()
 print_sites()

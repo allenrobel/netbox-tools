@@ -23,7 +23,7 @@ Example usage:
         --type CISCO-2600
 '''
 
-our_version = 101
+our_version = 102
 from netbox_tools.common import ip_address_id, interface_id
 from netbox_tools.device import Device, initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
 from netbox_tools.interface import Interface
@@ -34,70 +34,71 @@ import argparse
 from netbox_tools.credentials import NetboxCredentials
 from netbox_tools.common import get_device
 
-help_device = 'Name of the device to add.'
-help_interface = 'Management interface for the device.'
-help_mgmt_ip = 'Management IPv4 address for the device.'
-help_role = 'Role for the device. Role must already exist in netbox.'
-help_serial = 'Optional. Default: na. Serial number of the device.'
-help_site = 'Site in which device will reside. Site must already exist in netbox.'
-help_tags = 'Optional. Comma-separated list of pre-existing tags to associate with the device. All tags must already exist in netbox.'
-help_type = 'Type of device (i.e. model number). model number must already exist in netbox'
-ex_prefix     = 'Example: '
-ex_device = '{} --device leaf_3'.format(ex_prefix)
-ex_interface = '{} --interface mgmt0'.format(ex_prefix)
-ex_mgmt_ip = '{} --mgmt_ip 192.168.1.5/24'.format(ex_prefix)
-ex_role = '{} --role leaf'.format(ex_prefix)
-ex_serial = '{} --serial CX045BN'.format(ex_prefix)
-ex_site = '{} --site f1'.format(ex_prefix)
-ex_tags = '{} --tags poc,admin'.format(ex_prefix)
-ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
+def get_parser():
+    help_device = 'Name of the device to add.'
+    help_interface = 'Management interface for the device.'
+    help_mgmt_ip = 'Management IPv4 address for the device.'
+    help_role = 'Role for the device. Role must already exist in netbox.'
+    help_serial = 'Optional. Default: na. Serial number of the device.'
+    help_site = 'Site in which device will reside. Site must already exist in netbox.'
+    help_tags = 'Optional. Comma-separated list of pre-existing tags to associate with the device. All tags must already exist in netbox.'
+    help_type = 'Type of device (i.e. model number). model number must already exist in netbox'
+    ex_prefix     = 'Example: '
+    ex_device = '{} --device leaf_3'.format(ex_prefix)
+    ex_interface = '{} --interface mgmt0'.format(ex_prefix)
+    ex_mgmt_ip = '{} --mgmt_ip 192.168.1.5/24'.format(ex_prefix)
+    ex_role = '{} --role leaf'.format(ex_prefix)
+    ex_serial = '{} --serial CX045BN'.format(ex_prefix)
+    ex_site = '{} --site f1'.format(ex_prefix)
+    ex_tags = '{} --tags poc,admin'.format(ex_prefix)
+    ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Netbox: Add a device')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Netbox: Add a device')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--device',
-                     dest='device',
-                     required=True,
-                     help=help_device + ex_device)
-mandatory.add_argument('--interface',
-                     dest='interface',
-                     required=True,
-                     help=help_interface + ex_interface)
-mandatory.add_argument('--mgmt_ip',
-                     dest='mgmt_ip',
-                     required=True,
-                     help=help_mgmt_ip + ex_mgmt_ip)
-mandatory.add_argument('--role',
-                     dest='role',
-                     required=True,
-                     help=help_role + ex_role)
-default.add_argument('--serial',
-                     dest='serial',
-                     required=False,
-                     default=None,
-                     help=help_serial + ex_serial)
-mandatory.add_argument('--site',
-                     dest='site',
-                     required=True,
-                     help=help_site + ex_site)
-default.add_argument('--tags',
-                     dest='tags',
-                     required=False,
-                     default=None,
-                     help=help_tags + ex_tags)
-mandatory.add_argument('--type',
-                     dest='type',
-                     required=True,
-                     help=help_type + ex_type)
+    mandatory.add_argument('--device',
+                        dest='device',
+                        required=True,
+                        help=help_device + ex_device)
+    mandatory.add_argument('--interface',
+                        dest='interface',
+                        required=True,
+                        help=help_interface + ex_interface)
+    mandatory.add_argument('--mgmt_ip',
+                        dest='mgmt_ip',
+                        required=True,
+                        help=help_mgmt_ip + ex_mgmt_ip)
+    mandatory.add_argument('--role',
+                        dest='role',
+                        required=True,
+                        help=help_role + ex_role)
+    default.add_argument('--serial',
+                        dest='serial',
+                        required=False,
+                        default=None,
+                        help=help_serial + ex_serial)
+    mandatory.add_argument('--site',
+                        dest='site',
+                        required=True,
+                        help=help_site + ex_site)
+    default.add_argument('--tags',
+                        dest='tags',
+                        required=False,
+                        default=None,
+                        help=help_tags + ex_tags)
+    mandatory.add_argument('--type',
+                        dest='type',
+                        required=True,
+                        help=help_type + ex_type)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
 def get_tags():
     tags = list()
@@ -133,6 +134,7 @@ def assign_primary_ip_to_device(info):
     map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
     make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
 
+cfg = get_parser()
 nc = NetboxCredentials()
 nb = pynetbox.api(nc.url, token=nc.token)
 

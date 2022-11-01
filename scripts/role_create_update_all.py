@@ -40,40 +40,36 @@ device_roles:
 
 
 '''
-our_version = 102
+our_version = 103
 import argparse
-# import re
-# from string import punctuation
-# import yaml
 from netbox_tools.common import netbox, load_yaml
-# from netbox_tools.colors import color, color_to_rgb
 from netbox_tools.role import Role
 
-help_yaml = 'YAML file containing device_roles'
+def get_parser():
+    help_yaml = 'YAML file containing device_roles'
 
-ex_prefix     = 'Example: '
-ex_yaml = '{} --yaml ./info.yml'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_yaml = '{} --yaml ./info.yml'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Create or update roles described in YAML file')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Create or update roles described in YAML file')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--yaml',
-                     dest='yaml',
-                     required=True,
-                     help=help_yaml + ex_yaml)
+    mandatory.add_argument('--yaml',
+                        dest='yaml',
+                        required=True,
+                        help=help_yaml + ex_yaml)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
-
+cfg = get_parser()
 nb = netbox()
-
 info = load_yaml(cfg.yaml)
 for key in info['device_roles']:
     r = Role(nb, info['device_roles'][key])

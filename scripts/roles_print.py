@@ -3,23 +3,23 @@
 Name: roles_print.py
 Description: Display information about all device roles
 '''
-our_version = 102
+our_version = 103
 import argparse
 from netbox_tools.common import netbox
 from netbox_tools.colors import rgb_to_color
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: retrieve and print information about all device roles')
+def get_parser():
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: retrieve and print information about all device roles')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
-
+    return parser.parse_args()
 
 def get_fmt():
     return '{:>5} {:<18} {:>12} {:<6} {:<15} {:<7} {:<30}'
@@ -37,6 +37,7 @@ def print_headers():
     print(fmt.format('id', 'role_name', 'device_count', 'rgb', 'color', 'vm_role', 'description'))
     print(fmt.format('-' * 5, '-' * 18, '-' * 12, '-' * 6, '-' * 15, '-' * 7, '-' * 30))
 
+cfg = get_parser()
 nb = netbox()
 
 print_headers()

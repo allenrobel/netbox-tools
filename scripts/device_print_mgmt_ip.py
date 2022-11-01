@@ -11,34 +11,32 @@ SCRIPT="${HOME}/netbox-tools/device_print_mgmt_ip.py"
 ssh admin@`${SCRIPT} --device $1`
 
 '''
-our_version = 101
+our_version = 102
 import argparse
-import json
-import pynetbox
 from netbox_tools.common import netbox
 
-help_device = 'Name of device for which ipv4 address is to be printed.'
+def get_parser():
+    help_device = 'Name of device for which ipv4 address is to be printed.'
 
-ex_prefix     = 'Example: '
-ex_device = '{} --device cvd_leaf_3'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_device = '{} --device cvd_leaf_3'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print the primary ipv4 address of a device')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Print the primary ipv4 address of a device')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-mandatory.add_argument('--device',
-                     dest='device',
-                     required=True,
-                     help=help_device + ex_device)
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    mandatory.add_argument('--device',
+                        dest='device',
+                        required=True,
+                        help=help_device + ex_device)
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
-fmt = '{:>5} {:<20} {:<30}'
 
 def get_device():
     device = nb.dcim.devices.get(name=cfg.device)
@@ -47,6 +45,9 @@ def get_device():
         exit(1)
     return device
 
+fmt = '{:>5} {:<20} {:<30}'
+
+cfg = get_parser()
 nb = netbox()
 device = get_device()
 ipv4 = device.primary_ip4.address.split('/')[0]

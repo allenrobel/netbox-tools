@@ -3,42 +3,42 @@
 Name: site_print.py
 Description: Display information about ``--site``
 '''
-our_version = 102
+our_version = 103
 import argparse
 import json
 from netbox_tools.common import netbox
 
-help_detail = 'Optional. If present, print detailed info about role.'
-help_site = 'Retrieve information for site'
+def get_parser():
+    help_detail = 'Optional. If present, print detailed info about role.'
+    help_site = 'Retrieve information for site'
 
-ex_prefix     = 'Example: '
-ex_detail = '{} --detail'.format(ex_prefix)
-ex_site = '{} --site fabric_1'.format(ex_prefix)
+    ex_prefix     = 'Example: '
+    ex_detail = '{} --detail'.format(ex_prefix)
+    ex_site = '{} --site fabric_1'.format(ex_prefix)
 
-parser = argparse.ArgumentParser(
-         description='DESCRIPTION: Print information about a site')
+    parser = argparse.ArgumentParser(
+            description='DESCRIPTION: Print information about a site')
 
-mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
+    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-default.add_argument('--detail',
-                     dest='detail',
-                     required=False,
-                     default=False,
-                     action='store_true',
-                     help=help_detail + ex_detail)
-mandatory.add_argument('--site',
-                     dest='site',
-                     required=True,
-                     help=help_site + ex_site)
+    default.add_argument('--detail',
+                        dest='detail',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help=help_detail + ex_detail)
+    mandatory.add_argument('--site',
+                        dest='site',
+                        required=True,
+                        help=help_site + ex_site)
 
-parser.add_argument('--version',
-                    action='version',
-                    version='%(prog)s {}'.format(our_version))
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(our_version))
 
-cfg = parser.parse_args()
+    return parser.parse_args()
 
-fmt = '{:>5} {:<15} {:>12} {:>12} {:>12} {:<10} {:<30}'
 
 def error():
     sites = list()
@@ -61,8 +61,12 @@ def print_headers():
     print(fmt.format('id', 'name', 'device_count', 'rack_count', 'prefix_count', 'status', 'description'))
     print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 12, '-' * 12, '-' * 10, '-' * 30))
 
+cfg = get_parser()
 nb = netbox()
 site = get_site()
+
+fmt = '{:>5} {:<15} {:>12} {:>12} {:>12} {:<10} {:<30}'
+
 if cfg.detail:
     print_detail()
     exit()

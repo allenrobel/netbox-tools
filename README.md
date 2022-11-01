@@ -170,6 +170,7 @@ Script                         | Description
 [device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
 [device_choices_print] | Display choices associated with Netbox endpoint dcim.devices
 [device_count] | Print the number of devices matching a given query
+[device_create_update_all] | Create/update all Netbox devices defined in ``--yaml``
 [device_type_create_update] | Create/update a Netbox device type using command line options
 [device_type_create_update_all] | Create/update device types from information in a YAML file
 [device_type_delete_all] | Delete all device types contained in the YAML file ``--yaml``
@@ -178,6 +179,7 @@ Script                         | Description
 [device_types_print] | Display summary information about all device types
 [entity_create_update_all.py] | Create/update all Netbox entities (console server ports, device types, etc) from information in a YAML file
 [interface_create_update] | Create/update an interface using command line options
+[interface_create_update_all] | Create/update all interfaces defined in ``--yaml``
 [interface_delete] | Delete interface ``--interface`` from netbox
 [interface_print] | Display interface information for ``--device`` ``--interface`
 [interfaces_print] | Display information about all interfaces
@@ -236,6 +238,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [device_assign_primary_ip.py]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_assign_primary_ip.py
 [device_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_choices_print.py
 [device_count]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_count.py
+[device_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_create_update_all.py
 [device_type_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update.py
 [device_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update_all.py
 [device_type_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_delete_all.py
@@ -244,6 +247,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [device_types_print]:  https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_types_print.py
 [entity_create_update_all.py]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/entity_create_update_all.py
 [interface_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interface_create_update.py
+[interface_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interface_create_update_all.py
 [interface_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interface_delete.py
 [interface_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interface_print.py
 [interfaces_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interfaces_print.py

@@ -324,6 +324,34 @@ def tag_id(nb, name):
         print('common.tag_id: returning None. exception was: {}'.format(e))
         return None
 
+# virtual_machines (as of 2022-11-01, pynetbox apparently does not support the virtualization.virtual_machines endpoint)
+# We'll leave these here in hopes this is eventually supported.
+# def get_vm(nb, name):
+#     '''
+#     Given netbox instance and vm name, return vm.
+#     If vm does not exist in netbox, return None
+#     '''
+#     try:
+#         vm = nb.dcim.virtualization.virtual_machines.get(name=name)
+#         if vm != None:
+#             return vm
+#         print('common.get_vm: returning None. vm {} does not exist in netbox'.format(name))
+#     except Exception as e:
+#         print('common.get_vm: returning None. exception was: {}'.format(e))
+#         return None
+
+# def vm_id(nb, name):
+#     '''
+#     Given netbox instance and vm name, return vm id.
+#     If vm doesn't exist within netbox, return None
+#     '''
+#     try:
+#         vm = nb.virtualization.virtual_machines.get(name=name)
+#         return vm.id
+#     except Exception as e:
+#         print('common.vm_id: returning None. exception was: {}'.format(e))
+#         return None
+
 # utility functions
 def create_slug(s):
     '''
@@ -344,3 +372,4 @@ def load_yaml(f):
         return contents
     except Exception as e:
         print('common.load_yaml: exiting. Exception was: {}'.format(e))
+        exit(1)

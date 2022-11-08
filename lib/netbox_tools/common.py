@@ -25,6 +25,39 @@ def netbox():
     nb.http_session = session
     return nb
 
+# console_port
+
+def get_console_ports(nb):
+    return nb.dcim.console_ports.all()
+
+def get_console_port(nb, device, port):
+    '''
+    Given netbox instance, device name, and port, return console_port object.
+    If console_port does not exist in netbox, return None
+    '''
+    try:
+        console_port = nb.dcim.console_ports.get(device=device, name=port)
+        if console_port != None:
+            return console_port
+        print('common.console_port: returning None. console_port device {} port {} does not exist in netbox'.format(device, port))
+    except Exception as e:
+        print('common.console_port: returning None. exception was: {}'.format(e))
+        return None
+
+def console_port_id(nb, device, port):
+    '''
+    Given netbox instance, device name, and port, return console_port ID.
+    If console_port does not exist in netbox, return None
+    '''
+    try:
+        console_port = nb.dcim.console_ports.get(device=device, name=port)
+        if console_port != None:
+            return console_port.id
+        print('common.console_port: returning None. console_port device {} port {} does not exist in netbox'.format(device, port))
+    except Exception as e:
+        print('common.console_port: returning None. exception was: {}'.format(e))
+        return None
+
 # console_server_port
 
 def get_console_server_ports(nb):

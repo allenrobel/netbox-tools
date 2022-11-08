@@ -239,6 +239,10 @@ device_types:
     model: UCS-C210-M2
     manufacturer: cisco
     u_height: 2
+  UCSC-C220-M6S:
+    model: UCSC-C220-M6S
+    manufacturer: cisco
+    u_height: 1
 
 # Device Roles
 # Mandatory keys:
@@ -249,6 +253,12 @@ device_types:
 #   description : free-form description
 #   tags: yaml list of tags. Tags must already be present in Netbox.
 device_roles:
+  ipam_dcim:
+    name: ipam_dcim
+    color: gray
+    description: ip address management and data center infra management
+    tags:
+      - infra
   lab_gateway:
     name: lab_gateway
     color: gray
@@ -284,6 +294,11 @@ device_roles:
     name: unknown
     color: gray_dark
     description: unknown role for device
+  vm_host:
+    name: vm_host
+    color: gray_light
+    description: bare metal servers hosting virtual machines
+
 
 # Interfaces
 # Mandatory keys
@@ -308,6 +323,28 @@ interfaces:
     mac_address: 00a3.8ebf.eaf6
     untagged_vlan: 10
 
+# Console Ports
+# Mandatory keys
+#   device: Name of the device that contains this port
+#   port: Name of the port
+#
+# Optional keys
+#   description: Free-form description for the Console Port
+#   port_speed: speed in kbps of the console port. Valid values: 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
+#   port_type: type of port. Valid values: de-9, db-25, rj-11, rj-12, rj-45, mini-din-8, usb-a, usb-b, usb-c, 
+#                                          usb-mini-a, usb-mini-b, usb-micro-a, usb-micro-b, usb-micro-ab, other
+#   tags: A YAML list of tags to associate with the Console Port to enable filtering based on tag.
+console_ports:
+  lab_gateway_167_1_console:
+    description: lab_gateway_167_1_console
+    device: lab_gateway_167_1
+    port: console
+    port_speed: 9600
+    port_type: rj-45
+    tags:
+      - admin
+      - infra
+
 # Console Server Ports
 # Mandatory keys
 #   device: Name of the device that contains this port
@@ -315,7 +352,7 @@ interfaces:
 #
 # Optional keys
 #   description: Free-form description for the Console Server Port
-#   tags: A YAML list of tags to associate with the VlanGroup to enable filtering based on tag.
+#   tags: A YAML list of tags to associate with the Console Server Port to enable filtering based on tag.
 
 console_server_ports:
   ts_1_2003:
@@ -367,6 +404,45 @@ devices:
     serial: na
     site: mysite
     tags:
+      - infra
+  vm_host_1:
+    device: vm_host_1
+    mgmt_ip: 192.168.1.2/24
+    interface: eth1
+    role: vm_host
+    type: UCSC-C220-M6S
+    serial: na
+    site: mysite
+    tags:
+      - infra
+
+# VirtualMachine
+# 2022-11-01 pynetbox apparently does not yet support virtualization.virtual_machines endpoint 
+# Leaving this section here on the hope this is eventually supported.
+# Mandatory fields
+#   vm: (str) The name of the virtual machine
+# Optional fields
+#   cluster: (str) Cluster in which vm is located *,+
+#   device: (str) Device hosting the vm *
+#   memory: (int) Memory allocated to the virtual machine, in MB
+#   primary_ip4: (ipv4/prefix) IPv4 address of the vm *
+#   role: (str) Role the vm serves *
+#   site: (str) Site in which vm is located *
+#   status: (str) One of: offline, active, planned, staged, failed, decommissioning
+#   tenent: (str) Tenent to which vm is assigned *,+
+#   vcpus: (float) Number of virtual cpu units. Min 0.01
+#  * Item must be present in netbox
+#  + Not currently supported
+virtual_machines:
+  netbox:
+    vm: netbox
+    device: vm_host_1
+    role: ipam_dcim
+    memory: 4000
+    primary_ip4: 172.22.150.240/24
+    vcpus: 4
+    tags:
+      - admin
       - infra
 
 # VlanGroup

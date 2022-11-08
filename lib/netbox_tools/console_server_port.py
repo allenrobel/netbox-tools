@@ -31,9 +31,8 @@ class ConsoleServerPort(object):
         self.args['device'] = device_id(self.nb, self.device)
         if self.description != None:
             self.args['description'] = self.description
-        tags = self.tags
-        if tags != None:
-            self.args['tags'] = tags
+        if self.tags != None:
+            self.args['tags'] = self.tags
 
     def delete(self):
         self.validate_delete_keys()
@@ -104,7 +103,7 @@ class ConsoleServerPort(object):
             for tag in self.info['tags']:
                 tag_obj = get_tag(self.nb, tag)
                 if tag_obj == None:
-                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
+                    print('ConsoleServerPort.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
                     exit(1)
                 tag_list.append(tag_id(self.nb, tag))
             return tag_list

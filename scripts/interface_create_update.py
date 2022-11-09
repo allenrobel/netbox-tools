@@ -3,9 +3,9 @@
 Name: interface_create_update.py
 Description: Create/update an interface
 Example Usage:
-./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51 --description "My interface"
+./interface_create_update.py --device bgw_1 --interface mgmt0 --type 1000base-t --mgmt_only --disabled --mac 0844.cc4c.ee51 --description "My interface" --label "My interface"
 '''
-our_version = 106
+our_version = 107
 import argparse
 
 from netbox_tools.common import netbox
@@ -13,9 +13,11 @@ from netbox_tools.interface import Interface
 
 def get_parser():
     help_device = 'Device name to which the interface will be added.'
+    help_duplex = 'Optional. Valid values: auto, full, half.'
     help_description = 'Optional. Free-form description to associate with the interface.'
     help_disabled = 'Optional. Is the interface disabled or not. Default is False (i.e. interface is enabled)'
     help_interface = 'Name of the interface to add.'
+    help_label = 'Optional. Physical label on the interface.'
     help_mac = 'Optional. Mac address of the interface.'
     help_mode = 'Mode of interface (see http://<netbox_ip>/api/docs/ and look in POST /dcim/interfaces/ under type for valid modes).'
     help_mgmt_only = 'Optional. If present, interface will be flagged as management only. Default is False (not mgmt only)'
@@ -25,9 +27,11 @@ def get_parser():
 
     ex_prefix = ' Example: '
     ex_description = '{} --description "Server Vlan20"'.format(ex_prefix)
+    ex_duplex = '{} --duplex auto'.format(ex_prefix)
     ex_device = '{} --device leaf_1'.format(ex_prefix)
     ex_disabled = '{} --disabled'.format(ex_prefix)
     ex_interface = '{} --interface mgmt0'.format(ex_prefix)
+    ex_label = '{} --label my_interface_label'.format(ex_prefix)
     ex_mac = '{} --mac 00:01:00:00:bd:ff'.format(ex_prefix)
     ex_mgmt_only = '{} --mgmt_only'.format(ex_prefix)
     ex_mode = '{} --mode access'.format(ex_prefix)
@@ -52,6 +56,12 @@ def get_parser():
                         required=True,
                         help=help_device + ex_device)
 
+    default.add_argument('--duplex',
+                        dest='duplex',
+                        required=False,
+                        default=None,
+                        help=help_duplex + ex_duplex)
+
     mandatory.add_argument('--interface',
                         dest='interface',
                         required=True,
@@ -59,7 +69,7 @@ def get_parser():
 
     mandatory.add_argument('--type',
                         dest='type',
-                        required=False,
+                        required=True,
                         default=None,
                         help=help_type + ex_type)
 
@@ -69,6 +79,12 @@ def get_parser():
                         default=False,
                         action='store_true',
                         help=help_disabled + ex_disabled)
+
+    default.add_argument('--label',
+                        dest='label',
+                        required=False,
+                        default=None,
+                        help=help_label + ex_label)
 
     default.add_argument('--mac',
                         dest='mac',
@@ -114,35 +130,41 @@ def get_args():
        interface: name of the interface
     Optional keys:
         description: free-form description to associate with the interfacee
+        duplex: duplex of this interface. Valid values: auto, half, full
         interface_enabled: If True, Netbox will set its internal interface state to enabled
         interface_mode: Mode for this interface: access, tagged, tagged-all
         interface_type: Netbox type of this interface (default is 1000base-t)
+        label: physical label attached to the interface
         mac_address: Mac address of this interface
         mgmt_only: If True, the interface is used only for accessing management functions
         mtu: maximum transfer unit for the interface, in bytes
         vlan: Currently, vlan is applicable for access-mode interfaces only
     '''
     args = dict()
-    args['device'] = cfg.device
-    args['interface'] = cfg.interface
     if cfg.description != None:
         args['description'] = cfg.description
-    if cfg.mgmt_only == True:
-        args['mgmt_only'] = True
-    else:
-        args['mgmt_only'] = False
-    if cfg.mtu != None:
-        args['mtu'] = cfg.mtu
+    args['device'] = cfg.device
     if cfg.disabled == True:
         args['interface_enabled'] = False
     else:
         args['interface_enabled'] = True
-    if cfg.type != None:
-        args['interface_type'] = cfg.type
+    if cfg.duplex != None:
+        args['duplex'] = cfg.duplex
+    args['interface'] = cfg.interface
+    if cfg.label != None:
+        args['label'] = cfg.label
     if cfg.mac != None:
         args['mac_address'] = cfg.mac
+    if cfg.mgmt_only == True:
+        args['mgmt_only'] = True
+    else:
+        args['mgmt_only'] = False
     if cfg.mode != None:
         args['interface_mode'] = cfg.mode
+    if cfg.mtu != None:
+        args['mtu'] = cfg.mtu
+    if cfg.type != None:
+        args['interface_type'] = cfg.type
     if cfg.vlan != None:
         args['untagged_vlan'] = cfg.vlan
     return args

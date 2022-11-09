@@ -299,30 +299,6 @@ device_roles:
     color: gray_light
     description: bare metal servers hosting virtual machines
 
-
-# Interfaces
-# Mandatory keys
-#   device: Name of the device that contains this interface
-#   interface: Name of the interface e.g. Ethernet1/1
-# Optional keys
-#   description: Free-form description for the Console Server Port
-#   interface_enabled: True or False.  If True, interface is enabled.  If False, interface is disabled.
-#   interface_mode: Mode of the interface.  Valid values: access, tagged, tagged-all
-#   interface_type: PHY type of the interface. Common values: 1000base-t, 10gbase-t, 1000base-x-sfp.  See Netbox docs for full list.
-#   mac_address: The mac address of the interface.
-#   mgmt_only: True or False. If True, the interface is used only for device management.
-#   mtu: Maximum transfer unit, in bytes, of the interface
-#   untagged_vlan: Vlan ID for access mode interfaces
-
-interfaces:
-  cvd_leaf_1_e_1_1:
-    device: cvd_leaf_1
-    interface: Ethernet1/1
-    interface_mode: access
-    interface_type: 10gbase-x-sfpp
-    mac_address: 00a3.8ebf.eaf6
-    untagged_vlan: 10
-
 # Console Ports
 # Mandatory keys
 #   device: Name of the device that contains this port
@@ -366,8 +342,17 @@ console_server_ports:
 # Mandatory keys
 #   device: Name of the device
 #   site: The site in which the device is located (could be a fabric name, testbed, or physical location, etc)
-#   mgmt_ip: The IP address of interface used to manage the device
-#   interface: The interface used to manage the device, e.g. mgmt0 for NX-OS
+#   interface: A pointer to the interface used to manage the device. 
+#              The pointer is a key name in the interfaces dictionary in this file.
+#        For example, if the following is used as the management interface:
+#           interface: cvd_leaf_1_mgmt0
+#        We must have something like the following in the interfaces section
+#        interfaces:
+#           cvd_leaf_1_mgmt0:
+#             interface: mgmt0
+#             mgmt_only: True
+#             mac_address: 0000.014f.ffde
+#             etc...
 #   role: The device's functional role e.g. spine.
 #   type: The hardware device type which defines the device's make & model.
 #
@@ -397,8 +382,7 @@ console_server_ports:
 devices:
   lab_gateway_167_1:
     device: lab_gateway_1
-    mgmt_ip: 192.168.1.1/24
-    interface: mgmt0
+    interface: lab_gateway_167_1_mgmt0
     role: lab_gateway
     type: CISCO-UNKNOWN
     serial: na
@@ -407,14 +391,50 @@ devices:
       - infra
   vm_host_1:
     device: vm_host_1
-    mgmt_ip: 192.168.1.2/24
-    interface: eth1
+    interface: vm_host_1_eth1
     role: vm_host
     type: UCSC-C220-M6S
     serial: na
     site: mysite
     tags:
       - infra
+
+# Interfaces
+# Mandatory keys
+#   device: Name of the device that contains this interface
+#   interface: Name of the interface e.g. Ethernet1/1
+# Optional keys
+#   description: Free-form description for the Console Server Port
+#   interface_enabled: True or False.  If True, interface is enabled.  If False, interface is disabled.
+#   interface_mode: Mode of the interface.  Valid values: access, tagged, tagged-all
+#   interface_type: PHY type of the interface. Common values: 1000base-t, 10gbase-t, 1000base-x-sfp.  See Netbox docs for full list.
+#   ipv4: ipv4 address of the interface e.g. 192.168.0.1/24
+#   mac_address: The mac address of the interface.
+#   mgmt_only: True or False. If True, the interface is used only for device management.
+#   mtu: Maximum transfer unit, in bytes, of the interface
+#   untagged_vlan: Vlan ID for access mode interfaces
+#
+# NOTE: The dictionary key for each interface below is used as the value for 'interface'
+#       in the devices: section above.  Below, the keys are 'lab_gateway_167_1_mgmt0' 
+#       and 'vm_host_1_eth1' and these match the values for the 'interface' key for 
+#       devices 'cvd_leaf_1' and 'vm_host_1', respectively, in the devices section above
+interfaces:
+  lab_gateway_167_1_mgmt0:
+    device: cvd_leaf_1
+    interface: mgmt0
+    ipv4: 192.168.1.1/24
+    interface_mode: access
+    interface_type: 1000base-t
+    mac_address: 00a3.8ebf.eaf6
+    mgmt_only: True
+  vm_host_1_eth1:
+    device: vm_host_1
+    interface: eth1
+    ipv4: 192.168.1.2/24
+    interface_mode: access
+    interface_type: 1000base-t
+    mac_address: 00a3.66b4.f8aa
+    mgmt_only: True
 
 # VirtualMachine
 # 2022-11-01 pynetbox apparently does not yet support virtualization.virtual_machines endpoint 

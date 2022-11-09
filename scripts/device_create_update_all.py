@@ -5,7 +5,7 @@ Description: Create/update devices defined in ``--yaml``
 
 This script creates/updates device, device mgmt interface, and device primary_ip 
 '''
-our_version = 100
+our_version = 101
 import argparse
 from netbox_tools.common import netbox, load_yaml, interface_id, ip_address_id
 from netbox_tools.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
@@ -34,28 +34,52 @@ def get_parser():
                         version='%(prog)s {}'.format(our_version))
     return parser.parse_args()
 
-def assign_primary_ip_to_device(info):
-    ipv4_id = ip_address_id(nb, info['mgmt_ip'])
-    intf_id = interface_id(nb, info['device'], info['interface'])
+def assign_primary_ip_to_device(ip, device, interface):
+    ipv4_id = ip_address_id(nb, ip)
+    #intf_id = interface_id(nb, info['device'], info['interface'])
+    intf_id = interface_id(nb, device, interface)
     if ipv4_id == None:
-        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
+        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(ip))
         exit(1)
     if intf_id == None:
-        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
+        print('assign_primary_ip_to_device: Exiting. device {} interface {} not found in netbox'.format(
+            device,
+            interface))
         exit(1)
-    initialize_device_primary_ip(nb, info['device'])
-    map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
-    make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
+    initialize_device_primary_ip(nb, device)
+    map_device_primary_ip(nb, device, interface, ip)
+    make_device_primary_ip(nb, device, ip)
+
+def get_interface_dict(device_dict, interfaces_dict):
+    if 'interface' not in device_dict:
+        print('get_interface: exiting. interface key not found in device_dict {}'.format(device_dict))
+        exit(1)
+    interface_key = device_dict['interface']
+    if interface_key not in interfaces_dict:
+        print('get_interface: exiting. Interface {} not found in {} interfaces {}.'.format(interface_key, cfg.yaml, interfaces_dict.keys()))
+        exit(1)
+    return interfaces_dict[interface_key]
 
 cfg = get_parser()
 nb = netbox()
 info = load_yaml(cfg.yaml)
+
 for key in info['devices']:
     print('---')
     d = Device(nb, info['devices'][key])
     d.create_or_update()
-    i = Interface(nb, info['devices'][key])
+    interface_dict = get_interface_dict(info['devices'][key], info['interfaces'])
+    if 'ip4' not in interface_dict:
+        print('device {} interface {}, skipping ipv4 address processing since ip4 key is missing'.format(
+            interface_dict['device'],
+            interface_dict['interface']
+        ))
+        continue
+    i = Interface(nb, interface_dict)
     i.create_or_update()
-    ip = IpAddress(nb, info['devices'][key])
+    ip = IpAddress(nb, interface_dict)
     ip.create_or_update()
-    assign_primary_ip_to_device(info['devices'][key])
+    assign_primary_ip_to_device(
+        interface_dict['ip4'],
+        info['devices'][key]['device'],
+        interface_dict['interface'])

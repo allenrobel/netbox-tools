@@ -21,7 +21,7 @@ def initialize_device_primary_ip(nb, device_name):
     device.primary_ip4 = None
     device.primary_ip = None
     device.save()
-    print('device.initialize_device_primary_ip: device {} primary_ip and primary_ip4'.format(device_name))
+    print('device.initialize_device_primary_ip: device {}'.format(device_name))
 
 def map_device_primary_ip(nb, device_name, interface_name, ip_address):
     '''

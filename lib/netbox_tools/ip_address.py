@@ -7,13 +7,26 @@ from netbox_tools.common import device_id, get_device
 from netbox_tools.common import interface_id
 
 class IpAddress(object):
+    '''
+    nb = netbox instance
+    info = dictionary with the following keys:
+    {
+        # mandatory
+        device: device to which the interface belongs e.g. cvd_leaf_1
+        interface: interface on which ip addresses will be assigned e.g. mgmt0, Eth1/1, Vlan150, etc
+        ip4: ipv4 address for the interface e.g. 1.1.1.0/24
+        # optional
+        ip_description: free-form description of the ip address
+        ip_status: status of the ip address. Valid values: active, reserved, deprecated, dhcp, slaac
+    }
+    '''
     def __init__(self, nb, info):
         self.version = 101
         self.nb = nb
         self.info = info
         self.args = dict()
-        self.mandatory_keys = ['interface', 'mgmt_ip', 'device']
-        self.optional_keys = ['interface_description', 'interface_status']
+        self.mandatory_keys = ['interface', 'ip4', 'device']
+        self.optional_keys = ['ip_description', 'ip_status']
         self.default_ip_address_type = '1000base-t'
         self.default_ip_address_enabled = True
         self.fix_deprecations()
@@ -36,20 +49,20 @@ class IpAddress(object):
                 exit(1)
 
     def generate_args(self):
-        self.args['address'] = self.mgmt_ip
+        self.args['address'] = self.ip4
         self.args['assigned_object_id'] = device_id(self.nb, self.device)
         self.args['interface'] = interface_id(self.nb, self.device, self.interface)
-        if self.interface_description == None:
+        if self.ip_description == None:
             self.args['description'] = '{} : {} : {}'.format(
                 self.device,
                 self.interface,
-                self.mgmt_ip)
+                self.ip4)
         else:
-            self.args['description'] = self.interface_description
-        if self.interface_status == None:
+            self.args['description'] = self.ip_description
+        if self.ip_status == None:
             self.args['status'] = 'active'
         else:
-            self.args['status'] = self.interface_status
+            self.args['status'] = self.ip_status
 
     def initialize_device_primary_ip(self):
         '''
@@ -59,28 +72,27 @@ class IpAddress(object):
         device.primary_ip4 = None
         device.primary_ip = None
         device.save()
-        print('IpAddress.initialize_device_primary_ip: device {} primary_ip and primary_ip4'.format(self.device))
 
     def create(self):
-        print('IpAddress.create: device {} address {}'.format(self.device, self.mgmt_ip))
+        print('IpAddress.create: device {} address {}'.format(self.device, self.ip4))
         try:
             self.nb.ipam.ip_addresses.create(self.args)
         except Exception as e:
             print('IpAddress.create: Exiting. Unable to create device {} ip_address {}.  Error was: {}'.format(
                 self.device,
-                self.mgmt_ip,
+                self.ip4,
                 e))
             exit(1)
 
     def update(self):
-        print('IpAddress.update: device {} address {}'.format(self.device, self.mgmt_ip))
+        print('IpAddress.update: device {} address {}'.format(self.device, self.ip4))
         self.args['id'] = self.ip_address_id
         try:
             self.ip_address.update(self.args)
         except Exception as e:
             print('IpAddress.update: Exiting. Unable to update device {} ip_address {}.  Error was: {}'.format(
                 self.device,
-                self.mgmt_ip,
+                self.ip4,
                 e))
             exit(1)
 
@@ -95,25 +107,25 @@ class IpAddress(object):
         return self.info['device']
 
     @property
-    def interface_description(self):
-        if 'interface_description' in self.info:
-            return self.info['interface_description']
+    def ip_description(self):
+        if 'ip_description' in self.info:
+            return self.info['ip_description']
         else:
             return None
 
     @property
-    def interface_status(self):
-        if 'interface_status' in self.info:
-            return self.info['interface_status']
+    def ip_status(self):
+        if 'ip_status' in self.info:
+            return self.info['ip_status']
         else:
             return None
 
     @property
     def ip_address(self):
         try:
-            address,mask = self.mgmt_ip.split('/')
+            address,mask = self.ip4.split('/')
         except Exception as e:
-            print('IpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.mgmt_ip, e))
+            print('IpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.ip4, e))
             exit(1)
         return self.nb.ipam.ip_addresses.get(
             address=address,
@@ -147,5 +159,5 @@ class IpAddress(object):
         return self.info['interface']
 
     @property
-    def mgmt_ip(self):
-        return self.info['mgmt_ip']
+    def ip4(self):
+        return self.info['ip4']

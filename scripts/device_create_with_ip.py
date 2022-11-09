@@ -15,7 +15,8 @@ Example usage:
 ./device_create_2.py \
         --device foo \
         --interface mgmt0 \
-        --mgmt_ip 10.10.10.10/24 \
+        --interface_type 1000base-t \
+        --ip4 10.10.10.10/24 \
         --role lab_tor \
         --site SJC03-1-155 \
         --serial CN943G \
@@ -23,7 +24,7 @@ Example usage:
         --type CISCO-2600
 '''
 
-our_version = 102
+our_version = 103
 from netbox_tools.common import ip_address_id, interface_id
 from netbox_tools.device import Device, initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
 from netbox_tools.interface import Interface
@@ -37,7 +38,8 @@ from netbox_tools.common import get_device
 def get_parser():
     help_device = 'Name of the device to add.'
     help_interface = 'Management interface for the device.'
-    help_mgmt_ip = 'Management IPv4 address for the device.'
+    help_interface_type = 'PHY type for the device management interface.'
+    help_ip4 = 'Management IPv4 address for the device.'
     help_role = 'Role for the device. Role must already exist in netbox.'
     help_serial = 'Optional. Default: na. Serial number of the device.'
     help_site = 'Site in which device will reside. Site must already exist in netbox.'
@@ -46,7 +48,8 @@ def get_parser():
     ex_prefix     = 'Example: '
     ex_device = '{} --device leaf_3'.format(ex_prefix)
     ex_interface = '{} --interface mgmt0'.format(ex_prefix)
-    ex_mgmt_ip = '{} --mgmt_ip 192.168.1.5/24'.format(ex_prefix)
+    ex_interface_type = '{} --interface_type 1000base-t'.format(ex_prefix)
+    ex_ip4 = '{} --ip4 192.168.1.5/24'.format(ex_prefix)
     ex_role = '{} --role leaf'.format(ex_prefix)
     ex_serial = '{} --serial CX045BN'.format(ex_prefix)
     ex_site = '{} --site f1'.format(ex_prefix)
@@ -67,10 +70,14 @@ def get_parser():
                         dest='interface',
                         required=True,
                         help=help_interface + ex_interface)
-    mandatory.add_argument('--mgmt_ip',
-                        dest='mgmt_ip',
+    mandatory.add_argument('--interface_type',
+                        dest='interface_type',
                         required=True,
-                        help=help_mgmt_ip + ex_mgmt_ip)
+                        help=help_interface_type + ex_interface_type)
+    mandatory.add_argument('--ip4',
+                        dest='ip4',
+                        required=True,
+                        help=help_ip4 + ex_ip4)
     mandatory.add_argument('--role',
                         dest='role',
                         required=True,
@@ -107,8 +114,9 @@ def get_tags():
     return tags
 def get_info():
     info = dict()
-    info['mgmt_ip'] = cfg.mgmt_ip
+    info['ip4'] = cfg.ip4
     info['interface'] = cfg.interface
+    info['interface_type'] = cfg.interface_type
     info['device'] = cfg.device
     info['role'] = cfg.role
     if cfg.serial != None:
@@ -122,17 +130,17 @@ def get_info():
     return info
 
 def assign_primary_ip_to_device(info):
-    ipv4_id = ip_address_id(nb, info['mgmt_ip'])
+    ipv4_id = ip_address_id(nb, info['ip4'])
     intf_id = interface_id(nb, info['device'], info['interface'])
     if ipv4_id == None:
-        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['mgmt_ip']))
+        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['ip4']))
         exit(1)
     if intf_id == None:
         print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
         exit(1)
     initialize_device_primary_ip(nb, info['device'])
-    map_device_primary_ip(nb, info['device'], info['interface'], info['mgmt_ip'])
-    make_device_primary_ip(nb, info['device'], info['mgmt_ip'])
+    map_device_primary_ip(nb, info['device'], info['interface'], info['ip4'])
+    make_device_primary_ip(nb, info['device'], info['ip4'])
 
 cfg = get_parser()
 nc = NetboxCredentials()

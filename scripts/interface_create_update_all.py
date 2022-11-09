@@ -36,6 +36,6 @@ cfg = get_parser()
 info = load_yaml(cfg.yaml)
 nb = netbox()
 print('---')
-for key in info['devices']:
-    i = Interface(nb, info['devices'][key])
+for key in info['interfaces']:
+    i = Interface(nb, info['interfaces'][key])
     i.create_or_update()

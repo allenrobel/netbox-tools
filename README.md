@@ -164,6 +164,9 @@ Below is a complete list.
 
 Script                         | Description
 ------------                   | -----------
+[console_port_create_update_all] | Create/update a console port from information in a YAML file
+[console_port_delete] | Delete console_port from netbox, given ``--device`` ``--port``
+[console_ports_print] | Display information about all console ports
 [console_server_port_create_update_all] | Create/update a console server port from information in a YAML file
 [console_server_port_create_update] | Create/update a console server port using command line options
 [console_server_port_delete] | Delete console_server_port ``--port`` from netbox
@@ -232,6 +235,9 @@ GNU General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 
+[console_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_create_update_all.py
+[console_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_delete.py
+[console_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_ports_print.py
 [console_server_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_server_port_create_update_all.py
 [console_server_port_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_server_port_create_update.py
 [console_server_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_server_port_delete.py

@@ -217,7 +217,34 @@ def netbox_id_untagged_vlan(nb, vid):
         vlan_object = nb.ipam.vlans.get(vid=vid)
         return vlan_object.id
     except Exception as e:
-        print('common.netbox_id_untagged_vlan: returning None. exception was: {}'.format(e))
+        print('common.netbox_id_untagged_vlan: returning None for vid {}. exception was: {}'.format(vid, e))
+        print('common.netbox_id_untagged_vlan: possibly vlan ID (vid) {} does not yet exist in netbox, in which case you need to create it first.'.format(vid))
+        return None
+
+def vlan_name_to_id(nb, vlan_name):
+    '''
+    Given netbox instance and Vlan name, return Netbox id.
+    If vlan does not exist in netbox, return None
+    '''
+    try:
+        vlan_object = nb.ipam.vlans.get(name=vlan_name)
+        return vlan_object.id
+    except Exception as e:
+        print('common.vlan_name_to_id: returning None for vlan_name {}. exception was: {}'.format(vlan_name, e))
+        print('common.vlan_name_to_id: possibly vlan_name {} does not yet exist in netbox, in which case you need to create it first.'.format(vlan_name))
+        return None
+
+def vlan_vid_to_id(nb, vlan_vid):
+    '''
+    Given netbox instance and Vlan vid, return Netbox id.
+    If vlan does not exist in netbox, return None
+    '''
+    try:
+        vlan_object = nb.ipam.vlans.get(vid=vlan_vid)
+        return vlan_object.id
+    except Exception as e:
+        print('common.vlan_vid_to_id: returning None for vlan_vid {}. exception was: {}'.format(vlan_vid, e))
+        print('common.vlan_vid_to_id: possibly vlan_vid {} does not yet exist in netbox, in which case you need to create it first.'.format(vlan_vid))
         return None
 
 def vlan_group_id(nb, vlan_group_name):

@@ -4,7 +4,7 @@ Description: Class for create, update, delete operations on netbox ip_prefix
 '''
 
 from netbox_tools.common import device_id, get_device
-from netbox_tools.common import site_id
+from netbox_tools.common import site_id, vlan_vid_to_id
 
 class IpPrefix(object):
     def __init__(self, nb, info):
@@ -38,6 +38,8 @@ class IpPrefix(object):
             self.args['status'] = self.status
         else:
             self.args['status'] = self.default_status
+        if self.vlan != None:
+            self.args['vlan'] = self.vlan_id
 
     def delete(self):
         print('IpPrefix.delete: prefix {}'.format(self.prefix))
@@ -118,5 +120,21 @@ class IpPrefix(object):
     def status(self):
         if 'status' in self.info:
             return self.info['status']
+        else:
+            return None
+
+    @property
+    def vlan(self):
+        '''Vlan vid'''
+        if 'vlan' in self.info:
+            return self.info['vlan']
+        else:
+            return None
+
+    @property
+    def vlan_id(self):
+        '''Netbox ID of the vlan'''
+        if 'vlan' in self.info:
+            return vlan_vid_to_id(self.nb, self.vlan)
         else:
             return None

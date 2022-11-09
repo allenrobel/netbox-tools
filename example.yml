@@ -94,6 +94,7 @@ sites:
 #   site: The site in which the prefix resides (must match a site in the sites: section of this file)
 #   description: free-form description for the prefix
 #   status: Operational status of this prefix. Valid values: container, active, reserved, deprecated
+#   vlan: vlan ID aka vid
 prefixes:
   192.168.5.0/24:
     prefix: 192.168.5.0/24
@@ -486,7 +487,7 @@ vlan_groups:
 # Vlans
 # Mandatory fields
 #   vlan_name: The vlan name
-#   vid: The vlan ID of the vlan
+#   vid: The vlan ID, aka vid, of the vlan
 # Optional fields
 #   description: Free-form description for the vlan
 #   group: The vlan_group the vlan belongs to.  Must already exist in Netbox. See vlan_groups above. Mutually-exclusive with site.
@@ -502,7 +503,11 @@ vlans:
     vlan_name: WebServers
     vid: 10
     site: mysite
+    status: active
   Vlan20:
     vlan_name: DBServers
     vid: 20
     group: AdminServers
+    status: active
+    tags:
+      - admin

@@ -4,13 +4,12 @@ Name: device_create_all.py
 Summary: Delete all devices contained in the YAML file pointed to with --yaml
 Description: Delete device --device from netbox
 '''
-our_version = 102
+our_version = 103
 import argparse
+from netbox_tools.common import netbox
+from netbox_tools.device import Device
 
 def get_parser():
-    from netbox_tools.common import netbox
-    from netbox_tools.device import Device
-
     help_device = 'Name of the device to delete.'
 
     ex_prefix = ' Example: '

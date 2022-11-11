@@ -150,7 +150,11 @@ Location.update: row-c
 etc...
 ```
 
-We'll be adding additional things like console ports, etc, as we update this repo.
+## CAVEATS
+
+Item                      | Caveat
+------------              | -----------
+[cable_create_update_all] | ``2022-11-10`` We were hitting a 500 error when trying to call update() on the cable object.  For now, as a workaround, Cable.update() deletes the cable, then recreates it.  This is not ideal since the cable id changes, which deletes any journal entries and change logs for the cable.  We're probably doing something stupid and will try to get it fixed soon.
 
 ## Scripts
 
@@ -164,10 +168,12 @@ Below is a complete list.
 
 Script                         | Description
 ------------                   | -----------
-[console_port_create_update_all] | Create/update a console port from information in a YAML file
+[cable_create_update_all] | See CAVEATS: Create/update all cables defined in ``--yaml``
+[cable_delete_all] | Delete all cables defined in ``--yaml``
+[console_port_create_update_all] | Create/update all console ports defined in ``--yaml``
 [console_port_delete] | Delete console_port from netbox, given ``--device`` ``--port``
 [console_ports_print] | Display information about all console ports
-[console_server_port_create_update_all] | Create/update a console server port from information in a YAML file
+[console_server_port_create_update_all] | Create/update all console server ports defined in ``--yaml``
 [console_server_port_create_update] | Create/update a console server port using command line options
 [console_server_port_delete] | Delete console_server_port ``--port`` from netbox
 [console_server_ports_print] | Display information about all console server ports
@@ -175,14 +181,14 @@ Script                         | Description
 [device_assign_primary_ip.py]  | Assign an ip address to a device and make this address the primary ip for the device
 [device_choices_print] | Display choices associated with Netbox endpoint dcim.devices
 [device_count] | Print the number of devices matching a given query
-[device_create_update_all] | Create/update all Netbox devices defined in ``--yaml``
-[device_type_create_update] | Create/update a Netbox device type using command line options
-[device_type_create_update_all] | Create/update device types from information in a YAML file
+[device_create_update_all] | Create/update all devices defined in ``--yaml``
+[device_type_create_update] | Create/update a device type using command line options
+[device_type_create_update_all] | Create/update all device types defined in ``--yaml``
 [device_type_delete_all] | Delete all device types contained in the YAML file ``--yaml``
 [device_type_delete] | Delete device_type ``--model`` from netbox
 [device_type_print] | Display information about a device type
 [device_types_print] | Display summary information about all device types
-[entity_create_update_all.py] | Create/update all Netbox entities (console server ports, device types, etc) from information in a YAML file
+[entity_create_update_all.py] | Create/update all Netbox entities (console server ports, device types, etc) defined in ``--yaml``
 [interface_create_update] | Create/update an interface using command line options
 [interface_create_update_all] | Create/update all interfaces defined in ``--yaml``
 [interface_delete] | Delete interface ``--interface`` from netbox
@@ -197,29 +203,29 @@ Script                         | Description
 [location_create_update_all] | Create/update locations defined in ``--yaml``.
 [location_delete_all] | Delete all locations defined in ``--yaml``
 [location_delete] | Delete location ``--location`` from netbox
-[manufacturer_create_update_all] | Create/update manufacturers defined in ``--yaml``
+[manufacturer_create_update_all] | Create/update all manufacturers defined in ``--yaml``
 [manufacturer_create_update] | Create/update manufacturer ``--manufacturer``
 [manufacturer_delete] | Delete manufacturer ``--manufacturer``
-[rack_create_update_all] | Create/update racks defined in ``--yaml``
+[rack_create_update_all] | Create/update all racks defined in ``--yaml``
 [rack_create_update] | Create/update using command line options ``--comments``, ``--location``, ``--rack``, ``--site``, ``--tags``, ``--u_height``
 [rack_delete] | Delete rack ``--rack``
 [rack_print] | Display information about ``--rack``
 [racks_print] | Display information about all racks
-[role_create_update_all] | Create/update device roles defined in ``--yaml``
+[role_create_update_all] | Create/update all device roles defined in ``--yaml``
 [role_create_update] | Create/update device role using command line options ``--color``, ``--description``, ``--role``, ``--tags``
 [role_delete] | Delete role ``--role``
 [role_print] | Display information about device role ``--role``
 [roles_print] | Display information about all device roles
-[site_create_update_all] | Create/update sites defined in ``--yaml``
+[site_create_update_all] | Create/update all sites defined in ``--yaml``
 [site_delete] | Delete site ``--site``
 [site_print] | Display information about ``--site``
 [sites_print] | Display information about all sites
-[tag_create_update_all] | Create/update tags defined in ``--yaml``
+[tag_create_update_all] | Create/update all tags defined in ``--yaml``
 [tag_delete] | Delete tag ``--tag``
 [tags_print] | Display information about all tags
-[vlan_create_update_all] | Create/update vlans defined in ``--yaml``
+[vlan_create_update_all] | Create/update all vlans defined in ``--yaml``
 [vlan_delete] | Delete vlan ``--vlan``
-[vlan_group_create_update_all] | Create/update vlan_groups defined in ``--yaml``
+[vlan_group_create_update_all] | Create/update all vlan_groups defined in ``--yaml``
 [vlan_group_create_update] | Create/update a vlan_group with command line options ``--description``, ``--max_vid``, ``--min_vid``, ``--tags``, ``--vlan_group``
 [vlan_group_delete] | Delete vlan_group ``--vlan_group``
 [vlan_group_print] | Display information about vlan_group ``--vlan_group``
@@ -235,6 +241,8 @@ GNU General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 
+[cable_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_create_update_all.py
+[cable_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_all.py
 [console_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_create_update_all.py
 [console_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_delete.py
 [console_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_ports_print.py

@@ -44,6 +44,13 @@ def get_console_port(nb, device, port):
         print('common.console_port: returning None. exception was: {}'.format(e))
         return None
 
+def cable_id(nb, label):
+    try:
+        cable = nb.dcim.cables.get(label=label)
+    except:
+        print('common.cable_id: returning None. exception was: {}'.format(e))
+        return None
+
 def console_port_id(nb, device, port):
     '''
     Given netbox instance, device name, and port, return console_port ID.
@@ -53,9 +60,9 @@ def console_port_id(nb, device, port):
         console_port = nb.dcim.console_ports.get(device=device, name=port)
         if console_port != None:
             return console_port.id
-        print('common.console_port: returning None. console_port device {} port {} does not exist in netbox'.format(device, port))
+        print('common.console_port_id: returning None. console_port device {} port {} does not exist in netbox'.format(device, port))
     except Exception as e:
-        print('common.console_port: returning None. exception was: {}'.format(e))
+        print('common.console_port_id: returning None. exception was: {}'.format(e))
         return None
 
 # console_server_port

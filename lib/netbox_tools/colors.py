@@ -25,14 +25,20 @@ def color(s):
         return s
 
 def color_to_rgb(s):
+    '''
+    If s is not in color2rgb, and is 6 characters long, we assume it is a valid rgb string and return it unchanged.
+    '''
     if s in color2rgb:
         return color2rgb[s]
+    if len(s) == 6:
+        return s
     else:
-        print('exiting. Unknown color {}.  Valid colors: {}'.format(s, ', '.join(color2rgb.keys())))
+        print('colors.color_to_rgb: exiting. Unknown color {}.  Valid colors: {}'.format(s, ', '.join(color2rgb.keys())))
         exit(1)
+
 def rgb_to_color(s):
     if s in rgb2color:
         return rgb2color[s]
     else:
-        print('exiting. Unknown rgb {}.  Valid rgb: {}'.format(s, ', '.join(rgb2color.keys())))
+        print('colors.rgb_to_color: exiting. Unknown rgb {}.  Valid rgb: {}'.format(s, ', '.join(rgb2color.keys())))
         exit(1)

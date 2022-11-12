@@ -26,7 +26,7 @@ class Cable(object):
         self.mandatory_keys_delete = set()
         self.mandatory_keys_delete.add('label')
         self.optional_keys = set()
-        self.optional_keys.add('color') # str - a color from colors.py in this repo, or a hex rgb value.
+        self.optional_keys.add('color') # str - a color from colors.py in this repo, or a hex rgb color value, e.g. for red: f44336
         self.optional_keys.add('length') # int
         self.optional_keys.add('length_unit') # str
         self.optional_keys.add('status') # str
@@ -76,9 +76,11 @@ class Cable(object):
 
     def set_color(self):
         if self.rgb == None:
-            print('Cable.set_color: returning none. args {}'.format(self.info))
             return
         self.args['color'] = self.rgb
+
+    def set_label(self):
+        self.args['label'] = self.label
 
     def set_length(self):
         if self.length == None:
@@ -124,8 +126,7 @@ class Cable(object):
         if self.port_a_type not in self.valid_port_types:
             print('Cable.set_a_terminations: exiting. Unexpected port_a_type. Got {}. Expected one of {}.'.format(
                 self.port_a_type,
-                ','.join(self.valid_port_types)
-            ))
+                ','.join(self.valid_port_types)))
             exit(1)
         self.args['a_terminations'] = list()
         termination = dict()
@@ -146,8 +147,7 @@ class Cable(object):
         if self.port_b_type not in self.valid_port_types:
             print('Cable.set_b_terminations: exiting. Unexpected port_b_type. Got {}. Expected one of {}.'.format(
                 self.port_b_type,
-                ','.join(self.valid_port_types)
-            ))
+                ','.join(self.valid_port_types)))
             exit(1)
         self.args['b_terminations'] = list()
         termination = dict()
@@ -160,9 +160,9 @@ class Cable(object):
             self.args['tags'] = self.tags
 
     def generate_args_create_or_update(self):
-        self.args['label'] = self.label
         self.set_cable_type()
         self.set_color()
+        self.set_label()
         self.set_length_unit()
         self.set_status()
         self.set_length()
@@ -179,12 +179,11 @@ class Cable(object):
             exit(1)
 
     def update(self):
-        # We've tried calling update() on the object, per other classes in this repo, but that results in:
-        # object has no attribute "id" (even though 'id' is present when the object is inspected)
+        # There's a bug that causes update not to work for cable.
+        # https://github.com/netbox-community/pynetbox/issues/491
         # For now, we delete the cable, then recreate it with the new args.
         # This results in the cable_id changing though, which isn't ideal since change log will only
         # ever have one entry, and journel entries will be deleted.
-        # TODO: continue working on this...
         print('Cable.update: {} cable_id {}'.format(self.label, self.cable_id))
         try:
             self.cable_object.delete()
@@ -197,6 +196,15 @@ class Cable(object):
         except Exception as e:
             print('Cable.update: Exiting. Unable to create Cable {}.  Error was: {}'.format(self.label, e))
             exit(1)
+
+    # def update(self):
+    #     print('Cable.update: {} cable_id {}'.format(self.label, self.cable_id))
+    #     try:
+    #         self.cable_object.update(self.args)
+    #     except Exception as e:
+    #         print('Cable.update: Unable to update cable {}. Error was: {}'.format(self.label, e))
+    #         print('Cable.update: args: {}'.format(self.args))
+    #         exit(1)
 
     def delete(self):
         print('Cable.delete: {}'.format(self.label))

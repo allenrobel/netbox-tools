@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: console_port_create_update_all.py
-Description: Create or update operations on Netbox endpoint /dcim/console-ports/ from information in a YAML file.
+Description: Create/update all cables defined in ``--yaml``
 '''
 our_version = 100
 import argparse
@@ -15,7 +15,7 @@ def get_parser():
     ex_yaml = '{} --yaml ./console_ports.yml'.format(ex_prefix)
 
     parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Create or update operations on Netbox endpoint /dcim/console-ports/ from information in a YAML file')
+            description='DESCRIPTION: Create/update all cables defined in ``--yaml``')
 
     mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
     default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')

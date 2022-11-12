@@ -169,7 +169,9 @@ Below is a complete list.
 Script                         | Description
 ------------                   | -----------
 [cable_create_update_all] | See CAVEATS: Create/update all cables defined in ``--yaml``
+[cable_create_update_one] | Create/update cable in Netbox with key ``--key`` in file ``--yaml``
 [cable_delete_all] | Delete all cables defined in ``--yaml``
+[cable_delete_one] | Delete cable from Netbox with key ``--key`` in file ``--yaml``
 [console_port_create_update_all] | Create/update all console ports defined in ``--yaml``
 [console_port_delete] | Delete console_port from netbox, given ``--device`` ``--port``
 [console_ports_print] | Display information about all console ports
@@ -242,7 +244,9 @@ GNU General Public License v3.0 or later.
 See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 
 [cable_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_create_update_all.py
+[cable_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_create_update_one.py
 [cable_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_all.py
+[cable_delete_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_one.py
 [console_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_create_update_all.py
 [console_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_delete.py
 [console_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_ports_print.py

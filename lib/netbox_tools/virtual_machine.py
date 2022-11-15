@@ -2,7 +2,8 @@
 Name: virtual_machine.py
 Description: create/update/delete operations on netbox virtual_machine
 '''
-
+our_version = 101
+from inspect import stack, getframeinfo, currentframe
 from netbox_tools.common import cluster_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import device_id
@@ -22,7 +23,7 @@ def initialize_vm_primary_ip(nb, vm_name):
     vm.primary_ip4 = None
     vm.primary_ip = None
     vm.save()
-    print('virtual_machine.initialize_vm_primary_ip: vm {} primary_ip and primary_ip4'.format(vm_name))
+    print('{}(v{}).{}: vm: {}'.format(__name__, our_version, getframeinfo(currentframe()).function, vm_name))
 
 
 def map_vm_primary_ip(nb, vm_name, interface_name, ip_address):
@@ -45,11 +46,7 @@ def map_vm_primary_ip(nb, vm_name, interface_name, ip_address):
     address.assigned_object_id = virtual_interface_id(nb, vm_name, interface_name)
     address.assigned_object_type = "virtualization.vminterface"
     address.save()
-    print('virtual_machine.map_vm_primary_ip: vm {} interface {} address {}'.format(
-        vm_name,
-        interface_name,
-        ip_address))
-
+    print('{}(v{}).{}: vm: {}, interface: {}, address: {}'.format(__name__, our_version, getframeinfo(currentframe()).function, vm_name, interface_name, ip_address))
 
 def make_vm_primary_ip(nb, vm, ip):
     '''
@@ -61,29 +58,33 @@ def make_vm_primary_ip(nb, vm, ip):
     vm.primary_ip = address_id
     vm.primary_ip4 = address_id
     vm.save()
-    print('vm.make_vm_primary_ip: vm {} ip {}'.format(vm, ip))
+    print('{}(v{}).{}: vm: {}, ip: {}'.format(__name__, our_version, getframeinfo(currentframe()).function, vm, ip))
 
 
 class VirtualMachine(object):
     def __init__(self, nb, info):
         self.nb = nb
         self.info = info
+        self.lib_version = our_version
+        self.classname = __class__.__name__
         self.args = dict()
         self.mandatory_keys_create_or_update = ['vm', 'role']
         self.mandatory_keys_delete = ['vm']
 
+    def log(self, msg):
+        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
 
     def validate_keys_delete(self):
         for key in self.mandatory_keys_delete:
             if key not in self.info:
-                print('VirtualMachine.validate_keys_delete: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
 
     def validate_keys_create_or_update(self):
         for key in self.mandatory_keys_create_or_update:
             if key not in self.info:
-                print('VirtualMachine.validate_keys_create_or_update: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
 
@@ -100,7 +101,6 @@ class VirtualMachine(object):
     def set_device(self):
         '''device that hosts the virtual_machine'''
         if self.device != None:
-            print('VirtualMachine.set_device: got device {}'.format(self.device))
             self.args['device'] = device_id(self.nb, self.device)
 
 
@@ -157,21 +157,21 @@ class VirtualMachine(object):
 
 
     def create(self):
-        print('VirtualMachine.create: {} {}'.format(self.vm))
+        self.log('{}'.format(self.vm))
         try:
             self.nb.virtualization.virtual_machines.create(self.args)
         except Exception as e:
-            print('VirtualMachine.create: Exiting. Unable to create vm {}.  Error was: {}'.format(self.vm, e))
+            self.log('exiting. Unable to create vm {}.  Error was: {}'.format(self.vm, e))
             exit(1)
 
 
     def update(self):
-        print('VirtualMachine.update: {}'.format(self.vm))
+        self.log('{}'.format(self.vm))
         self.args['id'] = self.vm_id
         try:
             self.vm_object.update(self.args)
         except Exception as e:
-            print('VirtualMachine.update: Exiting. Unable to update vm {}.  Error was: {}'.format(self.vm, e))
+            self.log('exiting. Unable to update vm {}.  Error was: {}'.format(self.vm, e))
             exit(1)
 
 
@@ -179,12 +179,12 @@ class VirtualMachine(object):
         print('VirtualMachine.delete: {}'.format(self.device))
         self.validate_keys_delete()
         if self.vm_object == None:
-            print('VirtualMachine.delete: Nothing to do, vm {} does not exist in netbox.'.format(self.vm))
+            self.log('Nothing to do, vm {} does not exist in netbox.'.format(self.vm))
             return
         try:
             self.vm_object.delete()
         except Exception as e:
-            print('VirtualMachine.delete: Exiting. Unable to delete vm {}.  Error was: {}'.format(self.vm, e))
+            self.log('exiting. Unable to delete vm {}.  Error was: {}'.format(self.vm, e))
             exit(1)
 
 
@@ -280,10 +280,10 @@ class VirtualMachine(object):
             try:
                 vcpus = float(str(self.info['vcpus']))
             except:
-                print('VirtualMachine.vcpus: exiting. vcpus must be of type float. e.g. 1.01. Got {}'.format(self.info['vcpus']))
+                self.log('exiting. vcpus must be of type float. e.g. 1.01. Got {}'.format(self.info['vcpus']))
                 exit(1)
             if vcpus < 0.01:
-                print('VirtualMachine.vcpus: exiting. vcpus must be greater than 0.01. Got {}'.format(self.info['vcpus']))
+                self.log('exiting. vcpus must be greater than 0.01. Got {}'.format(self.info['vcpus']))
                 exit(1)
             return self.info['vcpus']
         else:

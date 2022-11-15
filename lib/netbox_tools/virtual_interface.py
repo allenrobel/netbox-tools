@@ -148,7 +148,6 @@ class VirtualInterface(object):
     def create_or_update(self):
         self.validate_create_update_keys()
         self.generate_create_update_args()
-        print('HERE1: self.interface_object {}'.format(self.interface_object))
         if self.interface_object == None:
             self.create()
         else:

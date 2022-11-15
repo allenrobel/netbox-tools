@@ -458,34 +458,86 @@ cables:
       - admin
       - yoda
 
-# VirtualMachine
-# 2022-11-01 pynetbox apparently does not yet support virtualization.virtual_machines endpoint 
-# Leaving this section here on the hope this is eventually supported.
+
+# clusters
+# Mandatory fields
+#   cluster: (str) The name of the cluster
+#   type: (str) pointer to item in cluster_types dictionary
+#   group: The cluster_group that contains the cluster. Mutually-exclusive with site. (NOT YET SUPPORTED)
+#   site: The site that contains the cluster.  Mutually-exclusive with group.
+# Optional fields
+#   description: (str) free-form description of the cluster type
+#   tags: YAML list of tags to allow later searching by tag
+clusters:
+  db:
+    cluster: db
+    type: vmware
+    # group: db_servers
+    site: mysite
+
+# cluster_types
+# Mandatory fields
+#   name: (str) The name of the cluster type
+# Optional fields
+#   description: (str) free-form description of the cluster type
+#   tags: YAML list of tags to allow later searching by tag
+cluster_types:
+  vmware:
+    name: vmware
+    description: VMWare cluster
+    tags:
+      - admin
+
+# virtual_machines
 # Mandatory fields
 #   vm: (str) The name of the virtual machine
+#   One of these, but not both:
+#       cluster: (str) The cluster in which the virtual machine is located *,^,+
+#       site: (str) The site in which the virtual machine is located @,^
 # Optional fields
-#   cluster: (str) Cluster in which vm is located *,+
+#   cluster: (str) Cluster in which vm is located *
 #   device: (str) Device hosting the vm *
 #   memory: (int) Memory allocated to the virtual machine, in MB
 #   primary_ip4: (ipv4/prefix) IPv4 address of the vm *
 #   role: (str) Role the vm serves *
-#   site: (str) Site in which vm is located *
 #   status: (str) One of: offline, active, planned, staged, failed, decommissioning
 #   tenent: (str) Tenent to which vm is assigned *,+
 #   vcpus: (float) Number of virtual cpu units. Min 0.01
 #  * Item must be present in netbox
 #  + Not currently supported
+#  @ If site is not defined, cluster must be defined
+#  ^ If cluster is not defined, site must be defined.
 virtual_machines:
-  netbox:
+  netbox_vm:
     vm: netbox
+    site: mysite
     device: vm_host_1
     role: ipam_dcim
     memory: 4000
-    primary_ip4: 172.22.150.240/24
+    interface: netbox_vm_vmnet0
     vcpus: 4
     tags:
       - admin
       - infra
+
+# virtual_interfaces
+# Mandatory fields:
+#    virtual_machine
+#    interface:
+# Optional fields:
+#   description       str - freeform description of the interface
+#   ip4               ipv4 address with prefix e.g. A.B.C.D/E
+#   interface_enabled bool - interface administrative state enabled?  True/False
+#   interface_mode    str - access, tagged, tagged-all
+#   mac_address       str - xxxx.xxxx.xxxx, xx:xx:xx:xx:xx:xx
+#   untagged_vlan     int - 
+#   
+virtual_interfaces:
+  netbox_vm_vmnet0:
+    virtual_machine: netbox_vm
+    interface: vm0
+    ipv4: 192.168.1.4/24
+    interface_mode: access
 
 # VlanGroup
 # Mandatory fields

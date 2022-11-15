@@ -25,6 +25,45 @@ def netbox():
     nb.http_session = session
     return nb
 
+# cable
+def cable_id(nb, label):
+    try:
+        cable = nb.dcim.cables.get(label=label)
+        return cable.id
+    except Exception as e:
+        print('common.cable_id: returning None for cable label {}. exception was: {}'.format(label, e))
+        return None
+
+# cluster
+
+def cluster_id(nb, name):
+    try:
+        cluster = nb.virtualization.clusters.get(name=name)
+        return cluster.id
+    except Exception as e:
+        print('common.cluster_id: returning None for cluster {}. exception was: {}'.format(name, e))
+        return None
+
+# cluster_group
+
+def cluster_group_id(nb, name):
+    try:
+        cluster_group = nb.virtualization.cluster_groups.get(name=name)
+        return cluster_group.id
+    except Exception as e:
+        print('common.cluster_group_id: returning None for cluster_group name {}. exception was: {}'.format(name, e))
+        return None
+
+# cluster_type
+
+def cluster_type_id(nb, name):
+    try:
+        ct = nb.virtualization.cluster_types.get(name=name)
+        return ct.id
+    except Exception as e:
+        print('common.cluster_type_id: returning None for cluster_type {}. exception was: {}'.format(name, e))
+        return None
+
 # console_port
 
 def get_console_ports(nb):
@@ -44,13 +83,6 @@ def get_console_port(nb, device, port):
         print('common.console_port: returning None. exception was: {}'.format(e))
         return None
 
-def cable_id(nb, label):
-    try:
-        cable = nb.dcim.cables.get(label=label)
-    except:
-        print('common.cable_id: returning None. exception was: {}'.format(e))
-        return None
-
 def console_port_id(nb, device, port):
     '''
     Given netbox instance, device name, and port, return console_port ID.
@@ -62,7 +94,7 @@ def console_port_id(nb, device, port):
             return console_port.id
         print('common.console_port_id: returning None. console_port device {} port {} does not exist in netbox'.format(device, port))
     except Exception as e:
-        print('common.console_port_id: returning None. exception was: {}'.format(e))
+        print('common.console_port_id: returning None for device {} console_port {}. exception was: {}'.format(device, port, e))
         return None
 
 # console_server_port
@@ -95,7 +127,7 @@ def console_server_port_id(nb, device, port):
             return console_server_port.id
         print('common.console_server_port: returning None. console_server_port device {} port {} does not exist in netbox'.format(device, port))
     except Exception as e:
-        print('common.console_server_port: returning None. exception was: {}'.format(e))
+        print('common.console_server_port: returning None for device {} console_server_port {}. exception was: {}'.format(device, port, e))
         return None
 
 # device
@@ -110,7 +142,7 @@ def get_device(nb, name):
             return device
         print('common.device_id: returning None. device {} does not exist in netbox'.format(name))
     except Exception as e:
-        print('common.device_id: returning None. exception was: {}'.format(e))
+        print('common.device_id: returning None for device name {}. exception was: {}'.format(name, e))
         return None
 
 def device_id(nb, name):
@@ -124,7 +156,7 @@ def device_id(nb, name):
             return device.id
         print('common.device_id: returning None. device {} does not exist in netbox'.format(name))
     except Exception as e:
-        print('common.device_id: returning None. exception was: {}'.format(e))
+        print('common.device_id: returning None for device name {}. exception was: {}'.format(name, e))
         return None
 
 # device_type
@@ -137,7 +169,7 @@ def get_device_type(nb, model):
         device_type = nb.dcim.device_types.get(slug=model.lower())
         return device_type
     except Exception as e:
-        print('common.get_device_type: returning None. exception was: {}'.format(e))
+        print('common.get_device_type: returning None for device_type {}. exception was: {}'.format(model, e))
         return None
 
 def device_type_id(nb, model):
@@ -149,7 +181,7 @@ def device_type_id(nb, model):
         device_type = nb.dcim.device_types.get(slug=model.lower())
         return device_type.id
     except Exception as e:
-        print('common.device_type_id: returning None. exception was: {}'.format(e))
+        print('common.device_type_id: returning None for device_type {}. exception was: {}'.format(model, e))
         return None
 
 # interface
@@ -164,7 +196,7 @@ def get_interface(nb, device, interface):
             device=device)
         return interface_object
     except Exception as e:
-        print('common.get_interface: returning None. exception was: {}'.format(e))
+        print('common.get_interface: returning None for device {} interface {}. exception was: {}'.format(device, interface, e))
         return None
 
 def interface_id(nb, device, interface):
@@ -178,7 +210,7 @@ def interface_id(nb, device, interface):
             device=device)
         return interface_object.id
     except Exception as e:
-        print('common.interface_id: returning None. exception was: {}'.format(e))
+        print('common.interface_id: returning None for device {} interface {}. exception was: {}'.format(device, interface, e))
         return None
 
 # ip address
@@ -195,7 +227,7 @@ def get_ip_address(nb, ip):
     try:
         return nb.ipam.ip_addresses.get(address=address, mask=mask)
     except Exception as e:
-        print('common.get_ip_address: returning None. exception was: {}'.format(e))
+        print('common.get_ip_address: returning None for ip {}. exception was: {}'.format(ip, e))
         return None
 
 def ip_address_id(nb, ip):
@@ -212,9 +244,45 @@ def ip_address_id(nb, ip):
         ip_address = nb.ipam.ip_addresses.get(address=address, mask=mask)
         return ip_address.id
     except Exception as e:
-        print('common.ip_address_id: returning None. exception was: {}'.format(e))
+        print('common.ip_address_id: returning None for ip {}. exception was: {}'.format(ip, e))
         return None
 
+# virtualization/interfaces virtual_interface
+def get_virtual_interface(nb, virtual_machine, virtual_interface):
+    '''
+    Given netbox instance, virtual_machine name, virtual_interface name, return virtual_interface object
+    If virtual_interface does not exist in netbox, return None
+    '''
+    try:
+        virtual_interface_object = nb.virtualization.interfaces.get(
+            name=virtual_interface,
+            virtual_machine=virtual_machine)
+        return virtual_interface_object
+    except Exception as e:
+        print('common.get_virtual_interface: returning None for virtual_machine {} virtual_interface {}. exception was: {}'.format(
+            virtual_machine,
+            virtual_interface,
+            e))
+        return None
+
+def virtual_interface_id(nb, virtual_machine, virtual_interface):
+    '''
+    Given netbox instance, virtual_machine name, virtual_interface name, return virtual_interface id
+    If virtual_interface does not exist in netbox, return None
+    '''
+    try:
+        virtual_interface_object = nb.virtualization.interfaces.get(
+            name=virtual_interface,
+            virtual_machine=virtual_machine)
+        return virtual_interface_object.id
+    except Exception as e:
+        print('common.virtual_interface_id: returning None for virtual_machine {} virtual_interface {}. exception was: {}'.format(
+            virtual_machine,
+            virtual_interface,
+            e))
+        return None
+
+# vlans
 def netbox_id_untagged_vlan(nb, vid):
     '''
     Given netbox instance and vid (vlan id), return netbox id for vlan.
@@ -263,7 +331,7 @@ def vlan_group_id(nb, vlan_group_name):
         vlan_group_object = nb.ipam.vlan_groups.get(name=vlan_group_name)
         return vlan_group_object.id
     except Exception as e:
-        print('common.vlan_group_id: returning None. exception was: {}'.format(e))
+        print('common.vlan_group_id: returning None for vlan_group_name {}. exception was: {}'.format(vlan_group_name, e))
         return None
 
 # location
@@ -276,7 +344,7 @@ def location_id(nb, name):
         location = nb.dcim.locations.get(name=name)
         return location.id
     except Exception as e:
-        print('common.location_id: returning None. exception was: {}'.format(e))
+        print('common.location_id: returning None for location {}. exception was: {}'.format(name, e))
         return None
 
 # rack
@@ -289,7 +357,7 @@ def rack_id(nb, name):
         rack = nb.dcim.racks.get(name=name)
         return rack.id
     except Exception as e:
-        print('common.rack_id: returning None. exception was: {}'.format(e))
+        print('common.rack_id: returning None for rack {}. exception was: {}'.format(name, e))
         return None
 
 # manufacturer
@@ -302,7 +370,7 @@ def get_manufacturer(nb, name):
         manufacturer = nb.dcim.manufacturers.get(name=name)
         return manufacturer
     except Exception as e:
-        print('common.get_manufacturer: returning None. exception was: {}'.format(e))
+        print('common.get_manufacturer: returning None for manufacturer {}. exception was: {}'.format(name, e))
         return None
 
 def manufacturer_id(nb, name):
@@ -314,7 +382,7 @@ def manufacturer_id(nb, name):
         manufacturer = nb.dcim.manufacturers.get(name=name)
         return manufacturer.id
     except Exception as e:
-        print('common.manufacturer_id: returning None. exception was: {}'.format(e))
+        print('common.manufacturer_id: returning None for manufacturer {}. exception was: {}'.format(name, e))
         return None
 
 # role
@@ -339,7 +407,7 @@ def role_id(nb, name):
         role = nb.dcim.device_roles.get(name=name)
         return role.id
     except Exception as e:
-        print('common.role_id: returning None. exception was: {}'.format(e))
+        print('common.role_id: returning None for role {}. exception was: {}'.format(name, e))
         return None
 
 # site
@@ -352,7 +420,7 @@ def site_id(nb, name):
         site = nb.dcim.sites.get(name=name)
         return site.id
     except Exception as e:
-        print('common.site_id: returning None. exception was: {}'.format(e))
+        print('common.site_id: returning None for site {}. exception was: {}'.format(name, e))
         return None
 
 # tag
@@ -367,17 +435,7 @@ def get_tag(nb, name):
             print('common.get_tag: returning None. tag {} does not exist in netbox.'.format(name))
         return tag
     except Exception as e:
-        print('common.get_tag: returning None. exception was: {}'.format(e))
-        return None
-def get_tags(nb):
-    '''
-    Given netbox instance, return all tag names currently configured in netbox.
-    '''
-    try:
-        tags = nb.extras.tags.all()
-        return [tag.name for tag in tags]
-    except Exception as e:
-        print('common.get_tags: returning None. exception was: {}'.format(e))
+        print('common.get_tag: returning None for tag {}. exception was: {}'.format(name, e))
         return None
 def tag_id(nb, name):
     '''
@@ -388,36 +446,45 @@ def tag_id(nb, name):
         tag = nb.extras.tags.get(name=name)
         return tag.id
     except Exception as e:
-        print('common.tag_id: returning None. exception was: {}'.format(e))
+        print('common.tag_id: returning None for tag {}. exception was: {}'.format(name, e))
         return None
 
-# virtual_machines (as of 2022-11-01, pynetbox apparently does not support the virtualization.virtual_machines endpoint)
-# We'll leave these here in hopes this is eventually supported.
-# def get_vm(nb, name):
-#     '''
-#     Given netbox instance and vm name, return vm.
-#     If vm does not exist in netbox, return None
-#     '''
-#     try:
-#         vm = nb.dcim.virtualization.virtual_machines.get(name=name)
-#         if vm != None:
-#             return vm
-#         print('common.get_vm: returning None. vm {} does not exist in netbox'.format(name))
-#     except Exception as e:
-#         print('common.get_vm: returning None. exception was: {}'.format(e))
-#         return None
+def get_tags(nb):
+    '''
+    Given netbox instance, return all tag names currently configured in netbox.
+    '''
+    try:
+        tags = nb.extras.tags.all()
+        return [tag.name for tag in tags]
+    except Exception as e:
+        print('common.get_tags: returning None. exception was: {}'.format(e))
+        return None
 
-# def vm_id(nb, name):
-#     '''
-#     Given netbox instance and vm name, return vm id.
-#     If vm doesn't exist within netbox, return None
-#     '''
-#     try:
-#         vm = nb.virtualization.virtual_machines.get(name=name)
-#         return vm.id
-#     except Exception as e:
-#         print('common.vm_id: returning None. exception was: {}'.format(e))
-#         return None
+def get_vm(nb, name):
+    '''
+    Given netbox instance and vm name, return vm.
+    If vm does not exist in netbox, return None
+    '''
+    try:
+        vm = nb.virtualization.virtual_machines.get(name=name)
+        if vm != None:
+            return vm
+        print('common.get_vm: returning None. vm {} does not exist in netbox'.format(name))
+    except Exception as e:
+        print('common.get_vm: returning None for vm {}. exception was: {}'.format(name, e))
+        return None
+
+def vm_id(nb, name):
+    '''
+    Given netbox instance and vm name, return vm id.
+    If vm doesn't exist within netbox, return None
+    '''
+    try:
+        vm = nb.virtualization.virtual_machines.get(name=name)
+        return vm.id
+    except Exception as e:
+        print('common.vm_id: returning None for vm {}. exception was: {}'.format(name, e))
+        return None
 
 # utility functions
 def create_slug(s):

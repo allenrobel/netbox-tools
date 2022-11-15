@@ -172,6 +172,8 @@ Script                         | Description
 [cable_create_update_one] | Create/update cable in Netbox with key ``--key`` in file ``--yaml``
 [cable_delete_all] | Delete all cables defined in ``--yaml``
 [cable_delete_one] | Delete cable from Netbox with key ``--key`` in file ``--yaml``
+[cluster_create_update_all] | Create/update clusters defined in ``--yaml`
+[cluster_type_create_update_all] | Create/update cluster_types defined in ``--yaml`
 [console_port_create_update_all] | Create/update all console ports defined in ``--yaml``
 [console_port_delete] | Delete console_port from netbox, given ``--device`` ``--port``
 [console_ports_print] | Display information about all console ports
@@ -225,6 +227,9 @@ Script                         | Description
 [tag_create_update_all] | Create/update all tags defined in ``--yaml``
 [tag_delete] | Delete tag ``--tag``
 [tags_print] | Display information about all tags
+[virtual_ip_address_create_update_all] | Create/update all virtual_ip_addresses (those belonging to virtual machines) defined in ``--yaml``
+[virtual_ip_address_delete_all] | Delete all virtual_ip_addresses (those belonging to virtual machines) defined in ``--yaml``
+[virtual_machine_create_update_all] | Create/update virtual_machines defined in ``--yaml``
 [vlan_create_update_all] | Create/update all vlans defined in ``--yaml``
 [vlan_delete] | Delete vlan ``--vlan``
 [vlan_group_create_update_all] | Create/update all vlan_groups defined in ``--yaml``
@@ -247,6 +252,8 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [cable_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_create_update_one.py
 [cable_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_all.py
 [cable_delete_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_one.py
+[cluster_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cluster_create_update_all.py
+[cluster_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cluster_type_create_update_all.py
 [console_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_create_update_all.py
 [console_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_delete.py
 [console_ports_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_ports_print.py
@@ -300,6 +307,9 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [tag_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tag_create_update_all.py
 [tag_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tag_delete.py
 [tags_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/tags_print.py
+[virtual_ip_address_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_ip_address_create_update_all.py
+[virtual_ip_address_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_ip_address_delete_all.py
+[virtual_machine_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_machine_create_update_all.py
 [vlan_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_create_update_all.py
 [vlan_delete]:  https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_delete.py
 [vlan_group_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_create_update_all.py

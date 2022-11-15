@@ -3,6 +3,7 @@ Name: device.py
 Description: Class for create, update, and delete operations on netbox device
 '''
 
+from netbox_tools.common import cluster_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import device_type_id, get_device
 from netbox_tools.common import interface_id
@@ -89,7 +90,18 @@ class Device(object):
                 print('Device.validate_keys_create_or_update: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
+    def set_cluster(self):
+        if self.cluster == None:
+            return
+        try:
+            self.args['cluster'] = cluster_id(self.nb, self.cluster)
+        except:
+            print('Device.set_cluster: exiting. unable to retrieve cluster_id from cluster {}'.format(self.cluster))
+            print('Device.set_cluster: Perhaps cluster {} does not exist in Netbox?'.format(self.cluster))
+            exit(1)
+
     def generate_args_create_or_update(self):
+        self.set_cluster()
         self.args['device_role'] = role_id(self.nb, self.device_role)
         self.args['device_type'] = device_type_id(self.nb, self.device_type)
         self.args['name'] = self.info['device']
@@ -144,6 +156,13 @@ class Device(object):
             self.create()
         else:
             self.update()
+
+    @property
+    def cluster(self):
+        if 'cluster' in self.info:
+            return self.info['cluster']
+        else:
+            return None
 
     @property
     def device_object(self):

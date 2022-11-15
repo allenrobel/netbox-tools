@@ -3,14 +3,15 @@ Name: virtual_machine.py
 Description: create/update/delete operations on netbox virtual_machine
 '''
 
+from netbox_tools.common import cluster_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import device_id
 from netbox_tools.common import get_vm
-from netbox_tools.common import virtual_interface_id
 from netbox_tools.common import ip_address_id, get_ip_address
 from netbox_tools.common import role_id
 from netbox_tools.common import site_id
 from netbox_tools.common import tag_id
+from netbox_tools.common import virtual_interface_id
 
 
 def initialize_vm_primary_ip(nb, vm_name):
@@ -86,6 +87,11 @@ class VirtualMachine(object):
                 exit(1)
 
 
+    def set_cluster(self):
+        if self.cluster != None:
+            self.args['cluster'] = cluster_id(self.nb, self.cluster)
+
+
     def set_comments(self):
         if self.comments != None:
             self.args['comments'] = self.comments
@@ -138,6 +144,7 @@ class VirtualMachine(object):
 
     def generate_args_create_or_update(self):
         self.set_comments()
+        self.set_cluster()
         self.set_device()
         self.set_disk()
         self.set_memory()

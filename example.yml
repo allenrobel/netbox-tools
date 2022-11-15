@@ -358,6 +358,7 @@ console_server_ports:
 #   type: The hardware device type which defines the device's make & model.
 #
 # Optional keys
+#   cluster: the virtualization cluster that VMs in this device belong to (see clusters section)
 #   interface_type: The type of interface (pertains to mgmt0). If not present, mgmt0 interface_type defaults
 #                   to 1000base-t
 #   mac_address: The mac address of the interface e.g. from 'show interface mgmt0'
@@ -394,6 +395,7 @@ devices:
     device: vm_host_1
     interface: vm_host_1_eth1
     role: vm_host
+    cluster: db
     type: UCSC-C220-M6S
     serial: na
     site: mysite
@@ -491,11 +493,11 @@ cluster_types:
 # virtual_machines
 # Mandatory fields
 #   vm: (str) The name of the virtual machine
-#   One of these, but not both:
-#       cluster: (str) The cluster in which the virtual machine is located *,^,+
-#       site: (str) The site in which the virtual machine is located @,^
+#   cluster: (str) The cluster in which the virtual machine is located *
+#      If cluster is defined, site will be taken from cluster
+#   site: (str) The site in which the virtual machine is located *
+#      If cluster is not defined, site can be specified directly
 # Optional fields
-#   cluster: (str) Cluster in which vm is located *
 #   device: (str) Device hosting the vm *
 #   memory: (int) Memory allocated to the virtual machine, in MB
 #   primary_ip4: (ipv4/prefix) IPv4 address of the vm *
@@ -505,8 +507,6 @@ cluster_types:
 #   vcpus: (float) Number of virtual cpu units. Min 0.01
 #  * Item must be present in netbox
 #  + Not currently supported
-#  @ If site is not defined, cluster must be defined
-#  ^ If cluster is not defined, site must be defined.
 virtual_machines:
   netbox_vm:
     vm: netbox

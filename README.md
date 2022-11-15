@@ -173,6 +173,7 @@ Script                         | Description
 [cable_delete_all] | Delete all cables defined in ``--yaml``
 [cable_delete_one] | Delete cable from Netbox with key ``--key`` in file ``--yaml``
 [cluster_create_update_all] | Create/update clusters defined in ``--yaml`
+[cluster_create_update_one] | Create/update cluster with key ``--key`` in file ``--yaml``
 [cluster_type_create_update_all] | Create/update cluster_types defined in ``--yaml`
 [console_port_create_update_all] | Create/update all console ports defined in ``--yaml``
 [console_port_delete] | Delete console_port from netbox, given ``--device`` ``--port``
@@ -186,6 +187,7 @@ Script                         | Description
 [device_choices_print] | Display choices associated with Netbox endpoint dcim.devices
 [device_count] | Print the number of devices matching a given query
 [device_create_update_all] | Create/update all devices defined in ``--yaml``
+[device_create_update_one] | Create/update device with key ``--key`` in file ``--yaml``
 [device_type_create_update] | Create/update a device type using command line options
 [device_type_create_update_all] | Create/update all device types defined in ``--yaml``
 [device_type_delete_all] | Delete all device types contained in the YAML file ``--yaml``
@@ -254,6 +256,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [cable_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_all.py
 [cable_delete_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cable_delete_one.py
 [cluster_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cluster_create_update_all.py
+[cluster_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cluster_create_update_one.py
 [cluster_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/cluster_type_create_update_all.py
 [console_port_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_create_update_all.py
 [console_port_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/console_port_delete.py
@@ -267,6 +270,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [device_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_choices_print.py
 [device_count]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_count.py
 [device_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_create_update_all.py
+[device_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_create_update_one.py
 [device_type_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update.py
 [device_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update_all.py
 [device_type_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_delete_all.py

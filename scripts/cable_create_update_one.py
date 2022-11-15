@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Name: cable_create_update_one.py
-Description: Create/update cable in Netbox with key ``--key`` in file ``--yaml``
+Description: Create/update cable with key ``--key`` in file ``--yaml``
 '''
 our_version = 101
 import argparse

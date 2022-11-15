@@ -3,7 +3,7 @@
 Name: cable_create_update_one.py
 Description: Create/update cable in Netbox with key ``--key`` in file ``--yaml``
 '''
-our_version = 100
+our_version = 101
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.cable import Cable
@@ -22,15 +22,15 @@ def get_parser():
     mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
     default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
 
-    mandatory.add_argument('--yaml',
-                        dest='yaml',
-                        required=True,
-                        help=help_yaml + ex_yaml)
-
     mandatory.add_argument('--key',
                         dest='key',
                         required=True,
                         help=help_key + ex_key)
+
+    mandatory.add_argument('--yaml',
+                        dest='yaml',
+                        required=True,
+                        help=help_yaml + ex_yaml)
 
     parser.add_argument('--version',
                         action='version',

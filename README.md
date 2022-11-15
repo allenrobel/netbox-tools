@@ -233,6 +233,7 @@ Script                         | Description
 [virtual_ip_address_create_update_all] | Create/update all virtual_ip_addresses (those belonging to virtual machines) defined in ``--yaml``
 [virtual_ip_address_delete_all] | Delete all virtual_ip_addresses (those belonging to virtual machines) defined in ``--yaml``
 [virtual_machine_create_update_all] | Create/update virtual_machines defined in ``--yaml``
+[virtual_machine_create_update_one] | Create/update virtual_machine with key ``--key`` in file ``--yaml``
 [vlan_create_update_all] | Create/update all vlans defined in ``--yaml``
 [vlan_delete] | Delete vlan ``--vlan``
 [vlan_group_create_update_all] | Create/update all vlan_groups defined in ``--yaml``
@@ -316,6 +317,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [virtual_ip_address_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_ip_address_create_update_all.py
 [virtual_ip_address_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_ip_address_delete_all.py
 [virtual_machine_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_machine_create_update_all.py
+[virtual_machine_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/virtual_machine_create_update_one.py
 [vlan_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_create_update_all.py
 [vlan_delete]:  https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_delete.py
 [vlan_group_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/vlan_group_create_update_all.py

@@ -36,7 +36,6 @@ def get_parser():
 
 def assign_primary_ip_to_device(ip, device, interface):
     ipv4_id = ip_address_id(nb, ip)
-    #intf_id = interface_id(nb, info['device'], info['interface'])
     intf_id = interface_id(nb, device, interface)
     if ipv4_id == None:
         print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(ip))

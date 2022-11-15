@@ -34,6 +34,7 @@ class IpAddress(object):
         self.generate_args()
         self.initialize_device_primary_ip()
 
+
     def fix_deprecations(self):
         if 'mgmt_interface' in self.info:
             print('IpAddress.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
@@ -42,16 +43,23 @@ class IpAddress(object):
             print('IpAddress.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
             self.info['device'] = self.info['name']
 
+
     def validate_keys(self):
         for key in self.mandatory_keys:
             if key not in self.info:
                 print('IpAddress.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
-    def generate_args(self):
+
+    def set_address(self):
         self.args['address'] = self.ip4
+
+
+    def set_assigned_object_id(self):
         self.args['assigned_object_id'] = device_id(self.nb, self.device)
-        self.args['interface'] = interface_id(self.nb, self.device, self.interface)
+
+
+    def set_description(self):
         if self.ip_description == None:
             self.args['description'] = '{} : {} : {}'.format(
                 self.device,
@@ -59,10 +67,26 @@ class IpAddress(object):
                 self.ip4)
         else:
             self.args['description'] = self.ip_description
+
+
+    # def set_interface(self):
+    #     self.args['interface'] = interface_id(self.nb, self.device, self.interface)
+
+
+    def set_status(self):
         if self.ip_status == None:
             self.args['status'] = 'active'
         else:
             self.args['status'] = self.ip_status
+
+
+    def generate_args(self):
+        self.set_address()
+        self.set_assigned_object_id()
+        self.set_description()
+        # self.set_interface()
+        self.set_status()
+
 
     def initialize_device_primary_ip(self):
         '''
@@ -72,6 +96,7 @@ class IpAddress(object):
         device.primary_ip4 = None
         device.primary_ip = None
         device.save()
+
 
     def create(self):
         print('IpAddress.create: device {} address {}'.format(self.device, self.ip4))
@@ -83,6 +108,7 @@ class IpAddress(object):
                 self.ip4,
                 e))
             exit(1)
+
 
     def update(self):
         print('IpAddress.update: device {} address {}'.format(self.device, self.ip4))
@@ -96,15 +122,18 @@ class IpAddress(object):
                 e))
             exit(1)
 
+
     def create_or_update(self):
         if self.ip_address == None:
             self.create()
         else:
             self.update()
 
+
     @property
     def device(self):
         return self.info['device']
+
 
     @property
     def ip_description(self):
@@ -113,12 +142,14 @@ class IpAddress(object):
         else:
             return None
 
+
     @property
     def ip_status(self):
         if 'ip_status' in self.info:
             return self.info['ip_status']
         else:
             return None
+
 
     @property
     def ip_address(self):
@@ -131,6 +162,7 @@ class IpAddress(object):
             address=address,
             mask=mask)
 
+
     @property
     def ip_address_enabled(self):
         if 'ip_address_enabled' in self.info:
@@ -138,9 +170,11 @@ class IpAddress(object):
         else:
             return None
 
+
     @property
     def ip_address_id(self):
         return self.ip_address.id
+
 
     @property
     def ip_address_type(self):
@@ -149,14 +183,17 @@ class IpAddress(object):
         else:
             return None
 
+
     # Keeping for backward-compatibility. Remove after 2023-09-29.
     @property
     def mgmt_interface(self):
         return self.info['interface']
 
+
     @property
     def interface(self):
         return self.info['interface']
+
 
     @property
     def ip4(self):

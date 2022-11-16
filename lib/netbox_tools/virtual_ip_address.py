@@ -2,7 +2,8 @@
 Name: virtual_ip_address.py
 Description: Class for create and update operations on netbox ip_addresss for virtual machines
 '''
-
+our_version = 101
+from inspect import stack, getframeinfo, currentframe
 from netbox_tools.common import get_vm, vm_id
 
 class VirtualIpAddress(object):
@@ -20,7 +21,8 @@ class VirtualIpAddress(object):
     }
     '''
     def __init__(self, nb, info):
-        self.version = 100
+        self.lib_version = our_version
+        self.classname = __class__.__name__
         self.nb = nb
         self.info = info
         self.args = dict()
@@ -35,11 +37,13 @@ class VirtualIpAddress(object):
         self.generate_args()
         self.initialize_vm_primary_ip()
 
+    def log(self, msg):
+        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
 
     def validate_keys(self):
         for key in self.mandatory_keys:
             if key not in self.info:
-                print('VirtualIpAddress.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
 
@@ -90,11 +94,11 @@ class VirtualIpAddress(object):
 
 
     def create(self):
-        print('VirtualIpAddress.create: virtual_machine {} address {}'.format(self.virtual_machine, self.ip4))
+        self.log('virtual_machine {}, address {}'.format(self.virtual_machine, self.ip4))
         try:
             self.nb.ipam.ip_addresses.create(self.args)
         except Exception as e:
-            print('VirtualIpAddress.create: Exiting. Unable to create virtual_machine {} ip_address {}.  Error was: {}'.format(
+            self.log('exiting. Unable to create virtual_machine {} ip_address {}.  Error was: {}'.format(
                 self.virtual_machine,
                 self.ip4,
                 e))
@@ -102,12 +106,12 @@ class VirtualIpAddress(object):
 
 
     def update(self):
-        print('VirtualIpAddress.update: virtual_machine {} address {}'.format(self.virtual_machine, self.ip4))
+        self.log('virtual_machine {}, address {}'.format(self.virtual_machine, self.ip4))
         self.args['id'] = self.ip_address_id
         try:
             self.ip_address.update(self.args)
         except Exception as e:
-            print('VirtualIpAddress.update: Exiting. Unable to update virtual_machine {} ip_address {}.  Error was: {}'.format(
+            self.log('exiting. Unable to update virtual_machine {} ip_address {}.  Error was: {}'.format(
                 self.virtual_machine,
                 self.ip4,
                 e))
@@ -115,11 +119,11 @@ class VirtualIpAddress(object):
 
 
     def delete(self):
-        print('VirtualIpAddress.delete: virtual_machine {} address {}'.format(self.virtual_machine, self.ip4))
+        self.log('virtual_machine {} address {}'.format(self.virtual_machine, self.ip4))
         try:
             self.ip_address.delete()
         except Exception as e:
-            print('VirtualIpAddress.delete: Exiting. Unable to delete virtual_machine {} ip_address {}.  Error was: {}'.format(
+            self.log('exiting. Unable to delete virtual_machine {} ip_address {}.  Error was: {}'.format(
                 self.virtual_machine,
                 self.ip4,
                 e))
@@ -154,7 +158,7 @@ class VirtualIpAddress(object):
         try:
             address,mask = self.ip4.split('/')
         except Exception as e:
-            print('VirtualIpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.ip4, e))
+            self.log('exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.ip4, e))
             exit(1)
         return self.nb.ipam.ip_addresses.get(
             address=address,

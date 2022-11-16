@@ -154,7 +154,12 @@ etc...
 
 Item                      | Caveat
 ------------              | -----------
-[cable_create_update_all] | ``2022-11-10`` We were hitting a 500 error when trying to call update() on the cable object.  For now, as a workaround, Cable.update() deletes the cable, then recreates it.  This is not ideal since the cable id changes, which deletes any journal entries and change logs for the cable.  We're probably doing something stupid and will try to get it fixed soon.
+[cable_create_update_all] | ``2022-11-10`` [pynetbox issue 491][pynetbox_issue_491] causes update not to work for cable.
+                                For now, as a workaround, Cable.update() deletes the cable, then recreates it.  This is not ideal since the
+                                cable id changes, which deletes any journal entries and change logs for the cable.
+
+[pynetbox_issue_491]: https://github.com/netbox-community/pynetbox/issues/491
+
 
 ## Scripts
 

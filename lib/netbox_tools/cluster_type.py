@@ -47,10 +47,11 @@ class ClusterType(object):
 
 
     def set_tags(self):
-        if 'tags' in self.info:
-            self.args['tags'] = list()
-            for tag in self.info['tags']:
-                self.args['tags'].append(tag_id(self.nb, tag))
+        if 'tags' not in self.info:
+            return
+        self.args['tags'] = list()
+        for tag in self.info['tags']:
+            self.args['tags'].append(tag_id(self.nb, tag))
 
 
     def generate_args_create_update(self):

@@ -244,7 +244,7 @@ class Cable():
         self._set_tags()
 
 
-    def _create(self):
+    def create(self):
         '''
         create a cable
         '''
@@ -259,7 +259,7 @@ class Cable():
             sys.exit(1)
 
 
-    def _update(self):
+    def update(self):
         '''
         update a cable
 
@@ -300,7 +300,7 @@ class Cable():
     #         self.log('args: {}'.format(self.args))
     #         sys.exit(1)
 
-    def _delete(self):
+    def delete(self):
         '''
         delete a cable
         '''
@@ -326,9 +326,9 @@ class Cable():
         self._validate_keys_create_or_update()
         self._generate_args_create_or_update()
         if self.cable_object is None:
-            self._create()
+            self.create()
         else:
-            self._update()
+            self.update()
 
     @property
     def color(self):

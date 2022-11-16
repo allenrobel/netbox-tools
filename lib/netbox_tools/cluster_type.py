@@ -2,9 +2,9 @@
 Name: cluster_type.py
 Description: Class for create and update operations on netbox cluster_type
 '''
-our_version = 101
+our_version = 102
 from inspect import stack, getframeinfo, currentframe
-from netbox_tools.common import cluster_id, create_slug, tag_id
+from netbox_tools.common import create_slug, tag_id
 
 
 class ClusterType(object):

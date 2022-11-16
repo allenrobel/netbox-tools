@@ -72,9 +72,9 @@ class Cable():
 
     def _populate_valid_choices(self):
         '''
-        pull the valid choices for dcim.cables from Netbox so we can use them
-        to validate caller's input, and provide caller a list of valid choices
-        of they provide invalid input.
+        pull the valid choices for dcim.cables from Netbox so we can 1) use them
+        to validate caller's input, and 2) provide caller a list of valid choices
+        if they provide invalid input.
         '''
         self.valid_choices = {}
         choices_dict = self._netbox.dcim.cables.choices()

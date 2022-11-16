@@ -176,7 +176,7 @@ class VirtualMachine(object):
 
 
     def delete(self):
-        print('VirtualMachine.delete: {}'.format(self.device))
+        self.log('{}'.format(self.device))
         self.validate_keys_delete()
         if self.vm_object == None:
             self.log('Nothing to do, vm {} does not exist in netbox.'.format(self.vm))

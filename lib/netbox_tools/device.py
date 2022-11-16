@@ -2,7 +2,8 @@
 Name: device.py
 Description: Class for create, update, and delete operations on netbox device
 '''
-
+our_version = 101
+from inspect import stack, getframeinfo, currentframe
 from netbox_tools.common import cluster_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import device_type_id, get_device
@@ -22,7 +23,7 @@ def initialize_device_primary_ip(nb, device_name):
     device.primary_ip4 = None
     device.primary_ip = None
     device.save()
-    print('device.initialize_device_primary_ip: device {}'.format(device_name))
+    print('{}(v{}).{}: device: {}'.format(__name__, our_version, getframeinfo(currentframe()).function, device_name))
 
 def map_device_primary_ip(nb, device_name, interface_name, ip_address):
     '''
@@ -44,7 +45,10 @@ def map_device_primary_ip(nb, device_name, interface_name, ip_address):
     address.assigned_object_id = interface_id(nb, device_name, interface_name)
     address.assigned_object_type = "dcim.interface"
     address.save()
-    print('device.map_device_primary_ip: device {} interface {} address {}'.format(
+    print('{}(v{}).{}: device: {}'.format(
+        __name__,
+        our_version,
+        getframeinfo(currentframe()).function,
         device_name,
         interface_name,
         ip_address))
@@ -59,35 +63,45 @@ def make_device_primary_ip(nb, device_name, ip):
     device.primary_ip = address_id
     device.primary_ip4 = address_id
     device.save()
-    print('device.make_device_primary_ip: device {} ip {}'.format(device_name, ip))
+    print('{}(v{}).{}: device: {}, ip {}'.format(
+        __name__,
+        our_version,
+        getframeinfo(currentframe()).function,
+        device_name,
+        ip))
 
 class Device(object):
     def __init__(self, nb, info):
         self.nb = nb
         self.info = info
+        self.lib_version = our_version
+        self.classname = __class__.__name__
         self.args = dict()
         self.mandatory_keys_create_or_update = ['device', 'role', 'type']
         self.mandatory_keys_delete = ['device']
         self.fix_deprecations()
 
+    def log(self, msg):
+        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
+
     def fix_deprecations(self):
         if 'mgmt_interface' in self.info:
-            print('Device.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
+            self.log('WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
             self.info['interface'] = self.info['mgmt_interface']
         if 'name' in self.info:
-            print('Device.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
+            self.log('WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
             self.info['device'] = self.info['name']
 
     def validate_keys_delete(self):
         for key in self.mandatory_keys_delete:
             if key not in self.info:
-                print('Device.validate_keys_delete: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
     def validate_keys_create_or_update(self):
         for key in self.mandatory_keys_create_or_update:
             if key not in self.info:
-                print('Device.validate_keys_create_or_update: exiting. mandatory key {} not found in info {}'.format(key, self.info))
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
                 exit(1)
 
     def set_cluster(self):
@@ -96,8 +110,8 @@ class Device(object):
         try:
             self.args['cluster'] = cluster_id(self.nb, self.cluster)
         except:
-            print('Device.set_cluster: exiting. unable to retrieve cluster_id from cluster {}'.format(self.cluster))
-            print('Device.set_cluster: Perhaps cluster {} does not exist in Netbox?'.format(self.cluster))
+            self.log('exiting. unable to retrieve cluster_id from cluster {}'.format(self.cluster))
+            self.log('Perhaps cluster {} does not exist in Netbox?'.format(self.cluster))
             exit(1)
 
     def generate_args_create_or_update(self):
@@ -121,32 +135,32 @@ class Device(object):
             self.args['tags'] = self.tags
 
     def create(self):
-        print('Device.create: {}'.format(self.device))
+        self.log('{}'.format(self.device))
         try:
             self.nb.dcim.devices.create(self.args)
         except Exception as e:
-            print('Device.create: Exiting. Unable to create device {}.  Error was: {}'.format(self.device, e))
+            self.log('exiting. Unable to create device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def update(self):
-        print('Device.update: {}'.format(self.device))
+        self.log('{}'.format(self.device))
         self.args['id'] = self.device_id
         try:
             self.device_object.update(self.args)
         except Exception as e:
-            print('Device.update: Exiting. Unable to update device {}.  Error was: {}'.format(self.device, e))
+            self.log('exiting. Unable to update device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def delete(self):
-        print('Device.delete: {}'.format(self.device))
+        self.log('{}'.format(self.device))
         self.validate_keys_delete()
         if self.device_object == None:
-            print('Device.delete: Nothing to do, device {} does not exist in netbox.'.format(self.device))
+            self.log('Nothing to do, device {} does not exist in netbox.'.format(self.device))
             return
         try:
             self.device_object.delete()
         except Exception as e:
-            print('Device.delete: Exiting. Unable to delete device {}.  Error was: {}'.format(self.device, e))
+            self.log('exiting. Unable to delete device {}.  Error was: {}'.format(self.device, e))
             exit(1)
 
     def create_or_update(self):

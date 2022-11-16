@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-rgb2color = dict()
+'''
+Convert rgb to color and vice-versa.
+'''
+import sys
+
+rgb2color = {}
 rgb2color['2196f3'] = 'blue'
 rgb2color['00bcd4'] = 'cyan'
 rgb2color['4caf50'] = 'green'
@@ -16,29 +21,35 @@ rgb2color['607d8b'] = 'gray_dark'
 
 color2rgb = dict([(value, key) for key, value in rgb2color.items()])
 
-def color(s):
-    if s in rgb2color:
-        return rgb2color[s]
-    elif s in rgb2color:
-        return rgb2color[s]
-    else:
-        return s
-
-def color_to_rgb(s):
+def color(color_name):
     '''
-    If s is not in color2rgb, and is 6 characters long, we assume it is a valid rgb string and return it unchanged.
+    return the mapped value for color_name, if it's in one
+    of the two dictionaries rgb2color/color2rgb.  Else,
+    return color_name unchanged.
     '''
-    if s in color2rgb:
-        return color2rgb[s]
-    if len(s) == 6:
-        return s
-    else:
-        print('colors.color_to_rgb: exiting. Unknown color {}.  Valid colors: {}'.format(s, ', '.join(color2rgb.keys())))
-        exit(1)
+    if color_name in rgb2color:
+        return rgb2color[color_name]
+    if color_name in color2rgb:
+        return color2rgb[color_name]
+    return color_name
 
-def rgb_to_color(s):
-    if s in rgb2color:
-        return rgb2color[s]
-    else:
-        print('colors.rgb_to_color: exiting. Unknown rgb {}.  Valid rgb: {}'.format(s, ', '.join(rgb2color.keys())))
-        exit(1)
+def color_to_rgb(color_name):
+    '''
+    If color_name is not in color2rgb, and is 6 characters long, we assume it is a valid rgb string and return it unchanged.
+    Else, exit with error.
+    '''
+    if color_name in color2rgb:
+        return color2rgb[color_name]
+    if len(color_name) == 6:
+        return color_name
+    print('colors.color_to_rgb: exiting. Unknown color {}.  Valid colors: {}'.format(color_name, ', '.join(color2rgb.keys())))
+    sys.exit(1)
+
+def rgb_to_color(rgb):
+    '''
+    If rgb is in rgb2color, return the color name.  Else, exit with error.
+    '''
+    if rgb in rgb2color:
+        return rgb2color[rgb]
+    print('colors.rgb_to_color: exiting. Unknown rgb {}.  Valid rgb: {}'.format(rgb, ', '.join(rgb2color.keys())))
+    sys.exit(1)

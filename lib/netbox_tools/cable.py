@@ -8,18 +8,18 @@ from pynetbox import RequestError
 from netbox_tools.common import interface_id
 from netbox_tools.common import tag_id
 from netbox_tools.colors import color_to_rgb
-OUR_VERSION = 102
+OUR_VERSION = 103
 
 class Cable():
     '''
     create, update, and delete operations on netbox dcim.cable
     '''
     def __init__(self, netbox, info):
-        self.netbox = netbox
-        self.info = info
+        self._netbox = netbox
+        self._info = info
         self.lib_version = OUR_VERSION
-        self.classname = __class__.__name__
-        self.args = {}
+        self._classname = __class__.__name__
+        self._args = {}
         self._populate_optional_keys()
         self._populate_valid_port_types()
         self._populate_port_type_map()
@@ -28,46 +28,46 @@ class Cable():
 
 
     def log(self, msg):
-        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
+        print('{}(v{}).{}: {}'.format(self._classname, self.lib_version, stack()[1].function, msg))
 
 
     def _populate_valid_port_types(self):
-        self.valid_port_types = set()
-        self.valid_port_types.add('interface')
-        self.valid_port_types.add('console_server')
-        self.valid_port_types.add('console')
-        self.valid_port_types.add('power')
+        self._valid_port_types = set()
+        self._valid_port_types.add('interface')
+        self._valid_port_types.add('console_server')
+        self._valid_port_types.add('console')
+        self._valid_port_types.add('power')
 
 
     def _populate_port_type_map(self):
-        self.port_type_map = {}
-        self.port_type_map['interface'] = 'dcim.interface'
-        self.port_type_map['console_server'] = 'dcim.console_server_port'
-        self.port_type_map['console'] = 'dcim.console_port'
-        self.port_type_map['power'] = 'dcim.power_outlet'
+        self._port_type_map = {}
+        self._port_type_map['interface'] = 'dcim.interface'
+        self._port_type_map['console_server'] = 'dcim.console_server_port'
+        self._port_type_map['console'] = 'dcim.console_port'
+        self._port_type_map['power'] = 'dcim.power_outlet'
 
 
     def _populate_optional_keys(self):
-        self.optional_keys = set()
-        self.optional_keys.add('color') # str - a color from colors.py in this repo, or a hex rgb color value, e.g. for red: f44336
-        self.optional_keys.add('length') # int
-        self.optional_keys.add('length_unit') # str
-        self.optional_keys.add('status') # str
-        self.optional_keys.add('tags') # a list of tags to associate with the cable
-        self.optional_keys.add('type') # str
+        self._optional_keys = set()
+        self._optional_keys.add('color') # str - a color from colors.py in this repo, or a hex rgb color value, e.g. for red: f44336
+        self._optional_keys.add('length') # int
+        self._optional_keys.add('length_unit') # str
+        self._optional_keys.add('status') # str
+        self._optional_keys.add('tags') # a list of tags to associate with the cable
+        self._optional_keys.add('type') # str
 
 
     def _populate_mandatory_keys(self):
-        self.mandatory_keys_create_or_update = set()
-        self.mandatory_keys_create_or_update.add('label') # A UNIQUE label to identify the cable
-        self.mandatory_keys_create_or_update.add('device_a') # termination_a device name
-        self.mandatory_keys_create_or_update.add('device_b') # termination_b device name
-        self.mandatory_keys_create_or_update.add('port_a') # termination_a port name
-        self.mandatory_keys_create_or_update.add('port_b') # termination_b port name
-        self.mandatory_keys_create_or_update.add('port_a_type') # termination_a port type: interface, console, console_server, power
-        self.mandatory_keys_create_or_update.add('port_b_type') # termination_a port type: interface, console, console_server, power
-        self.mandatory_keys_delete = set()
-        self.mandatory_keys_delete.add('label')
+        self._mandatory_keys_create_or_update = set()
+        self._mandatory_keys_create_or_update.add('label') # A UNIQUE label to identify the cable
+        self._mandatory_keys_create_or_update.add('device_a') # termination_a device name
+        self._mandatory_keys_create_or_update.add('device_b') # termination_b device name
+        self._mandatory_keys_create_or_update.add('port_a') # termination_a port name
+        self._mandatory_keys_create_or_update.add('port_b') # termination_b port name
+        self._mandatory_keys_create_or_update.add('port_a_type') # termination_a port type: interface, console, console_server, power
+        self._mandatory_keys_create_or_update.add('port_b_type') # termination_a port type: interface, console, console_server, power
+        self._mandatory_keys_delete = set()
+        self._mandatory_keys_delete.add('label')
 
 
     def _populate_valid_choices(self):
@@ -77,7 +77,7 @@ class Cable():
         of they provide invalid input.
         '''
         self.valid_choices = {}
-        choices_dict = self.netbox.dcim.cables.choices()
+        choices_dict = self._netbox.dcim.cables.choices()
         for item in choices_dict:
             valid_values = choices_dict[item]
             self.valid_choices[item] = [item['value'] for item in valid_values]
@@ -87,9 +87,9 @@ class Cable():
         '''
         ensure the caller has set all keys required by the delete method
         '''
-        for key in self.mandatory_keys_delete:
-            if key not in self.info:
-                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
+        for key in self._mandatory_keys_delete:
+            if key not in self._info:
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self._info))
                 sys.exit(1)
 
 
@@ -97,9 +97,9 @@ class Cable():
         '''
         ensure the caller has set all keys required by the create and update methods
         '''
-        for key in self.mandatory_keys_create_or_update:
-            if key not in self.info:
-                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
+        for key in self._mandatory_keys_create_or_update:
+            if key not in self._info:
+                self.log('exiting. mandatory key {} not found in info {}'.format(key, self._info))
                 sys.exit(1)
 
 
@@ -110,7 +110,7 @@ class Cable():
         if self.cable_type is None:
             return
         if self.cable_type in self.valid_choices['type']:
-            self.args['type'] = self.cable_type
+            self._args['type'] = self.cable_type
         else:
             self.log('exiting. Invalid cable_type. Got {}. Expected one of {}.'.format(
                 self.cable_type,
@@ -124,13 +124,13 @@ class Cable():
         '''
         if self.rgb is None:
             return
-        self.args['color'] = self.rgb
+        self._args['color'] = self.rgb
 
     def _set_label(self):
         '''
         add the caller's cable label
         '''
-        self.args['label'] = self.label
+        self._args['label'] = self.label
 
     def _set_length(self):
         '''
@@ -139,7 +139,7 @@ class Cable():
         if self.length is None:
             return
         if isinstance(self.length, int):
-            self.args['length'] = self.length
+            self._args['length'] = self.length
         else:
             self.log('exiting. Expected type int for length. Got {}'.format(self.length))
             sys.exit(1)
@@ -151,7 +151,7 @@ class Cable():
         if self.length_unit is None:
             return
         if self.length_unit in self.valid_choices['length_unit']:
-            self.args['length_unit'] = self.length_unit
+            self._args['length_unit'] = self.length_unit
         else:
             self.log('exiting. Invalid length_unit. Got {}. Expected one of {}.'.format(
                 self.length_unit,
@@ -165,7 +165,7 @@ class Cable():
         if self.status is None:
             return
         if self.status in self.valid_choices['status']:
-            self.args['status'] = self.status
+            self._args['status'] = self.status
         else:
             self.log('exiting. Invalid status. Got {}. Expected one of {}.'.format(
                 self.status,
@@ -185,16 +185,16 @@ class Cable():
         if self.port_a_type is None:
             self.log('exiting. Missing mandatory parameter: port_a_type')
             sys.exit(1)
-        if self.port_a_type not in self.valid_port_types:
+        if self.port_a_type not in self._valid_port_types:
             self.log('exiting. Unexpected port_a_type. Got {}. Expected one of {}.'.format(
                 self.port_a_type,
-                ','.join(self.valid_port_types)))
+                ','.join(self._valid_port_types)))
             sys.exit(1)
-        self.args['a_terminations'] = []
+        self._args['a_terminations'] = []
         termination = {}
-        termination['object_id'] = interface_id(self.netbox, self.device_a, self.port_a)
-        termination['object_type'] = self.port_type_map[self.port_a_type]
-        self.args['a_terminations'].append(termination)
+        termination['object_id'] = interface_id(self._netbox, self.device_a, self.port_a)
+        termination['object_type'] = self._port_type_map[self.port_a_type]
+        self._args['a_terminations'].append(termination)
 
     def _set_b_terminations(self):
         '''
@@ -209,16 +209,16 @@ class Cable():
         if self.port_b_type is None:
             self.log('exiting. Missing mandatory parameter: port_b_type')
             sys.exit(1)
-        if self.port_b_type not in self.valid_port_types:
+        if self.port_b_type not in self._valid_port_types:
             self.log('exiting. Unexpected port_b_type. Got {}. Expected one of {}.'.format(
                 self.port_b_type,
-                ','.join(self.valid_port_types)))
+                ','.join(self._valid_port_types)))
             sys.exit(1)
-        self.args['b_terminations'] = []
+        self._args['b_terminations'] = []
         termination = {}
-        termination['object_id'] = interface_id(self.netbox, self.device_b, self.port_b)
-        termination['object_type'] = self.port_type_map[self.port_b_type]
-        self.args['b_terminations'].append(termination)
+        termination['object_id'] = interface_id(self._netbox, self.device_b, self.port_b)
+        termination['object_type'] = self._port_type_map[self.port_b_type]
+        self._args['b_terminations'].append(termination)
 
 
     def _set_tags(self):
@@ -226,7 +226,7 @@ class Cable():
         add the caller's tags, if any
         '''
         if self.tags is not None:
-            self.args['tags'] = self.tags
+            self._args['tags'] = self.tags
 
 
     def _generate_args_create_or_update(self):
@@ -250,7 +250,7 @@ class Cable():
         '''
         self.log('{}'.format(self.label))
         try:
-            self.netbox.dcim.cables.create(self.args)
+            self._netbox.dcim.cables.create(self._args)
         except RequestError as request_error:
             self.log('exiting. RequestError Unable to create Cable {}.  Error was: {}'.format(self.label, request_error))
             sys.exit(1)
@@ -283,7 +283,7 @@ class Cable():
             self.log('proceeding nonetheless...')
 
         try:
-            self.netbox.dcim.cables.create(self.args)
+            self._netbox.dcim.cables.create(self._args)
         except RequestError as request_error:
             self.log('exiting. RequestError Unable to update Cable {}.  Error was: {}'.format(self.label, request_error))
             sys.exit(1)
@@ -294,10 +294,10 @@ class Cable():
     # def _update(self):
     #     self.log('{} cable_id {}'.format(self.label, self.cable_id))
     #     try:
-    #         self.cable_object.update(self.args)
+    #         self.cable_object.update(self._args)
     #     except Exception as general_error:
     #         self.log('Unable to update cable {}. Error was: {}'.format(self.label, general_error))
-    #         self.log('args: {}'.format(self.args))
+    #         self.log('args: {}'.format(self._args))
     #         sys.exit(1)
 
     def delete(self):
@@ -335,8 +335,8 @@ class Cable():
         '''
         set the cable's netbox color
         '''
-        if 'color' in self.info:
-            return self.info['color']
+        if 'color' in self._info:
+            return self._info['color']
         return None
 
     @property
@@ -346,21 +346,21 @@ class Cable():
         '''
         if self.color is None:
             return None
-        return color_to_rgb(self.info['color'])
+        return color_to_rgb(self._info['color'])
 
     @property
     def label(self):
         '''
         set a cable's physical label
         '''
-        return self.info['label']
+        return self._info['label']
 
     @property
     def cable_object(self):
         '''
         return a cable object by searching for the cable's label
         '''
-        return self.netbox.dcim.cables.get(label=self.label)
+        return self._netbox.dcim.cables.get(label=self.label)
 
     @property
     def cable_id(self):
@@ -374,8 +374,8 @@ class Cable():
         '''
         return the cable's type set by the caller
         '''
-        if 'cable_type' in self.info:
-            return self.info['cable_type']
+        if 'cable_type' in self._info:
+            return self._info['cable_type']
         return None
 
     @property
@@ -383,8 +383,8 @@ class Cable():
         '''
         return the cable's device_a termination set by the caller
         '''
-        if 'device_a' in self.info:
-            return self.info['device_a']
+        if 'device_a' in self._info:
+            return self._info['device_a']
         return None
 
     @property
@@ -392,8 +392,8 @@ class Cable():
         '''
         return the cable's device_b termination set by the caller
         '''
-        if 'device_b' in self.info:
-            return self.info['device_b']
+        if 'device_b' in self._info:
+            return self._info['device_b']
         return None
 
     @property
@@ -401,8 +401,8 @@ class Cable():
         '''
         return the cable's length set by the caller
         '''
-        if 'length' in self.info:
-            return self.info['length']
+        if 'length' in self._info:
+            return self._info['length']
         return None
 
     @property
@@ -410,8 +410,8 @@ class Cable():
         '''
         return the cable's length unit (e.g. m, km) set by the caller
         '''
-        if 'length_unit' in self.info:
-            return self.info['length_unit']
+        if 'length_unit' in self._info:
+            return self._info['length_unit']
         return None
 
     @property
@@ -419,8 +419,8 @@ class Cable():
         '''
         return the cable's port_a termination set by the caller
         '''
-        if 'port_a' in self.info:
-            return self.info['port_a']
+        if 'port_a' in self._info:
+            return self._info['port_a']
         return None
 
     @property
@@ -428,8 +428,8 @@ class Cable():
         '''
         return the cable's port_b termination set by the caller
         '''
-        if 'port_b' in self.info:
-            return self.info['port_b']
+        if 'port_b' in self._info:
+            return self._info['port_b']
         return None
 
     @property
@@ -437,8 +437,8 @@ class Cable():
         '''
         return the cable's port_a port-type set by the caller
         '''
-        if 'port_a_type' in self.info:
-            return self.info['port_a_type']
+        if 'port_a_type' in self._info:
+            return self._info['port_a_type']
         return None
 
     @property
@@ -446,8 +446,8 @@ class Cable():
         '''
         return the cable's port_b port-type set by the caller
         '''
-        if 'port_b_type' in self.info:
-            return self.info['port_b_type']
+        if 'port_b_type' in self._info:
+            return self._info['port_b_type']
         return None
 
     @property
@@ -455,8 +455,8 @@ class Cable():
         '''
         return the cable's status set by the caller
         '''
-        if 'status' in self.info:
-            return self.info['status']
+        if 'status' in self._info:
+            return self._info['status']
         return None
 
     @property
@@ -464,9 +464,9 @@ class Cable():
         '''
         return the cable's tags set by the caller
         '''
-        if 'tags' in self.info:
+        if 'tags' in self._info:
             tag_list = []
-            for tag in self.info['tags']:
-                tag_list.append(tag_id(self.netbox, tag))
+            for tag in self._info['tags']:
+                tag_list.append(tag_id(self._netbox, tag))
             return tag_list
         return None

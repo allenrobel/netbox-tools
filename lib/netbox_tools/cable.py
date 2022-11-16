@@ -116,7 +116,6 @@ class Cable():
                 self.cable_type,
                 ','.join(sorted(self.valid_choices['type']))))
             sys.exit(1)
-        self.args['type'] = 'foobar'
 
 
     def _set_color(self):

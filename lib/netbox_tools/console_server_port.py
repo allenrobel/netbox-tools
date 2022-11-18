@@ -155,7 +155,7 @@ class ConsoleServerPort:
                 f"Valid values are: {valid_values}",
             )
             sys.exit(1)
-        self._args["speed"] = self.port_speed
+server_        self._args["speed"] = self.port_speed
 
     def _set_port_type(self):
         """
@@ -174,7 +174,7 @@ class ConsoleServerPort:
 
     def _set_tags(self):
         """
-        set the console_port's tags, if any; converting them to netbox ids
+        set the console_server_port's tags, if any; converting them to netbox ids
         """
         if self.tags is None:
             return
@@ -182,7 +182,7 @@ class ConsoleServerPort:
         for tag in self.tags:
             self._args["tags"].append(tag_id(self._netbox, tag))
 
-    def generate_create_update_args(self):
+    def _generate_create_update_args(self):
         """
         generate all supported arguments for create() and update() methods
         """
@@ -247,7 +247,7 @@ class ConsoleServerPort:
         entry point into create and update methods
         """
         self._validate_create_update_keys()
-        self.generate_create_update_args()
+        self._generate_create_update_args()
         if self.console_server_port_object is None:
             self.create()
         else:
@@ -291,7 +291,7 @@ class ConsoleServerPort:
     @property
     def label(self):
         """
-        A physical label attached to the console port.
+        A physical label attached to the console_server_port.
         If label is set, return it.  Else return None.
         """
         if "label" in self._info:
@@ -311,14 +311,14 @@ class ConsoleServerPort:
     @property
     def port(self):
         """
-        Mandatory. The console server port name. This is used to populate the "name" argument.
+        Mandatory. The console_server_port name. This is used to populate the "name" argument.
         """
         return self._info["port"]
 
     @property
     def port_speed(self):
         """
-        The speed of the console port in bits per second.
+        The speed of the console_server_port in bits per second.
         If the caller set port_speed, return it.  Else return None.
         """
         if "port_speed" in self._info:

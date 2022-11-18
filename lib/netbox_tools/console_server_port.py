@@ -1,14 +1,15 @@
-'''
+"""
 Name: console_server_port.py
 Description: Create, update, delete operations on netbox /dcim/console-server-ports/ endpoint
-'''
+"""
 from inspect import stack
 import sys
 from netbox_tools.common import device_id, tag_id
 
 OUR_VERSION = 102
 
-class ConsoleServerPort():
+
+class ConsoleServerPort:
     """
     create, update, delete Netbox console server ports
 
@@ -34,6 +35,7 @@ class ConsoleServerPort():
 
     TODO: 2022-11-18: add support for module
     """
+
     def __init__(self, netbox_obj, info):
         self._netbox = netbox_obj
         self._info = info
@@ -42,16 +44,16 @@ class ConsoleServerPort():
         self._args = {}
 
         self._mandatory_create_update_keys = set()
-        self._mandatory_create_update_keys.add('device')
-        self._mandatory_create_update_keys.add('port')
+        self._mandatory_create_update_keys.add("device")
+        self._mandatory_create_update_keys.add("port")
 
         self._mandatory_delete_keys = set()
-        self._mandatory_delete_keys.add('device')
-        self._mandatory_delete_keys.add('port')
+        self._mandatory_delete_keys.add("device")
+        self._mandatory_delete_keys.add("port")
 
         self._optional_keys = set()
-        self._optional_keys.add('description')
-        self._optional_keys.add('mark_connected')
+        self._optional_keys.add("description")
+        self._optional_keys.add("mark_connected")
         self._optional_keys.add("port_speed")
         self._optional_keys.add("port_type")
 
@@ -96,7 +98,7 @@ class ConsoleServerPort():
         """
         for key in self._mandatory_delete_keys:
             if key not in self._info:
-                self.log(f'exiting. mandatory key {key} not found in info {self._info}')
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
                 sys.exit(1)
 
     def _validate_create_update_keys(self):
@@ -105,7 +107,7 @@ class ConsoleServerPort():
         """
         for key in self._mandatory_create_update_keys:
             if key not in self._info:
-                self.log(f'exiting. mandatory key {key} not found in info {self._info}')
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
                 sys.exit(1)
 
     def _set_description(self):
@@ -258,7 +260,9 @@ class ConsoleServerPort():
         the console_server_port's device and name
         """
         try:
-            return self._netbox.dcim.console_server_ports.get(device=self.device, name=self.port)
+            return self._netbox.dcim.console_server_ports.get(
+                device=self.device, name=self.port
+            )
         except Exception as _general_error:
             self.log(
                 "exiting. dcim.console_server_ports.get() failed for device",

@@ -22,16 +22,16 @@ class ConsoleServerPort:
     Where info_dict contains the following structure
 
     console_server_ports:
-    ts_1_2003:
-        device: ts_1
-        label: dc-115
-        mark_connected: False
-        port: 2003
-        port_speed: 9600
-        port_type: rj-45
-        description: bgw_3
-        tags:
-        - admin
+        ts_1_2003:
+            device: ts_1
+            label: dc-115
+            mark_connected: False
+            port: 2003
+            port_speed: 9600
+            port_type: rj-45
+            description: bgw_3
+            tags:
+            - admin
 
     TODO: 2022-11-18: add support for module
     """

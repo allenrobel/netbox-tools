@@ -307,6 +307,8 @@ device_roles:
 #
 # Optional keys
 #   description: Free-form description for the Console Port
+#   label: The text for a physical label affixed to the console_port
+#   mark_connected: boolean. Treat as if a cable is connected
 #   port_speed: speed in kbps of the console port. Valid values: 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
 #   port_type: type of port. Valid values: de-9, db-25, rj-11, rj-12, rj-45, mini-din-8, usb-a, usb-b, usb-c, 
 #                                          usb-mini-a, usb-mini-b, usb-micro-a, usb-micro-b, usb-micro-ab, other
@@ -315,6 +317,7 @@ console_ports:
   lab_gateway_167_1_console:
     description: lab_gateway_167_1_console
     device: lab_gateway_167_1
+    label: dc_115
     port: console
     port_speed: 9600
     port_type: rj-45
@@ -329,12 +332,20 @@ console_ports:
 #
 # Optional keys
 #   description: Free-form description for the Console Server Port
+#   label: The text for a physical label affixed to the console_server_port
+#   mark_connected: boolean. Treat as if a cable is connected
+#   port_speed: speed in kbps of the console port. Example valid values: 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
+#   port_type: type of port. Example valid values: de-9, db-25, rj-11, rj-12, rj-45, mini-din-8, usb-a, usb-b, usb-c, 
+#                                          usb-mini-a, usb-mini-b, usb-micro-a, usb-micro-b, usb-micro-ab, other
 #   tags: A YAML list of tags to associate with the Console Server Port to enable filtering based on tag.
 
 console_server_ports:
   ts_1_2003:
     device: ts_1
+    label: dc_115
     port: 2003
+    port_speed: 9600
+    port_type: rj-45
     description: bgw_3
     tags:
       - admin
@@ -377,7 +388,7 @@ console_server_ports:
 # 3. tags. All tags must be listed in the tags section of this file.  We could have written the
 #          scripts to create tags "on demand" if they are added to a device below but are not 
 #          present in netbox, but that would likely result in "tag explosion."  Instead, we 
-#          opted to force the user to think about why they are adding a tag by requiring that
+#          opted to force the user to think about why they aspeedre adding a tag by requiring that
 #          all tags be listed in the tags section. This also forces you to document all your
 #          tags in a single place.
 

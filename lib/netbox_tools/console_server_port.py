@@ -155,7 +155,7 @@ class ConsoleServerPort:
                 f"Valid values are: {valid_values}",
             )
             sys.exit(1)
-server_        self._args["speed"] = self.port_speed
+        self._args["speed"] = self.port_speed
 
     def _set_port_type(self):
         """

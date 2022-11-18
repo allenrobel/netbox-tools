@@ -25,6 +25,7 @@ class ConsolePort:
     cvd_leaf_1_console:
         description: cvd_leaf_1_console
         device: cvd_leaf_1
+        label: dc-115
         mark_connected: True
         port: console
         port_speed: 9600
@@ -36,53 +37,53 @@ class ConsolePort:
     TODO: 2022-11-18: add support for module
     """
 
-    def __init__(self, netbox, info):
-        self._netbox = netbox
+    def __init__(self, netbox_obj, info):
+        self._netbox = netbox_obj
         self._info = info
         self._classname = __class__.__name__
         self.lib_version = OUR_VERSION
         self._args = {}
 
-        self.mandatory_create_update_keys = set()
-        self.mandatory_create_update_keys.add("device")
-        self.mandatory_create_update_keys.add("port")
+        self._mandatory_create_update_keys = set()
+        self._mandatory_create_update_keys.add("device")
+        self._mandatory_create_update_keys.add("port")
 
-        self.mandatory_delete_keys = set()
-        self.mandatory_delete_keys.add("device")
-        self.mandatory_delete_keys.add("port")
+        self._mandatory_delete_keys = set()
+        self._mandatory_delete_keys.add("device")
+        self._mandatory_delete_keys.add("port")
 
-        self.optional_keys = set()  # optional_keys is not used anywhere. It's just FYI.
-        self.optional_keys.add("description")
-        self.optional_keys.add("mark_connected")
-        self.optional_keys.add("port_speed")
-        self.optional_keys.add("port_type")
+        self._optional_keys = set()  # _optional_keys is not used anywhere. It's just FYI.
+        self._optional_keys.add("description")
+        self._optional_keys.add("mark_connected")
+        self._optional_keys.add("port_speed")
+        self._optional_keys.add("port_type")
 
-        self.port_speed_to_label = {}
-        self.port_speed_to_label[1200] = "1200 bps"
-        self.port_speed_to_label[2400] = "2400 bps"
-        self.port_speed_to_label[4800] = "4800 bps"
-        self.port_speed_to_label[9600] = "9600 bps"
-        self.port_speed_to_label[19200] = "19.2 kbps"
-        self.port_speed_to_label[38400] = "38.4 kbps"
-        self.port_speed_to_label[57600] = "57.6 kbps"
-        self.port_speed_to_label[115200] = "115.2 kbps"
+        self._port_speed_to_label = {}
+        self._port_speed_to_label[1200] = "1200 bps"
+        self._port_speed_to_label[2400] = "2400 bps"
+        self._port_speed_to_label[4800] = "4800 bps"
+        self._port_speed_to_label[9600] = "9600 bps"
+        self._port_speed_to_label[19200] = "19.2 kbps"
+        self._port_speed_to_label[38400] = "38.4 kbps"
+        self._port_speed_to_label[57600] = "57.6 kbps"
+        self._port_speed_to_label[115200] = "115.2 kbps"
 
-        self.port_type_to_label = {}
-        self.port_type_to_label["de-9"] = "DE-9"
-        self.port_type_to_label["db-25"] = "DB-25"
-        self.port_type_to_label["rj-11"] = "RJ-11"
-        self.port_type_to_label["rj-12"] = "RJ-12"
-        self.port_type_to_label["rj-45"] = "RJ-45"
-        self.port_type_to_label["mini-din-8"] = "Mini-DIN 8"
-        self.port_type_to_label["usb-a"] = "USB Type A"
-        self.port_type_to_label["usb-b"] = "USB Type B"
-        self.port_type_to_label["usb-c"] = "USB Type C"
-        self.port_type_to_label["usb-mini-a"] = "USB Mini A"
-        self.port_type_to_label["usb-mini-b"] = "USB Mini B"
-        self.port_type_to_label["usb-micro-a"] = "USB Micro A"
-        self.port_type_to_label["usb-micro-b"] = "USB Micro B"
-        self.port_type_to_label["usb-micro-ab"] = "USB Micro AB"
-        self.port_type_to_label["other"] = "Other"
+        self._port_type_to_label = {}
+        self._port_type_to_label["de-9"] = "DE-9"
+        self._port_type_to_label["db-25"] = "DB-25"
+        self._port_type_to_label["rj-11"] = "RJ-11"
+        self._port_type_to_label["rj-12"] = "RJ-12"
+        self._port_type_to_label["rj-45"] = "RJ-45"
+        self._port_type_to_label["mini-din-8"] = "Mini-DIN 8"
+        self._port_type_to_label["usb-a"] = "USB Type A"
+        self._port_type_to_label["usb-b"] = "USB Type B"
+        self._port_type_to_label["usb-c"] = "USB Type C"
+        self._port_type_to_label["usb-mini-a"] = "USB Mini A"
+        self._port_type_to_label["usb-mini-b"] = "USB Mini B"
+        self._port_type_to_label["usb-micro-a"] = "USB Micro A"
+        self._port_type_to_label["usb-micro-b"] = "USB Micro B"
+        self._port_type_to_label["usb-micro-ab"] = "USB Micro AB"
+        self._port_type_to_label["other"] = "Other"
 
     def log(self, *args):
         """
@@ -96,16 +97,16 @@ class ConsolePort:
         """
         verify that all mandatory keys for delete() are present
         """
-        for key in self.mandatory_delete_keys:
+        for key in self._mandatory_delete_keys:
             if key not in self._info:
                 self.log(f"exiting. mandatory key {key} not found in info {self._info}")
                 sys.exit(1)
 
     def _validate_create_update_keys(self):
         """
-        verify that all mandatory keys for create()/update() are present
+        verify that all mandatory keys for create() and update() are present
         """
-        for key in self.mandatory_create_update_keys:
+        for key in self._mandatory_create_update_keys:
             if key not in self._info:
                 self.log(f"exiting. mandatory key {key} not found in info {self._info}")
                 sys.exit(1)
@@ -155,8 +156,8 @@ class ConsolePort:
         """
         if self.port_speed is None:
             return
-        if self.port_speed not in self.port_speed_to_label:
-            valid_values = ",".join(self.port_speed_to_label.keys())
+        if self.port_speed not in self._port_speed_to_label:
+            valid_values = ",".join(self._port_speed_to_label.keys())
             self.log(
                 f"exiting. Unknown port_speed {self.port_speed}.",
                 f"Valid values are: {valid_values}",
@@ -170,8 +171,8 @@ class ConsolePort:
         """
         if self.port_type is None:
             return
-        if self.port_type not in self.port_type_to_label:
-            valid_values = ",".join(self.port_type_to_label.keys())
+        if self.port_type not in self._port_type_to_label:
+            valid_values = ",".join(self._port_type_to_label.keys())
             self.log(
                 f"exiting. Unknown port_type {self.port_type}",
                 f"Valid values are: {valid_values}",
@@ -191,7 +192,7 @@ class ConsolePort:
 
     def _generate_create_update_args(self):
         """
-        generate all supported arguments
+        generate all supported arguments for create() and update() methods
         """
         self._set_description()
         self._set_device()
@@ -322,16 +323,6 @@ class ConsolePort:
         return self._info["port"]
 
     @property
-    def tags(self):
-        """
-        A list of tag names to associate with the console_port.
-        If tags is set, return it.  Else return None.
-        """
-        if "tags" in self._info:
-            return self._info["tags"]
-        return None
-
-    @property
     def port_speed(self):
         """
         The speed of the console port in bits per second.
@@ -348,4 +339,14 @@ class ConsolePort:
         """
         if "port_type" in self._info:
             return self._info["port_type"]
+        return None
+
+    @property
+    def tags(self):
+        """
+        A list of tag names to associate with the console_port.
+        If tags is set, return it.  Else return None.
+        """
+        if "tags" in self._info:
+            return self._info["tags"]
         return None

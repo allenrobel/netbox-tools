@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 Name: credentials.py
 Description:
 
@@ -26,73 +26,121 @@ and modify the config_file variable at the top of the file to point to your
 vault e.g.
 
 netbox_vault = /Users/arobel/repos/netbox-tools/lib/secrets
-'''
-from ansible import constants as C
+"""
+from inspect import stack
+import sys
 from ansible.cli import CLI
 from ansible.parsing.dataloader import DataLoader
 
 from netbox_tools.config.netbox_config import LoadConfig
 
-class NetboxCredentials(object):
+OUR_VERSION = 102
+
+
+class NetboxCredentials:
+    """
+    Read the caller's Ansible vault and expose the following keys via properties:
+
+    token - via property token
+    url - via property url
+    """
+
     def __init__(self):
-        self.mandatory_keys = set()
-        self.mandatory_keys.add('netbox_token')
-        self.mandatory_keys.add('netbox_url')
+        self._classname = __class__.__name__
+        self.lib_version = OUR_VERSION
+
+        self._mandatory_keys = set()
+        self._mandatory_keys.add("netbox_token")
+        self._mandatory_keys.add("netbox_url")
 
         # TODO: Remove deprecated keys handling after 2023-11-01
-        self.deprecated_keys = set()
-        self.deprecated_keys.add('token')
-        self.deprecated_keys.add('url')
+        self._deprecated_keys = set()
+        self._deprecated_keys.add("token")
+        self._deprecated_keys.add("url")
 
-        self.c = LoadConfig()
+        self._config = LoadConfig()
 
-        self.load_credentials()
+        self._load_credentials()
 
-    def verify_mandatory_keys(self):
-        for k in self.mandatory_keys:
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _verify_mandatory_keys(self):
+        """
+        return True if all mandatory keys are set
+        else, return False
+        """
+        for k in self._mandatory_keys:
             if k not in self.data:
                 return False
         return True
-    def verify_deprecated_keys(self):
+
+    def _verify_deprecated_keys(self):
+        """
+        return True if any deprecated keys are being used.
+        else, return False
+        """
         # TODO: remove deprecated keys handling after 2023-11-01
-        for k in self.deprecated_keys:
+        for k in self._deprecated_keys:
             if k not in self.data:
                 return False
         return True
-    def load_credentials(self):
+
+    def _load_credentials(self):
+        """
+        load credentials from ansible vault
+        """
         try:
             loader = DataLoader()
-            vault_secrets = CLI.setup_vault_secrets(loader=loader,
-                        vault_ids=C.DEFAULT_VAULT_IDENTITY_LIST)
+            vault_secrets = CLI.setup_vault_secrets(loader=loader, vault_ids=[])
             loader.set_vault_secrets(vault_secrets)
-            self.data = loader.load_from_file(self.c.config['vault'])
-        except Exception as e:
-            print('unable to load credentials in {}.'.format(self.c.config['vault']))
-            print('Exception was: {}'.format(e))
-            exit(1)
+            self.data = loader.load_from_file(self._config.config["vault"])
+        except Exception as _general_error:
+            self.log(
+                f"unable to load credentials in {self._config.config['vault']}.",
+                f"Exception detail: {_general_error}",
+            )
+            sys.exit(1)
 
         # TODO: remove deprecated keys handling after 2023-11-01
         use_deprecated_keys = False
-        if self.verify_mandatory_keys() == False:
-            if self.verify_deprecated_keys() == True:
+        if self._verify_mandatory_keys() is False:
+            if self._verify_deprecated_keys() is True:
                 use_deprecated_keys = True
-                print('WARNING: Using deprecated keys in {}'.format(self.c.config['vault']))
-                print('Deprecated keys will stop working after 2023-11-01')
+                self.log(
+                    f"WARNING: Using deprecated keys in {self._config.config['vault']}",
+                    "Deprecated keys will stop working after 2023-11-01",
+                )
             else:
-                print('Exiting. Vault is missing one or more of the following keys {}'.format(self.mandatory_keys))
-                exit(1)
-                    
-        self.credentials = dict()
-        if use_deprecated_keys == True:
-            self.credentials['netbox_token'] = str(self.data['token'])
-            self.credentials['netbox_url'] = str(self.data['url'])
+                self.log(
+                    "exiting. Vault is missing one or more of the following keys:",
+                    f"{self._mandatory_keys}",
+                )
+                sys.exit(1)
+
+        self._credentials = {}
+        if use_deprecated_keys is True:
+            self._credentials["netbox_token"] = str(self.data["token"])
+            self._credentials["netbox_url"] = str(self.data["url"])
         else:
-            self.credentials['netbox_token'] = str(self.data['netbox_token'])
-            self.credentials['netbox_url'] = str(self.data['netbox_url'])
+            self._credentials["netbox_token"] = str(self.data["netbox_token"])
+            self._credentials["netbox_url"] = str(self.data["netbox_url"])
 
     @property
     def token(self):
-        return self.credentials['netbox_token']
+        """
+        Netbox API Token
+        """
+        return self._credentials["netbox_token"]
+
     @property
     def url(self):
-        return self.credentials['netbox_url']
+        """
+        Netbox URL
+        """
+        return self._credentials["netbox_url"]

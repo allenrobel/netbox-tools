@@ -281,7 +281,7 @@ def device_type_id(netbox_instance, name):
     If device_type does not exist in netbox, return None
     """
     try:
-        device_type = netbox_instance.dcim.device_types.get(slug=name.lower())
+        device_type = netbox_instance.dcim.device_types.get(model=name)
         if device_type is not None:
             return device_type.id
         print(

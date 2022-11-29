@@ -1,84 +1,153 @@
-'''
+"""
 Name: manufacturer.py
-Description: Class for create and update operations on netbox manufacturer
-'''
+Description: create, update, and delete operations on netbox manufacturer
+"""
 
+from inspect import stack
+import sys
 from netbox_tools.common import create_slug
 
-class Manufacturer(object):
-    def __init__(self, nb, info):
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_create_update_keys = ['name']
-        self.mandatory_delete_keys = ['name']
-        self.optional_keys = []
 
-    def validate_delete_keys(self):
-        for key in self.mandatory_delete_keys:
-            if key not in self.info:
-                print('manufacturer.validate_delete_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
+class Manufacturer:
+    """
+    create, update, and delete operations on netbox manufacturer
+    """
 
-    def validate_create_update_keys(self):
-        for key in self.mandatory_create_update_keys:
-            if key not in self.info:
-                print('manufacturer.validate_create_update_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
+    def __init__(self, netbox_obj, info):
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_create_update_keys = set()
+        self._mandatory_create_update_keys.add("name")
+        self._mandatory_delete_keys = set()
+        self._mandatory_delete_keys("name")
+        self._optional_keys = set()
 
-    def generate_create_update_args(self):
-        self.args['name'] = self.name
-        self.args['slug'] = create_slug(self.name)
-        for key in self.optional_keys:
-            if key in self.info:
-                self.args[key] = self.info[key]
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _validate_delete_keys(self):
+        """
+        Verify that all mandatory delete operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_delete_keys:
+            if key not in self._info:
+                self.log(
+                    f"exiting. mandatory key {key} not found in info {self._info}"
+                )
+                sys.exit(1)
+
+    def _validate_create_update_keys(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_create_update_keys:
+            if key not in self._info:
+                self.log(
+                    f"exiting. mandatory key {key} not found in info {self._info}"
+                )
+                sys.exit(1)
+
+    def _generate_create_update_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._args["name"] = self.name
+        self._args["slug"] = create_slug(self.name)
+        for key in self._optional_keys:
+            if key in self._info:
+                self._args[key] = self._info[key]
 
     def delete(self):
-        self.validate_delete_keys()
-        if self.manufacturer == None:
-            print('Manufacturer.delete: Nothing to do. Manufacturer {} does not exist in netbox.'.format(self.name))
+        """
+        delete a manufacturer
+        """
+        self._validate_delete_keys()
+        if self.manufacturer_obj == None:
+            self.log(
+                f"Nothing to do. Manufacturer {self.name} does not exist in netbox."
+            )
             return
-        print('Manufacturer.delete: {}'.format(self.name))
+        self.log(f"{self.name}")
         try:
-            self.manufacturer.delete()
-        except Exception as e:
-            print('Manufacturer.delete: Error. Unable to delete manufacturer {}.  Error was: {}'.format(self.name, e))
+            self.manufacturer_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"Error. Unable to delete manufacturer {self.name}",
+                f"Exception detail: {_general_exception}",
+            )
             return
 
     def create(self):
-        print('Manufacturer.create: {}'.format(self.name))
+        """
+        create a manufacturer
+        """
+        self.log(f"{self.name}")
         try:
-            self.nb.dcim.manufacturers.create(self.args)
-        except Exception as e:
-            print('manufacturer.create: Exiting. Unable to create manufacturer {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self._netbox_obj.dcim.manufacturers.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Error. Unable to create manufacturer {self.name}",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('Manufacturer.update: {}'.format(self.name))
-        self.args['id'] = self.manufacturer_id
+        """
+        update a manufacturer
+        """
+        self.log(f"{self.name}")
+        self._args["id"] = self.manufacturer_id
         try:
-            self.manufacturer.update(self.args)
-        except Exception as e:
-            print('manufacturer.update: Exiting. Unable to update manufacturer {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self.manufacturer_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Error. Unable to update manufacturer {self.name}",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_create_update_keys()
-        self.generate_create_update_args()
-        if self.manufacturer == None:
+        """
+        entry point into create and update methods
+        """
+        self._validate_create_update_keys()
+        self._generate_create_update_args()
+        if self.manufacturer_obj == None:
             self.create()
         else:
             self.update()
 
     @property
     def name(self):
-        return self.info['name']
+        """
+        Return the manufacturer name set by the caller.
+        """
+        return self._info["name"]
 
     @property
-    def manufacturer(self):
-        return self.nb.dcim.manufacturers.get(name=self.name)
+    def manufacturer_obj(self):
+        """
+        Return the manufacturer object associated with the
+        manufacturer name set by the caller.
+        Netbox will return None if this does not exist.
+        """
+        return self._netbox_obj.dcim.manufacturers.get(name=self.name)
 
     @property
     def manufacturer_id(self):
-        return self.manufacturer.id
-
+        """
+        Return the Netbox ID of the manufacturer object associated
+        with the manufacturer name set by the caller.
+        Return None if the manufacturer object does not exist in Netbox.
+        """
+        if self.manufacturer_obj is not None:
+            return self.manufacturer_obj.id
+        return None

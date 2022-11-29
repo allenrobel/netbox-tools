@@ -1,111 +1,212 @@
-'''
+"""
 Name: role.py
-Description: Class for create and update operations on netbox device roles
-'''
-
-from netbox_tools.common import create_slug, get_tag, get_tags, tag_id
+Description: create, update, and delete operations on netbox device roles
+"""
+from inspect import stack
+import sys
+from netbox_tools.common import create_slug, tag_id
 from netbox_tools.colors import color_to_rgb
 
-class Role(object):
-    def __init__(self, nb, info):
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys = ['color', 'name']
-        self.optional_keys = ['description', 'tags,'] # FYI only.  Not used in this class.
+OUR_VERSION = 101
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
-            if key not in self.info:
-                print('Role.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
 
-    def generate_args(self):
-        self.args['name'] = self.name
-        self.args['color'] = self.rgb
-        self.args['slug'] = create_slug(self.name)
-        if self.description != None:
-            self.args['description'] = self.description
-        if self.tags != None:
-            self.args['tags'] = self.tags
+class Role:
+    """
+    create, update, and delete operations on netbox device roles
+    """
+
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_keys = set()
+        self._mandatory_keys.add("color")
+        self._mandatory_keys.add("name")
+        self._optional_keys = set()  # FYI only.  Not used in this class.
+        self._optional_keys.add("description")
+        self._optional_keys.add("tags")
+
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _validate_keys(self):
+        for key in self._mandatory_keys:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
+
+    def _set_color(self):
+        """
+        Add color to args
+        """
+        self._args["color"] = self.rgb
+
+    def _set_description(self):
+        """
+        Add description, if any, to args
+        """
+        if self.description is None:
+            return
+        self._args["description"] = self.description
+
+    def _set_name(self):
+        """
+        Add name to args
+        """
+        self._args["name"] = self.name
+
+    def _set_slug(self):
+        """
+        Add slug to args
+        """
+        self._args["slug"] = create_slug(self.name)
+
+    def _set_tags(self):
+        """
+        Add tags, if any, to args; converting them to netbox IDs
+        """
+        if self.tags is None:
+            return
+        self._args["tags"] = []
+        for tag in self.tags:
+            self._args["tags"].append(tag_id(self._netbox_obj, tag))
+
+    def _generate_args(self):
+        self._set_color()
+        self._set_description()
+        self._set_name()
+        self._set_slug()
+        self._set_tags()
 
     def delete(self):
-        if self.role == None:
-            print('Role.delete: Nothing to do. Role {} does not exist in netbox.'.format(self.name))
+        """
+        delete a role
+        """
+        if self.role_obj is None:
+            self.log(f"Nothing to do. Role {self.name} does not exist in netbox.")
             return
-        print('Role.delete: {}'.format(self.name))
+        self.log(f"{self.name}")
         try:
-            self.role.delete()
-        except Exception as e:
-            print('Role.delete: Error. Unable to delete role {}.  Error was: {}'.format(self.name, e))
-            return
+            self.role_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to delete role {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create(self):
-        print('Role.create: {}'.format(self.name))
+        """
+        create a role
+        """
+        self.log(f"{self.name}")
         try:
-            self.nb.dcim.device_roles.create(self.args)
-        except Exception as e:
-            print('Role.create: Exiting. Unable to create role {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self._netbox_obj.dcim.device_roles.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to create role {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('Role.update: {}'.format(self.name))
-        self.args['id'] = self.role_id
+        """
+        update a role
+        """
+        if self.role_id is None:
+            self.log(f"Skipping. role {self.name} does not exist in Netbox")
+            return
+        self.log(f"{self.name}")
+        self._args["id"] = self.role_id
         try:
-            self.role.update(self.args)
-        except Exception as e:
-            print('Role.update: Exiting. Unable to update role {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self.role_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to update role {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_keys()
-        self.generate_args()
-        if self.role == None:
+        """
+        entry point into create and update methods
+        """
+        self._validate_keys()
+        self._generate_args()
+        if self.role_obj is None:
             self.create()
         else:
             self.update()
 
     @property
     def color(self):
-        return self.info['color']
+        """
+        Return color set by the caller.
+        """
+        return self._info["color"]
 
     @property
     def description(self):
-        if 'description' in self.info:
-            return self.info['description']
-        else:
-            return None
+        """
+        Return description set by the caller.
+        Return None if the caller didn't set this.
+        """
+        if "description" in self._info:
+            return self._info["description"]
+        return None
 
     @property
     def name(self):
-        return self.info['name']
+        """
+        Return name set by the caller.
+        """
+        return self._info["name"]
 
     @property
     def rgb(self):
-        return color_to_rgb(self.info['color'])
+        """
+        Return rgb assocated with color set by the caller.
+        """
+        return color_to_rgb(self._info["color"])
 
     @property
-    def role(self):
-        return self.nb.dcim.device_roles.get(name=self.name)
+    def role_obj(self):
+        """
+        Return role object associated with name set by the caller.
+        """
+        return self._netbox_obj.dcim.device_roles.get(name=self.name)
 
     @property
     def role_id(self):
-        return self.role.id
+        """
+        Return Netbox ID for the role object associated with role name
+        set by the caller.
+        """
+        if self.role_obj is not None:
+            return self.role_obj.id
+        return None
 
     @property
     def slug(self):
+        """
+        Return slug (url friendly name) for the role name
+        set by the caller.
+        """
         return create_slug(self.name)
 
     @property
     def tags(self):
-        if 'tags' in self.info:
-            tag_list = list()
-            for tag in self.info['tags']:
-                tag_obj = get_tag(self.nb, tag)
-                if tag_obj == None:
-                    print('DeviceType.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
-                    exit(1)
-                tag_list.append(tag_id(self.nb, tag))
-            return tag_list
-        else:
-            return None
+        """
+        Return the list of tag names set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "tags" in self._info:
+            return self._info["tags"]
+        return None

@@ -1,200 +1,294 @@
-'''
+"""
 Name: ip_address.py
-Description: Class for create and update operations on netbox ip_addresss
-'''
+Description: Class for create and update operations on netbox ip_address
 
-from netbox_tools.common import device_id, get_device
-from netbox_tools.common import interface_id
+NOTES:
 
-class IpAddress(object):
-    '''
-    nb = netbox instance
-    info = dictionary with the following keys:
-    {
+1. For create and update operations, this class also maps and assigns the
+IP address as a device's primary IP.  We shouldn't have to do this, but
+are seeing Netbox get into a state where the IPAM -> IP Addresses
+page will not load if the IP address is not mapped to a device.
+"""
+from inspect import stack
+import sys
+from netbox_tools.common import device_id
+from netbox_tools.device import (
+    map_device_primary_ip,
+    make_device_primary_ip,
+    initialize_device_primary_ip,
+)
+
+OUR_VERSION = 102
+
+class IpAddress:
+    """
+    create, update, delete operations on ipam.ip_address
+
+    Parameters:
+        netbox_obj = netbox instance
+        info = dictionary with the following keys:
+
         # mandatory
         device: device to which the interface belongs e.g. cvd_leaf_1
-        interface: interface on which ip addresses will be assigned e.g. mgmt0, Eth1/1, Vlan150, etc
+        interface: interface on which ip addresses will be assigned: mgmt0, Eth1/1, Vlan150, etc
         ip4: ipv4 address for the interface e.g. 1.1.1.0/24
         # optional
-        ip_description: free-form description of the ip address
-        ip_status: status of the ip address. Valid values: active, reserved, deprecated, dhcp, slaac
-    }
-    '''
-    def __init__(self, nb, info):
-        self.version = 101
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys = ['interface', 'ip4', 'device']
-        self.optional_keys = ['ip_description', 'ip_status']
-        self.default_ip_address_type = '1000base-t'
-        self.default_ip_address_enabled = True
-        self.fix_deprecations()
-        self.validate_keys()
-        self.generate_args()
-        self.initialize_device_primary_ip()
+        description: free-form description of the ip address
+        status: ip address status.
+        role: ip address role.
+    """
 
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_create_update_keys = set()
+        self._mandatory_create_update_keys.add("interface")
+        self._mandatory_create_update_keys.add("ip4")
+        self._mandatory_create_update_keys.add("device")
+        self._optional_keys = set()
+        self._optional_keys.add("description")
+        self._optional_keys.add("role")
+        self._optional_keys.add("status")
+        self._fix_deprecations()
+        self._populate_valid_choices()
 
-    def fix_deprecations(self):
-        if 'mgmt_interface' in self.info:
-            print('IpAddress.fix_deprecations: WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated. Use devices: <device>: interface instead.')
-            self.info['interface'] = self.info['mgmt_interface']
-        if 'name' in self.info:
-            print('IpAddress.fix_deprecations: WARNING: devices: <device>: name in your YAML file is deprecated. Use devices: <device>: device instead.')
-            self.info['device'] = self.info['name']
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
 
+    def _populate_valid_choices(self):
+        """
+        retrieve valid ip address choices from the users netbox instance
+        """
+        self._valid_choices = {}
+        choices_dict = self._netbox_obj.ipam.ip_addresses.choices()
+        for item in choices_dict:
+            valid_values = choices_dict[item]
+            self._valid_choices[item] = [item["value"] for item in valid_values]
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
-            if key not in self.info:
-                print('IpAddress.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
+    def _fix_deprecations(self):
+        """
+        We changed some key names for devices on 2022-09-29.
+        If the caller presents the old key names, warn them and convert
+        them to the new key names.
+        TODO: remove this method on 2023-09-29
+        """
+        if "mgmt_interface" in self._info:
+            self.log(
+                "WARNING: devices: <device>: mgmt_interface in your YAML file is deprecated.",
+                "Use devices: <device>: interface instead.",
+            )
+            self._info["interface"] = self._info["mgmt_interface"]
+        if "name" in self._info:
+            self.log(
+                "WARNING: devices: <device>: name in your YAML file is deprecated.",
+                "Use devices: <device>: device instead.",
+            )
+            self._info["device"] = self._info["name"]
 
+    def _validate_create_update_keys(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_create_update_keys:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
 
-    def set_address(self):
-        self.args['address'] = self.ip4
+    def _set_address(self):
+        self._args["address"] = self.ip4
 
+    def _set_assigned_object_id(self):
+        self._args["assigned_object_id"] = device_id(self._netbox_obj, self.device)
 
-    def set_assigned_object_id(self):
-        self.args['assigned_object_id'] = device_id(self.nb, self.device)
-
-
-    def set_description(self):
-        if self.ip_description == None:
-            self.args['description'] = '{} : {} : {}'.format(
-                self.device,
-                self.interface,
-                self.ip4)
+    def _set_description(self):
+        """
+        Update args with description, if the user has set this.
+        If the user has not set this, update args with a generic description
+        which includes device, interface, and ip4 address
+        """
+        if self.description is not None:
+            self._args["description"] = self.description
         else:
-            self.args['description'] = self.ip_description
+            self._args["description"] = f"{self.device} : {self.interface} : {self.ip4}"
 
-
-    # def set_interface(self):
-    #     self.args['interface'] = interface_id(self.nb, self.device, self.interface)
-
-
-    def set_status(self):
-        if self.ip_status == None:
-            self.args['status'] = 'active'
+    def _set_role(self):
+        """
+        Update args with the ip address role, if the user has set this.
+        Exit with error if the user set an invalid role.
+        """
+        if self.role is None:
+            return
+        if self.role in self._valid_choices["role"]:
+            self._args["role"] = self.role
         else:
-            self.args['status'] = self.ip_status
+            _valid_choices = ",".join(sorted(self._valid_choices["role"]))
+            self.log(
+                f"exiting. Invalid role. Got {self.role}",
+                f"Expected one of {_valid_choices}.",
+            )
+            sys.exit(1)
 
+    def _set_status(self):
+        """
+        Update args with the ip address status, if the user has set this.
+        Exit with error if the user set an invalid status.
+        """
+        if self.status is None:
+            return
+        if self.status in self._valid_choices["status"]:
+            self._args["status"] = self.status
+        else:
+            _valid_choices = ",".join(sorted(self._valid_choices["status"]))
+            self.log(
+                f"exiting. Invalid status. Got {self.status}",
+                f"Expected one of {_valid_choices}.",
+            )
+            sys.exit(1)
 
-    def generate_args(self):
-        self.set_address()
-        self.set_assigned_object_id()
-        self.set_description()
-        # self.set_interface()
-        self.set_status()
-
-
-    def initialize_device_primary_ip(self):
-        '''
-        Initialize primary_ip4 and primary_ip to avoid errors in map_device_primary_ip()address.save()
-        '''
-        device = get_device(self.nb, self.device)
-        device.primary_ip4 = None
-        device.primary_ip = None
-        device.save()
-
+    def _generate_create_update_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._set_address()
+        self._set_assigned_object_id()
+        self._set_description()
+        self._set_role()
+        self._set_status()
 
     def create(self):
-        print('IpAddress.create: device {} address {}'.format(self.device, self.ip4))
+        """
+        Create an ip address.
+        """
+        self.log(f"device {self.device} address {self.ip4}")
         try:
-            self.nb.ipam.ip_addresses.create(self.args)
-        except Exception as e:
-            print('IpAddress.create: Exiting. Unable to create device {} ip_address {}.  Error was: {}'.format(
-                self.device,
-                self.ip4,
-                e))
-            exit(1)
-
+            self._netbox_obj.ipam.ip_addresses.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to create device {self.device} ip_address {self.ip4}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('IpAddress.update: device {} address {}'.format(self.device, self.ip4))
-        self.args['id'] = self.ip_address_id
+        """
+        Update an ip address.
+        """
+        self.log(f"device {self.device} address {self.ip4}")
+        self._args["id"] = self.ip_address_id
         try:
-            self.ip_address.update(self.args)
-        except Exception as e:
-            print('IpAddress.update: Exiting. Unable to update device {} ip_address {}.  Error was: {}'.format(
-                self.device,
-                self.ip4,
-                e))
-            exit(1)
-
+            self.ip_address.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to update device {self.device} ip_address {self.ip4}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        if self.ip_address == None:
+        """
+        Entry point into create and update methods
+        """
+        self._validate_create_update_keys()
+        self._generate_create_update_args()
+        initialize_device_primary_ip(self._netbox_obj, self.device)
+        if self.ip_address is None:
             self.create()
         else:
             self.update()
-
+        map_device_primary_ip(self._netbox_obj, self.device, self.interface, self.ip4)
+        make_device_primary_ip(self._netbox_obj, self.device, self.ip4)
 
     @property
     def device(self):
-        return self.info['device']
-
-
-    @property
-    def ip_description(self):
-        if 'ip_description' in self.info:
-            return self.info['ip_description']
-        else:
-            return None
-
+        """
+        Return the device set by the caller.
+        We've already checked that this is set in _validate_create_update_keys()
+        """
+        return self._info["device"]
 
     @property
-    def ip_status(self):
-        if 'ip_status' in self.info:
-            return self.info['ip_status']
-        else:
-            return None
+    def description(self):
+        """
+        Return the ip address description set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "description" in self._info:
+            return self._info["description"]
+        return None
 
+    @property
+    def status(self):
+        """
+        Return the ip address status set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "status" in self._info:
+            return self._info["status"]
+        return None
 
     @property
     def ip_address(self):
+        """
+        Return the ip address object associated with the ip address and mask set by the caller.
+        """
         try:
-            address,mask = self.ip4.split('/')
-        except Exception as e:
-            print('IpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.ip4, e))
-            exit(1)
-        return self.nb.ipam.ip_addresses.get(
-            address=address,
-            mask=mask)
-
+            address, mask = self.ip4.split("/")
+        except Exception as _general_exception:
+            self.log(
+                "IpAddress: exiting. Unexpected IP address format.  Expected A.B.C.D/E.",
+                f"Got {self.ip4}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
+        return self._netbox_obj.ipam.ip_addresses.get(address=address, mask=mask)
 
     @property
-    def ip_address_enabled(self):
-        if 'ip_address_enabled' in self.info:
-            return self.info['ip_address_enabled']
-        else:
-            return None
-
+    def role(self):
+        """
+        Return the ip address role set by the caller.
+        If the caller didn't set this, return None
+        """
+        if "role" in self._info:
+            return self._info["role"]
+        return None
 
     @property
     def ip_address_id(self):
+        """
+        Return the Netbox ID associated with the ip address object.
+        If the ip address object doesn't exist, None will be returned.
+        """
         return self.ip_address.id
-
-
-    @property
-    def ip_address_type(self):
-        if 'ip_address_type' in self.info:
-            return self.info['ip_address_type']
-        else:
-            return None
-
-
-    # Keeping for backward-compatibility. Remove after 2023-09-29.
-    @property
-    def mgmt_interface(self):
-        return self.info['interface']
-
 
     @property
     def interface(self):
-        return self.info['interface']
-
+        """
+        Return the interface set by the caller.
+        We've already checked that this is set in _validate_create_update_keys()
+        """
+        return self._info["interface"]
 
     @property
     def ip4(self):
-        return self.info['ip4']
+        """
+        Return the ipv4 address set by the caller.
+        We've already checked that this is set in _validate_create_update_keys()
+        """
+        return self._info["ip4"]
+
+    @property
+    def mgmt_interface(self):
+        """
+        Keeping for backward-compatibility.
+        TODO: Remove after 2023-09-29
+        """
+        return self._info["interface"]

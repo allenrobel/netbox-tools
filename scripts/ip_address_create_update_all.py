@@ -32,12 +32,31 @@ def get_parser():
 
     return parser.parse_args()
 
+def make_ip_address_dict(info_dict, interface_dict):
+    """
+    Return a dictionary with the keys expected by the IpAddress class.
+    """
+    if 'ip4' not in interface_dict:
+        return None
+    if 'ip4_addresses' not in info_dict:
+        return interface_dict
+    ip4 = interface_dict['ip4']
+    if ip4 not in info_dict['ip4_addresses']:
+        return interface_dict
+    ip_address_dict = interface_dict
+    if 'status' in info_dict['ip4_addresses'][ip4]:
+        ip_address_dict['status'] = info_dict['ip4_addresses'][ip4]['status']
+    if 'role' in info_dict['ip4_addresses'][ip4]:
+        ip_address_dict['role'] = info_dict['ip4_addresses'][ip4]['role']
+    return ip_address_dict
+
 cfg = get_parser()
 info = load_yaml(cfg.yaml)
 nb = netbox()
-print('---')
 for key in info['interfaces']:
-    if 'ip4' not in info['interfaces'][key]:
+    ip_address_dict = make_ip_address_dict(info, info['interfaces'][key])
+    if ip_address_dict is None:
         continue
-    ip = IpAddress(nb, info['interfaces'][key])
+    print('---')
+    ip = IpAddress(nb, ip_address_dict)
     ip.create_or_update()

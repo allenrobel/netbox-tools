@@ -165,7 +165,7 @@ def get_interface_dict(device_dict, interfaces_dict):
     return interfaces_dict[interface_key]
 
 
-def devices_create_update(interfaces_dict, devices_dict, device_class):
+def devices_create_update(interfaces_dict, ip_addresses_dict, devices_dict, device_class):
     """
     create or update device and set the device's primary_ip to
     its management interface ipv4 address
@@ -182,13 +182,9 @@ def devices_create_update(interfaces_dict, devices_dict, device_class):
             continue
         intf_obj = Interface(nb, interface_dict)
         intf_obj.create_or_update()
-        ip4_obj = IpAddress(nb, interface_dict)
+        ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
+        ip4_obj = IpAddress(nb, ip_address_dict)
         ip4_obj.create_or_update()
-        assign_primary_ip_to_device(
-            interface_dict["ip4"],
-            devices_dict[key]["device"],
-            interface_dict["interface"],
-        )
         print("---")
 
 
@@ -197,6 +193,7 @@ def virtual_machines_create_update(interfaces_dict, vm_dict, virtual_machine_cla
     create or update virtual_machine and set the virtual_machine's
     primary_ip to its management interface ipv4 address
     """
+    #print(f"vm_dict: {vm_dict}")
     for vm_key in vm_dict:
         vm_obj = virtual_machine_class(nb, vm_dict[vm_key])
         vm_obj.create_or_update()
@@ -214,7 +211,7 @@ def virtual_machines_create_update(interfaces_dict, vm_dict, virtual_machine_cla
         vip_obj.create_or_update()
         assign_primary_ip_to_vm(
             interface_dict["ip4"],
-            vm_dict[key]["vm"],
+            vm_dict[vm_key]["vm"],
             interface_dict["interface"],
         )
         print("---")
@@ -247,6 +244,21 @@ def get_runner_dict():
     runner[16] = {"key": "virtual_machines", "object": VirtualMachine}
     return runner
 
+def make_ip_address_dict(ip_addresses_dict, interface_dict):
+    """
+    Return a dictionary with the keys expected by the IpAddress class.
+    """
+    if 'ip4' not in interface_dict:
+        return None
+    ip4 = interface_dict['ip4']
+    if ip4 not in ip_addresses_dict:
+        return interface_dict
+    ip_address_dict = interface_dict
+    if 'status' in ip_addresses_dict[ip4]:
+        ip_address_dict['status'] = ip_addresses_dict[ip4]['status']
+    if 'role' in ip_addresses_dict[ip4]:
+        ip_address_dict['role'] = ip_addresses_dict[ip4]['role']
+    return ip_address_dict
 
 cfg = get_parser()
 nb = netbox()
@@ -259,7 +271,10 @@ for item in sorted(runner_dict):
     if key == "devices":
         # special case for devices
         devices_create_update(
-            info["interfaces"], info[key], runner_dict[item]["object"]
+            info["interfaces"],
+            info['ip4_addresses'],
+            info[key],
+            runner_dict[item]["object"]
         )
         continue
     if key == "virtual_machines":

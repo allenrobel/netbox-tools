@@ -58,9 +58,7 @@ class Location:
                 if tid is not None:
                     self._args["tags"].append(tid)
                 else:
-                    self.log(
-                        f"tag {tag} not found in Netbox.  Skipping."
-                    )
+                    self.log(f"tag {tag} not found in Netbox.  Skipping.")
 
     def delete(self):
         """

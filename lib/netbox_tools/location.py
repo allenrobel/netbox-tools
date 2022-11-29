@@ -1,70 +1,137 @@
-'''
+"""
 Name: location.py
-Description: Class for create and update operations on netbox location
-'''
-
+Description: create and update operations on netbox location
+"""
+from inspect import stack
+import sys
 from netbox_tools.common import create_slug
+from netbox_tools.common import tag_id
 from netbox_tools.common import site_id
 
-class Location(object):
-    def __init__(self, nb, info):
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys_create_update = ['name', 'site']
+OUR_VERSION = 101
 
-    def validate_keys_create_update(self):
+
+class Location:
+    """
+    create and update operations on netbox location
+    """
+
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self.mandatory_keys_create_update = set()
+        self.mandatory_keys_create_update.add("name")
+        self.mandatory_keys_create_update.add("site")
+
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _validate_keys_create_update(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
         for key in self.mandatory_keys_create_update:
-            if key not in self.info:
-                print('Location.validate_keys_create_update: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
 
-    def generate_args_create_update(self):
-        self.args['name'] = self.info['name']
-        self.args['site'] = site_id(self.nb, self.info['site'])
-        self.args['slug'] = create_slug(self.info['name'])
-        if 'tags' in self.info:
-            self.args['tags'] = list()
-            for tag in self.info['tags']:
-                self.args['tags'].append(self.get_tag_id(tag))
+    def _generate_args_create_update(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._args["name"] = self._info["name"]
+        self._args["site"] = site_id(self._netbox_obj, self._info["site"])
+        self._args["slug"] = create_slug(self._info["name"])
+        if "tags" in self._info:
+            self._args["tags"] = []
+            for tag in self._info["tags"]:
+                tid = tag_id(self._netbox_obj, tag)
+                if tid is not None:
+                    self._args["tags"].append(tid)
+                else:
+                    self.log(
+                        f"tag {tag} not found in Netbox.  Skipping."
+                    )
 
     def delete(self):
-        print('Location.delete: {}'.format(self.info['name']))
+        """
+        delete a location
+        """
+        self.log(f"location {self._info['name']}")
         try:
-            self.location.delete()
-        except Exception as e:
-            print('Location.delete: WARNING. Unable to delete location {}.  Error was: {}'.format(self.info['name'], e))
+            self.location_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"WARNING. Unable to delete location {self._info['name']}.",
+                f"Exception detail: {_general_exception}",
+            )
             return
 
     def create(self):
-        print('Location.create: {}'.format(self.info['name']))
+        """
+        create a location
+        """
+        self.log(f"location {self._info['name']}")
         try:
-            self.nb.dcim.locations.create(self.args)
-        except Exception as e:
-            print('Location.create: Exiting. Unable to create location {}.  Error was: {}'.format(self.info['name'], e))
-            exit(1)
+            self._netbox_obj.dcim.locations.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"WARNING. Unable to create location {self._info['name']}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('Location.update: {}'.format(self.info['name']))
-        self.args['id'] = self.location_id
+        """
+        update a location
+        """
+        self.log(f"location {self._info['name']}")
+        self._args["id"] = self.location_id
         try:
-            self.location.update(self.args)
-        except Exception as e:
-            print('Location.update: Exiting. Unable to update location {}.  Error was: {}'.format(self.info['name'], e))
-            exit(1)
+            self.location_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"WARNING. Unable to update location {self._info['name']}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_keys_create_update()
-        self.generate_args_create_update()
-        if self.location == None:
+        """
+        entry point into create and update methods
+        """
+        self._validate_keys_create_update()
+        self._generate_args_create_update()
+        if self.location_obj is None:
             self.create()
         else:
             self.update()
 
     @property
-    def location(self):
-        return self.nb.dcim.locations.get(name=self.info['name'])
+    def location_obj(self):
+        """
+        Return the location object assocated with the location
+        name set by the caller.
+        Netbox will return None if the location is not found.
+        """
+        return self._netbox_obj.dcim.locations.get(name=self._info["name"])
 
     @property
     def location_id(self):
-        return self.location.id
+        """
+        Return the Netbox ID of the location object assocated with the location
+        name set by the caller.
+        Return None, if the location is not found in Netbox.
+        """
+        if self.location_obj is not None:
+            return self.location_obj.id
+        return None

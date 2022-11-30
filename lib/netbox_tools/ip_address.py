@@ -1,6 +1,6 @@
 """
 Name: ip_address.py
-Description: Class for create and update operations on netbox ip_address
+Description: create, update and delete operations on netbox ip_address
 
 NOTES:
 
@@ -18,11 +18,11 @@ from netbox_tools.device import (
     initialize_device_primary_ip,
 )
 
-OUR_VERSION = 102
+OUR_VERSION = 103
 
 class IpAddress:
     """
-    create, update, delete operations on ipam.ip_address
+    create, update, delete operations on Netbox ipam.ip_address
 
     Parameters:
         netbox_obj = netbox instance
@@ -48,6 +48,10 @@ class IpAddress:
         self._mandatory_create_update_keys.add("interface")
         self._mandatory_create_update_keys.add("ip4")
         self._mandatory_create_update_keys.add("device")
+
+        self._mandatory_delete_keys = set()
+        self._mandatory_delete_keys.add("ip4")
+
         self._optional_keys = set()
         self._optional_keys.add("description")
         self._optional_keys.add("role")
@@ -92,6 +96,16 @@ class IpAddress:
                 "Use devices: <device>: device instead.",
             )
             self._info["device"] = self._info["name"]
+
+    def _validate_delete_keys(self):
+        """
+        Verify that all mandatory delete operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_delete_keys:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
 
     def _validate_create_update_keys(self):
         """
@@ -164,6 +178,24 @@ class IpAddress:
         self._set_role()
         self._set_status()
 
+    def delete(self):
+        """
+        Delete an ip address.
+        """
+        self._validate_delete_keys()
+        if self.ip_address_obj is None:
+            self.log(f"Nothing to do. IP address {self.ip4} does not exist in netbox.")
+            return
+        self.log(f"{self.ip4}")
+        try:
+            self.ip_address_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to delete ip_address {self.ip4}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
+
     def create(self):
         """
         Create an ip address.
@@ -185,7 +217,7 @@ class IpAddress:
         self.log(f"device {self.device} address {self.ip4}")
         self._args["id"] = self.ip_address_id
         try:
-            self.ip_address.update(self._args)
+            self.ip_address_obj.update(self._args)
         except Exception as _general_exception:
             self.log(
                 f"exiting. Unable to update device {self.device} ip_address {self.ip4}.",
@@ -200,7 +232,7 @@ class IpAddress:
         self._validate_create_update_keys()
         self._generate_create_update_args()
         initialize_device_primary_ip(self._netbox_obj, self.device)
-        if self.ip_address is None:
+        if self.ip_address_obj is None:
             self.create()
         else:
             self.update()
@@ -236,7 +268,7 @@ class IpAddress:
         return None
 
     @property
-    def ip_address(self):
+    def ip_address_obj(self):
         """
         Return the ip address object associated with the ip address and mask set by the caller.
         """
@@ -267,7 +299,7 @@ class IpAddress:
         Return the Netbox ID associated with the ip address object.
         If the ip address object doesn't exist, None will be returned.
         """
-        return self.ip_address.id
+        return self.ip_address_obj.id
 
     @property
     def interface(self):

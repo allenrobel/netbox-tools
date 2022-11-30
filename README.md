@@ -207,6 +207,7 @@ Script                         | Description
 [interfaces_print] | Display information about all interfaces
 [ip_choices_print] | Display choices associated with endpoint ipam.ip_addresses
 [ip_address_create_update_all] | Create/update all ip addresses defined in ``--yaml``
+[ip_address_delete] | Delete an ip address using command line options ``--ip``
 [ip_prefix_create_update_all] | Create/update all ip prefixes defined in ``--yaml``
 [ip_prefix_create_update] | Create/update an ip prefix using command line options
 [ip_prefix_delete] | Delete ip prefix ``--prefix`` from netbox
@@ -291,6 +292,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [interfaces_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/interfaces_print.py
 [ip_choices_print]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_choices_print.py
 [ip_address_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_address_create_update_all.py
+[ip_address_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_address_delete.py
 [ip_prefix_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_prefix_create_update_all.py
 [ip_prefix_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_prefix_create_update.py
 [ip_prefix_delete]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/ip_prefix_delete.py

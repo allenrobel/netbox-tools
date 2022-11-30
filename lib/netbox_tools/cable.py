@@ -9,7 +9,7 @@ from netbox_tools.common import interface_id
 from netbox_tools.common import tag_id
 from netbox_tools.colors import color_to_rgb
 
-OUR_VERSION = 103
+OUR_VERSION = 104
 
 
 class Cable:
@@ -248,10 +248,17 @@ class Cable:
 
     def _set_tags(self):
         """
-        add the caller's tags, if any
+        Add tags, if any, to args; converting them to netbox IDs
         """
-        if self.tags is not None:
-            self._args["tags"] = self.tags
+        if self.tags is None:
+            return
+        self._args["tags"] = []
+        for tag in self.tags:
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_args_create_or_update(self):
         """
@@ -512,11 +519,9 @@ class Cable:
     @property
     def tags(self):
         """
-        return the cable's tags set by the caller
+        Return the list of tag names set by the caller.
+        If the caller didn't set this, return None.
         """
         if "tags" in self._info:
-            tag_list = []
-            for tag in self._info["tags"]:
-                tag_list.append(tag_id(self._netbox, tag))
-            return tag_list
+            return self._info["tags"]
         return None

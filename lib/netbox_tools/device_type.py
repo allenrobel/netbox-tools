@@ -8,7 +8,7 @@ from netbox_tools.common import manufacturer_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import tag_id
 
-OUR_VERSION = 104
+OUR_VERSION = 105
 
 
 class DeviceType:
@@ -103,13 +103,17 @@ class DeviceType:
 
     def _set_tags(self):
         """
-        set the device_type's tags, if any; converting them to netbox IDs
+        Add tags, if any, to args; converting them to netbox IDs
         """
         if self.tags is None:
             return
         self._args["tags"] = []
         for tag in self.tags:
-            self._args["tags"].append(tag_id(self._netbox, tag))
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_create_update_args(self):
         self._set_comments()

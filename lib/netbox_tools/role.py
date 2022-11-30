@@ -7,7 +7,7 @@ import sys
 from netbox_tools.common import create_slug, tag_id
 from netbox_tools.colors import color_to_rgb
 
-OUR_VERSION = 101
+OUR_VERSION = 102
 
 
 class Role:
@@ -80,7 +80,11 @@ class Role:
             return
         self._args["tags"] = []
         for tag in self.tags:
-            self._args["tags"].append(tag_id(self._netbox_obj, tag))
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_args(self):
         """

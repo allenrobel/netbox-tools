@@ -6,7 +6,7 @@ from inspect import stack
 import sys
 from netbox_tools.common import location_id, site_id, tag_id
 
-OUR_VERSION = 101
+OUR_VERSION = 102
 
 class Rack:
     """
@@ -92,7 +92,11 @@ class Rack:
             return
         self._args["tags"] = []
         for tag in self.tags:
-            self._args["tags"].append(tag_id(self._netbox_obj, tag))
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _set_u_height(self):
         """

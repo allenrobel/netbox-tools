@@ -6,7 +6,7 @@ from inspect import stack
 import sys
 from netbox_tools.common import device_id, tag_id
 
-OUR_VERSION = 103
+OUR_VERSION = 104
 
 
 class ConsolePort:
@@ -38,7 +38,7 @@ class ConsolePort:
     """
 
     def __init__(self, netbox_obj, info):
-        self._netbox = netbox_obj
+        self._netbox_obj = netbox_obj
         self._info = info
         self._classname = __class__.__name__
         self.lib_version = OUR_VERSION
@@ -122,7 +122,7 @@ class ConsolePort:
         """
         add device to args
         """
-        self._args["device"] = device_id(self._netbox, self.device)
+        self._args["device"] = device_id(self._netbox_obj, self.device)
 
     def _set_label(self):
         """
@@ -182,13 +182,17 @@ class ConsolePort:
 
     def _set_tags(self):
         """
-        set the console_port's tags, if any; converting them to netbox ids
+        Add tags, if any, to args; converting them to netbox IDs
         """
         if self.tags is None:
             return
         self._args["tags"] = []
         for tag in self.tags:
-            self._args["tags"].append(tag_id(self._netbox, tag))
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_create_update_args(self):
         """
@@ -228,7 +232,7 @@ class ConsolePort:
         """
         self.log(f"device {self.device} port {self.port}")
         try:
-            self._netbox.dcim.console_ports.create(self._args)
+            self._netbox_obj.dcim.console_ports.create(self._args)
         except Exception as _general_error:
             self.log(
                 f"exiting. Unable to create device {self.device} port {self.port}.",
@@ -267,7 +271,7 @@ class ConsolePort:
         return a console_port object by searching for the console_port's device and name
         """
         try:
-            return self._netbox.dcim.console_ports.get(
+            return self._netbox_obj.dcim.console_ports.get(
                 device=self.device, name=self.port
             )
         except Exception as _general_error:

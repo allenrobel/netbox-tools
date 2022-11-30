@@ -17,7 +17,7 @@ from netbox_tools.common import role_id
 from netbox_tools.common import site_id
 from netbox_tools.common import tag_id
 
-OUR_VERSION = 104
+OUR_VERSION = 105
 
 
 def initialize_device_primary_ip(netbox_obj, device_name):
@@ -74,7 +74,7 @@ class Device:
     """
 
     def __init__(self, netbox_obj, info):
-        self._netbox = netbox_obj
+        self._netbox_obj = netbox_obj
         self._info = info
         self.lib_version = OUR_VERSION
         self._classname = __class__.__name__
@@ -144,7 +144,7 @@ class Device:
         if self.cluster is None:
             return
         try:
-            self._args["cluster"] = cluster_id(self._netbox, self.cluster)
+            self._args["cluster"] = cluster_id(self._netbox_obj, self.cluster)
         except Exception as _general_exception:
             self.log(
                 f"exiting. unable to retrieve cluster_id from cluster {self.cluster}",
@@ -157,13 +157,13 @@ class Device:
         """
         add device role to args
         """
-        self._args["device_role"] = role_id(self._netbox, self.device_role)
+        self._args["device_role"] = role_id(self._netbox_obj, self.device_role)
 
     def _set_device_type(self):
         """
         add device type to args
         """
-        self._args["device_type"] = device_type_id(self._netbox, self.device_type)
+        self._args["device_type"] = device_type_id(self._netbox_obj, self.device_type)
 
     def _set_face(self):
         """
@@ -177,7 +177,7 @@ class Device:
         add location, if any, to args
         """
         if self.location is not None:
-            self._args["location"] = location_id(self._netbox, self.location)
+            self._args["location"] = location_id(self._netbox_obj, self.location)
 
     def _set_name(self):
         """
@@ -197,7 +197,7 @@ class Device:
         add rack, if any, to args
         """
         if self.rack is not None:
-            self._args["rack"] = rack_id(self._netbox, self.rack)
+            self._args["rack"] = rack_id(self._netbox_obj, self.rack)
 
     def _set_serial(self):
         """
@@ -210,7 +210,7 @@ class Device:
         """
         add site to args
         """
-        self._args["site"] = site_id(self._netbox, self.site)
+        self._args["site"] = site_id(self._netbox_obj, self.site)
 
     def _set_slug(self):
         """
@@ -220,13 +220,17 @@ class Device:
 
     def _set_tags(self):
         """
-        add tags, if any, to args; converting them to netbox IDs
+        Add tags, if any, to args; converting them to netbox IDs
         """
         if self.tags is None:
             return
         self._args["tags"] = []
         for tag in self.tags:
-            self._args["tags"].append(tag_id(self._netbox, tag))
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_args_create_or_update(self):
         """
@@ -251,7 +255,7 @@ class Device:
         """
         self.log(f"{self.device}")
         try:
-            self._netbox.dcim.devices.create(self._args)
+            self._netbox_obj.dcim.devices.create(self._args)
         except Exception as _general_error:
             self.log(
                 f"exiting. Unable to create device {self.device}.",
@@ -318,7 +322,7 @@ class Device:
         """
         return the netbox device object
         """
-        return self._netbox.dcim.devices.get(name=self.device)
+        return self._netbox_obj.dcim.devices.get(name=self.device)
 
     @property
     def device_id(self):

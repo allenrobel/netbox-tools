@@ -6,7 +6,7 @@ import sys
 from inspect import stack
 from netbox_tools.common import create_slug, tag_id
 
-OUR_VERSION = 102
+OUR_VERSION = 103
 
 
 class ClusterType:
@@ -14,12 +14,12 @@ class ClusterType:
     create, update, and delete operations on netbox virtualization.cluster_types
     """
 
-    def __init__(self, netbox, info):
-        self._netbox = netbox
-        self._info = info
+    def __init__(self, netbox_obj, info):
         self.lib_version = OUR_VERSION
         self._classname = __class__.__name__
-        self.args = {}
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
         self._populate_mandatory_keys()
         self._populate_optional_keys()
 
@@ -63,13 +63,13 @@ class ClusterType:
         populate args with the cluster_type description
         """
         if self.description is not None:
-            self.args["description"] = self.description
+            self._args["description"] = self.description
 
     def _set_name(self):
         """
         populate args with the cluster_type name
         """
-        self.args["name"] = self.name
+        self._args["name"] = self.name
 
     def _set_slug(self):
         """
@@ -77,19 +77,23 @@ class ClusterType:
         If the caller has not set the slug, we do it here
         """
         if self.slug is None:
-            self.args["slug"] = create_slug(self.name)
+            self._args["slug"] = create_slug(self.name)
         else:
-            self.args["slug"] = self.slug
+            self._args["slug"] = self.slug
 
     def _set_tags(self):
         """
-        populate args with tags, if any
+        Add tags, if any, to args; converting them to netbox IDs
         """
-        if "tags" not in self._info:
+        if self.tags is None:
             return
-        self.args["tags"] = []
-        for tag in self._info["tags"]:
-            self.args["tags"].append(tag_id(self._netbox, tag))
+        self._args["tags"] = []
+        for tag in self.tags:
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
 
     def _generate_args_create_update(self):
         """
@@ -121,7 +125,7 @@ class ClusterType:
         """
         self.log(f"{self._info['name']}")
         try:
-            self._netbox.virtualization.cluster_types.create(self.args)
+            self._netbox_obj.virtualization.cluster_types.create(self._args)
         except Exception as _general_error:
             self.log(
                 f"exiting. Unable to create cluster_type {self._info['name']}",
@@ -135,7 +139,7 @@ class ClusterType:
         """
         self.log("{}".format(self._info["name"]))
         try:
-            self.cluster_type_object.update(self.args)
+            self.cluster_type_object.update(self._args)
         except Exception as _general_error:
             self.log(
                 f"exiting. Unable to update cluster_type {self._info['name']}",
@@ -159,7 +163,7 @@ class ClusterType:
         """
         retrieve a cluster_type object from netbox by filtering on self.name and return it
         """
-        return self._netbox.virtualization.cluster_types.get(name=self.name)
+        return self._netbox_obj.virtualization.cluster_types.get(name=self.name)
 
     @property
     def cluster_type_id(self):

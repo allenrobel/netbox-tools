@@ -1,8 +1,9 @@
-'''
+"""
 Name: virtual_machine.py
 Description: create/update/delete operations on netbox virtual_machine
-'''
+"""
 from inspect import stack, getframeinfo, currentframe
+import sys
 from netbox_tools.common import cluster_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import device_id
@@ -13,124 +14,103 @@ from netbox_tools.common import site_id
 from netbox_tools.common import tag_id
 from netbox_tools.common import virtual_interface_id
 
-OUR_VERSION = 102
-
-def initialize_vm_primary_ip(nb, vm_name):
-    '''
-    Initialize primary_ip4 and primary_ip to avoid errors in map_vm_primary_ip()address.save()
-    '''
-    vm = get_vm(nb, vm_name)
-    vm.primary_ip4 = None
-    vm.primary_ip = None
-    vm.save()
-    print('{}(v{}).{}: vm: {}'.format(__name__, OUR_VERSION, getframeinfo(currentframe()).function, vm_name))
+OUR_VERSION = 105
 
 
-def map_vm_primary_ip(nb, vm_name, interface_name, ip_address):
-    '''
-    Map an existing IP address to an interface ID
+class VirtualMachine:
+    """
+    create/update/delete operations on netbox virtual_machine
+    """
 
-    args: nb, vm_name, interface_name, ip_address
-
-    Where:
-
-        nb - netbox instance
-
-        vm_name - str() name of a virtual machine
-
-        interface_name - str() name of an interface
-
-        ip_address - str() ip address in A.B.C.D/E format    
-    '''
-    address = get_ip_address(nb, ip_address)
-    address.assigned_object_id = virtual_interface_id(nb, vm_name, interface_name)
-    address.assigned_object_type = "virtualization.vminterface"
-    address.save()
-    print('{}(v{}).{}: vm: {}, interface: {}, address: {}'.format(__name__, OUR_VERSION, getframeinfo(currentframe()).function, vm_name, interface_name, ip_address))
-
-def make_vm_primary_ip(nb, vm, ip):
-    '''
-    Make an ip address the primary address for a virtual_machine by mapping
-    the address ID to a virtual_machines's primary_ip and primary_ip4.
-    '''
-    vm = get_vm(nb, vm)
-    address_id = ip_address_id(nb, ip)
-    vm.primary_ip = address_id
-    vm.primary_ip4 = address_id
-    vm.save()
-    print('{}(v{}).{}: vm: {}, ip: {}'.format(__name__, OUR_VERSION, getframeinfo(currentframe()).function, vm, ip))
-
-
-class VirtualMachine(object):
     def __init__(self, netbox_obj, info):
         self.lib_version = OUR_VERSION
-        self.classname = __class__.__name__
+        self._classname = __class__.__name__
         self._netbox_obj = netbox_obj
         self._info = info
-        self._args = dict()
-        self.mandatory_keys_create_or_update = ['vm', 'role']
-        self.mandatory_keys_delete = ['vm']
+        self._args = {}
+        self._mandatory_keys_create_or_update = ["vm", "role"]
+        self._mandatory_keys_delete = ["vm"]
 
-    def log(self, msg):
-        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
 
-    def validate_keys_delete(self):
-        for key in self.mandatory_keys_delete:
+    def _validate_keys_delete(self):
+        for key in self._mandatory_keys_delete:
             if key not in self._info:
-                self.log('exiting. mandatory key {} not found in info {}'.format(key, self._info))
-                exit(1)
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
 
-
-    def validate_keys_create_or_update(self):
-        for key in self.mandatory_keys_create_or_update:
+    def _validate_keys_create_or_update(self):
+        for key in self._mandatory_keys_create_or_update:
             if key not in self._info:
-                self.log('exiting. mandatory key {} not found in info {}'.format(key, self._info))
-                exit(1)
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
 
+    def _set_cluster(self):
+        """
+        Add cluster, if any, to args
+        """
+        if self.cluster is not None:
+            self._args["cluster"] = cluster_id(self._netbox_obj, self.cluster)
 
-    def set_cluster(self):
-        if self.cluster != None:
-            self._args['cluster'] = cluster_id(self._netbox_obj, self.cluster)
+    def _set_comments(self):
+        """
+        Add comments, if any, to args
+        """
+        if self.comments is not None:
+            self._args["comments"] = self.comments
 
+    def _set_device(self):
+        """
+        Add device, if any, to args
+        """
+        if self.device is not None:
+            self._args["device"] = device_id(self._netbox_obj, self.device)
 
-    def set_comments(self):
-        if self.comments != None:
-            self._args['comments'] = self.comments
+    def _set_disk(self):
+        """
+        Add disk, if any, to args
+        """
+        if self.disk is not None:
+            self._args["disk"] = self.disk
 
+    def _set_memory(self):
+        """
+        Add memory, if any, to args
+        """
+        if self.memory is not None:
+            self._args["memory"] = self.memory
 
-    def set_device(self):
-        '''device that hosts the virtual_machine'''
-        if self.device != None:
-            self._args['device'] = device_id(self._netbox_obj, self.device)
+    def _set_name(self):
+        """
+        Add name to args
+        """
+        self._args["name"] = self.vm_name
 
+    def _set_role(self):
+        """
+        Add role, if any, to args; converting to its corresponding netbox id
+        """
+        if self.role is not None:
+            self._args["role"] = role_id(self._netbox_obj, self.role)
 
-    def set_disk(self):
-        if self.disk != None:
-            self._args['disk'] = self.disk
+    def _set_site(self):
+        """
+        Add site, if any, to args; converting to its corresponding netbox id
+        """
+        if self.site is not None:
+            self._args["site"] = site_id(self._netbox_obj, self.site)
 
-
-    def set_memory(self):
-        if self.memory != None:
-            self._args['memory'] = self.memory
-
-
-    def set_name(self):
-        self._args['name'] = self.vm
-
-
-    def set_role(self):
-        if self.role != None:
-            self._args['role'] = role_id(self._netbox_obj, self.role)
-
-
-    def set_site(self):
-        if self.site != None:
-            self._args['site'] = site_id(self._netbox_obj, self.site)
-
-
-    def set_slug(self):
-        self._args['slug'] = create_slug(self._info['vm'])
-
+    def _set_slug(self):
+        """
+        Add slug to args
+        """
+        self._args["slug"] = create_slug(self._info["vm"])
 
     def _set_tags(self):
         """
@@ -146,131 +126,180 @@ class VirtualMachine(object):
                 continue
             self._args["tags"].append(tid)
 
+    def _set_vcpus(self):
+        """
+        Add vcpus, if any, to args
+        (float) virtual cpu units allocated to the vm. Min value: 0.01
+        """
+        if self.vcpus is None:
+            return
+        try:
+            vcpus = float(str(self.vcpus))
+        except ValueError as _value_error:
+            self.log(
+                "exiting. vcpus must be of type float. e.g. 1.01.", f"Got {self.vcpus}"
+            )
+            sys.exit(1)
+        if vcpus < 0.01:
+            self.log("exiting. vcpus must be greater than 0.01.", f"Got {vcpus}")
+            sys.exit(1)
+        self._args["vcpus"] = vcpus
 
-    def set_vcpus(self):
-        if self.vcpus != None:
-            self._args['vcpus'] = self.vcpus
-
-
-    def generate_args_create_or_update(self):
-        self.set_comments()
-        self.set_cluster()
-        self.set_device()
-        self.set_disk()
-        self.set_memory()
-        self.set_name()
-        self.set_role()
-        self.set_site()
-        self.set_slug()
+    def _generate_args_create_or_update(self):
+        """
+        generate all supported arguments for create/update operations
+        """
+        self._set_comments()
+        self._set_cluster()
+        self._set_device()
+        self._set_disk()
+        self._set_memory()
+        self._set_name()
+        self._set_role()
+        self._set_site()
+        self._set_slug()
         self._set_tags()
-        self.set_vcpus()
-
+        self._set_vcpus()
 
     def create(self):
-        self.log('{}'.format(self.vm))
+        """
+        create a virtual machine
+        """
+        self.log(f"{self.vm_name}")
         try:
             self._netbox_obj.virtualization.virtual_machines.create(self._args)
-        except Exception as e:
-            self.log('exiting. Unable to create vm {}.  Error was: {}'.format(self.vm, e))
-            exit(1)
-
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to create vm {self.vm_name}."
+                f"Exception detail: {_general_exception}"
+            )
+            sys.exit(1)
 
     def update(self):
-        self.log('{}'.format(self.vm))
-        self._args['id'] = self.vm_id
+        """
+        update a virtual machine
+        """
+        self.log(f"{self.vm_name}")
+        self._args["id"] = self.vm_id
         try:
             self.vm_object.update(self._args)
-        except Exception as e:
-            self.log('exiting. Unable to update vm {}.  Error was: {}'.format(self.vm, e))
-            exit(1)
-
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to update vm {self.vm_name}."
+                f"Exception detail: {_general_exception}"
+            )
+            sys.exit(1)
 
     def delete(self):
-        self.log('{}'.format(self.device))
-        self.validate_keys_delete()
-        if self.vm_object == None:
-            self.log('Nothing to do, vm {} does not exist in netbox.'.format(self.vm))
+        """
+        delete a virtual machine
+        """
+        self.log(f"{self.vm_name}")
+        self._validate_keys_delete()
+        if self.vm_object is None:
+            self.log(f"Nothing to do, vm {self.vm_name} does not exist in netbox.")
             return
         try:
             self.vm_object.delete()
-        except Exception as e:
-            self.log('exiting. Unable to delete vm {}.  Error was: {}'.format(self.vm, e))
-            exit(1)
-
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to delete vm {self.vm_name}."
+                f"Exception detail: {_general_exception}"
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_keys_create_or_update()
-        self.generate_args_create_or_update()
-        if self.vm_object == None:
+        """
+        entry point into creation and updation methods
+        """
+        self._validate_keys_create_or_update()
+        self._generate_args_create_or_update()
+        if self.vm_object is None:
             self.create()
         else:
             self.update()
 
-
     @property
     def cluster(self):
-        if 'cluster' in self._info:
-            return self._info['cluster']
-        else:
-            return None
-
+        """
+        Return the cluster set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "cluster" in self._info:
+            return self._info["cluster"]
+        return None
 
     @property
     def comments(self):
-        if 'comments' in self._info:
-            return self._info['comments']
-        else:
-            return None
-
+        """
+        Return the comments set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "comments" in self._info:
+            return self._info["comments"]
+        return None
 
     @property
     def device(self):
-        '''
+        """
+        Return the device set by the caller.
+        If the caller didn't set this, return None.
+
         The device hosting the virtual machine. device must already exist in netbox.
         If device is defined, cluster must also be defined.  We don't test for that
         here since netbox returns a good error message.
-        '''
-        if 'device' in self._info:
-            return self._info['device']
-        else:
-            return None
-
+        """
+        if "device" in self._info:
+            return self._info["device"]
+        return None
 
     @property
     def disk(self):
-        '''(int) disk space allocated to the vm, in GB'''
-        if 'disk' in self._info:
-            return self._info['disk']
-        else:
-            return None
+        """
+        Return the disk space set by the caller.
+        If the caller didn't set this, return None.
 
+        (int) disk space allocated to the vm, in GB
+        """
+        if "disk" in self._info:
+            return self._info["disk"]
+        return None
 
     @property
     def memory(self):
-        '''(int) memory allocated to the vm, in MB'''
-        if 'memory' in self._info:
-            return self._info['memory']
-        else:
-            return None
+        """
+        Return the memory set by the caller.
+        If the caller didn't set this, return None.
 
+        (int) memory allocated to the vm, in MB
+        """
+        if "memory" in self._info:
+            return self._info["memory"]
+        return None
 
     @property
     def role(self):
-        '''(str) role the vm serves. role must already exist in netbox'''
-        if 'role' in self._info:
-            return self._info['role']
-        else:
-            return None
+        """
+        Return the role set by the caller.
+        If the caller didn't set this, return None.
 
+        (str) role the vm serves. role must already exist in netbox
+        """
+        if "role" in self._info:
+            return self._info["role"]
+        return None
 
     @property
     def site(self):
-        '''site in which the vm is located. site must already exist in netbox'''
-        if 'site' in self._info:
-            return self._info['site']
-        else:
-            return None
+        """
+        Return the site set by the caller.
+        If the caller didn't set this, return None.
 
+        site in which the vm is located. site must already exist in netbox
+        """
+        if "site" in self._info:
+            return self._info["site"]
+        return None
 
     @property
     def tags(self):
@@ -282,35 +311,117 @@ class VirtualMachine(object):
             return self._info["tags"]
         return None
 
-
     @property
     def vcpus(self):
-        '''(float) virtual cpu units allocated to the vm. Min value: 0.01'''
-        if 'vcpus' in self._info:
-            try:
-                vcpus = float(str(self._info['vcpus']))
-            except:
-                self.log('exiting. vcpus must be of type float. e.g. 1.01. Got {}'.format(self._info['vcpus']))
-                exit(1)
-            if vcpus < 0.01:
-                self.log('exiting. vcpus must be greater than 0.01. Got {}'.format(self._info['vcpus']))
-                exit(1)
-            return self._info['vcpus']
-        else:
-            return None
+        """
+        Return the vcpus set by the caller.
+        If the caller didn't set this, return None.
 
+        (float) virtual cpu units allocated to the vm. Min value: 0.01
+        """
+        if "vcpus" in self._info:
+            return self._info["vcpus"]
+        return None
 
     @property
-    def vm(self):
-        return self._info['vm']
-
+    def vm_name(self):
+        """
+        Return the virtual machine name set by the caller.
+        """
+        return self._info["vm"]
 
     @property
     def vm_id(self):
+        """
+        Return the netbox ID of the virtual machine.
+        """
         return self.vm_object.id
-
 
     @property
     def vm_object(self):
-        return self._netbox_obj.virtualization.virtual_machines.get(name=self.vm)
+        """
+        Return the netbox object associated with the virtual machine.
+        """
+        try:
+            return self._netbox_obj.virtualization.virtual_machines.get(
+                name=self.vm_name
+            )
+        except Exception as _general_exception:
+            self.log(
+                f"exiting. Unable to retrieve vm_object associated with {self.vm_name}",
+                f"Exceptioin detail: {_general_exception}",
+            )
+            sys.exit(1)
 
+
+# utility functions related to virtual machines
+
+
+def initialize_vm_primary_ip(netbox_obj, vm_name):
+    """
+    Initialize primary_ip4 and primary_ip to avoid errors in map_vm_primary_ip()address.save()
+    """
+    vm_obj = get_vm(netbox_obj, vm_name)
+    vm_obj.primary_ip4 = None
+    vm_obj.primary_ip = None
+    vm_obj.save()
+    print(
+        "{}(v{}).{}: vm: {}".format(
+            __name__, OUR_VERSION, getframeinfo(currentframe()).function, vm_name
+        )
+    )
+
+
+def map_vm_primary_ip(netbox_obj, vm_name, interface_name, ip_address):
+    """
+    Map an existing IP address to an interface ID
+
+    args: nb, vm_name, interface_name, ip_address
+
+    Where:
+
+        netbox_obj - netbox instance
+
+        vm_name - str() name of a virtual machine
+
+        interface_name - str() name of an interface
+
+        ip_address - str() ip address in A.B.C.D/E format
+    """
+    address = get_ip_address(netbox_obj, ip_address)
+    address.assigned_object_id = virtual_interface_id(
+        netbox_obj, vm_name, interface_name
+    )
+    address.assigned_object_type = "virtualization.vminterface"
+    address.save()
+    print(
+        "{}(v{}).{}: vm: {}, interface: {}, address: {}".format(
+            __name__,
+            OUR_VERSION,
+            getframeinfo(currentframe()).function,
+            vm_name,
+            interface_name,
+            ip_address,
+        )
+    )
+
+
+def make_vm_primary_ip(netbox_obj, vm_name, ip_address):
+    """
+    Make an ip address the primary address for a virtual_machine by mapping
+    the address ID to a virtual_machines's primary_ip and primary_ip4.
+    """
+    vm_obj = get_vm(netbox_obj, vm_name)
+    address_id = ip_address_id(netbox_obj, ip_address)
+    vm_obj.primary_ip = address_id
+    vm_obj.primary_ip4 = address_id
+    vm_obj.save()
+    print(
+        "{}(v{}).{}: vm: {}, ip: {}".format(
+            __name__,
+            OUR_VERSION,
+            getframeinfo(currentframe()).function,
+            vm_name,
+            ip_address,
+        )
+    )

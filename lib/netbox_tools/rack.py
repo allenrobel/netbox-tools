@@ -109,6 +109,7 @@ class Rack:
         self._set_comments()
         self._set_location()
         self._set_name()
+        self._set_site()
         self._set_tags()
         self._set_u_height()
 

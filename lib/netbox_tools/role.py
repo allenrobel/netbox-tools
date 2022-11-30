@@ -37,6 +37,10 @@ class Role:
         )
 
     def _validate_keys(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
         for key in self._mandatory_keys:
             if key not in self._info:
                 self.log(f"exiting. mandatory key {key} not found in info {self._info}")
@@ -79,6 +83,9 @@ class Role:
             self._args["tags"].append(tag_id(self._netbox_obj, tag))
 
     def _generate_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
         self._set_color()
         self._set_description()
         self._set_name()

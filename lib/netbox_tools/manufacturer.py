@@ -20,7 +20,7 @@ class Manufacturer:
         self._mandatory_create_update_keys = set()
         self._mandatory_create_update_keys.add("name")
         self._mandatory_delete_keys = set()
-        self._mandatory_delete_keys("name")
+        self._mandatory_delete_keys.add("name")
         self._optional_keys = set()
 
     def log(self, *args):

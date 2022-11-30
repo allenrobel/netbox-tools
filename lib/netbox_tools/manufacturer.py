@@ -7,6 +7,7 @@ from inspect import stack
 import sys
 from netbox_tools.common import create_slug
 
+OUR_VERSION = 103
 
 class Manufacturer:
     """
@@ -14,6 +15,8 @@ class Manufacturer:
     """
 
     def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
         self._netbox_obj = netbox_obj
         self._info = info
         self._args = {}

@@ -1,80 +1,191 @@
+"""
+Name: tag.py
+Description: create, update, and delete operations on netbox tags
+"""
+from inspect import stack
+import sys
 from netbox_tools.colors import color_to_rgb
 from netbox_tools.common import create_slug
 
-class Tag(object):
-    def __init__(self, nb, info):
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys = ['color', 'name']
-        self.optional_keys = ['description']
+OUR_VERSION = 101
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
-            if key not in self.info:
-                print('Tag.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
 
-    def generate_args(self):
-        self.args['name'] = self.name
-        self.args['color'] = self.rgb
-        self.args['slug'] = create_slug(self.name)
-        for key in self.optional_keys:
-            if key in self.info:
-                self.args[key] = self.info[key]
+class Tag:
+    """
+    create, update, and delete operations on netbox tags
+    """
+
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_keys = set()
+        self._mandatory_keys.add("name")
+        self._optional_keys = set()  # Just FYI. Not used in this class.
+        self._optional_keys.add("description")
+        self._optional_keys.add("color")
+
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _validate_keys(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_keys:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
+
+    def _set_color(self):
+        """
+        Add color to args
+        """
+        if self.color is not None:
+            self._args["color"] = self.rgb
+
+    def _set_description(self):
+        """
+        Add description, if any, to args
+        """
+        if self.description is None:
+            return
+        self._args["description"] = self.description
+
+    def _set_name(self):
+        """
+        Add name to args
+        """
+        self._args["name"] = self.name
+
+    def _set_slug(self):
+        """
+        Add slug to args
+        """
+        self._args["slug"] = create_slug(self.name)
+
+    def _generate_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._set_color()
+        self._set_description()
+        self._set_name()
+        self._set_slug()
 
     def delete(self):
-        if self.tag == None:
-            print('Nothing to do, tag {} does not exist in netbox.'.format(self.name))
+        """
+        delete a tag
+        """
+        if self.tag_obj is None:
+            self.log(f"Nothing to do, tag {self.name} does not exist in netbox.")
             return
-        print('Tag.delete: {}'.format(self.name))
+        self.log(f"{self.name}")
         try:
-            self.tag.delete()
-        except Exception as e:
-            print('Tag.delete: Exiting. Unable to delete tag {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self.tag_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to delete tag {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create(self):
-        print('Tag.create: {}'.format(self.name))
+        """
+        create a tag
+        """
+        self.log(f"{self.name}")
         try:
-            self.nb.extras.tags.create(self.args)
-        except Exception as e:
-            print('Tag.create: Exiting. Unable to create tag {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self._netbox_obj.extras.tags.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to create tag {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('Tag.update: {}'.format(self.name))
-        self.args['id'] = self.tag_id
+        """
+        update a tag
+        """
+        if self.tag_id is None:
+            self.log(f"Skipping. tag {self.name} does not exist in Netbox")
+            return
+        self.log(f"{self.name}")
+        self._args["id"] = self.tag_id
         try:
-            self.tag.update(self.args)
-        except Exception as e:
-            print('Tag.update: Exiting. Unable to update tag {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self.tag_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to update tag {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_keys()
-        self.generate_args()
-        if self.tag == None:
+        """
+        entry point into create and update methods
+        """
+        self._validate_keys()
+        self._generate_args()
+        if self.tag_obj is None:
             self.create()
         else:
             self.update()
 
     @property
     def color(self):
-        return self.info['color']
-    
+        """
+        Return color set by the caller.
+        """
+        if "color" in self._info:
+            return self._info["color"]
+        return None
+
+    @property
+    def description(self):
+        """
+        Return description set by the caller.
+        Return None if the caller didn't set this.
+        """
+        if "description" in self._info:
+            return self._info["description"]
+        return None
+
     @property
     def name(self):
-        return self.info['name']
+        """
+        Return name set by the caller.
+        """
+        return self._info["name"]
 
     @property
     def rgb(self):
-        return color_to_rgb(self.info['color'])
+        """
+        Return rgb assocated with color set by the caller.
+        """
+        return color_to_rgb(self._info["color"])
 
     @property
-    def tag(self):
-        return self.nb.extras.tags.get(name=self.name)
+    def tag_obj(self):
+        """
+        Return tag object associated with name set by the caller.
+        """
+        return self._netbox_obj.extras.tags.get(name=self.name)
 
     @property
     def tag_id(self):
-        return self.tag.id
+        """
+        Return Netbox ID for the tag object associated with tag name set by the caller.
+        """
+        if self.tag_obj is not None:
+            return self.tag_obj.id
+        return None

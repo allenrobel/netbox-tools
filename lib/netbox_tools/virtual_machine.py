@@ -14,7 +14,7 @@ from netbox_tools.common import site_id
 from netbox_tools.common import tag_id
 from netbox_tools.common import virtual_interface_id
 
-OUR_VERSION = 105
+OUR_VERSION = 106
 
 
 class VirtualMachine:
@@ -28,8 +28,11 @@ class VirtualMachine:
         self._netbox_obj = netbox_obj
         self._info = info
         self._args = {}
-        self._mandatory_keys_create_or_update = ["vm", "role"]
-        self._mandatory_keys_delete = ["vm"]
+        self._mandatory_keys_create_or_update = set()
+        self._mandatory_keys_create_or_update.add("vm")
+        self._mandatory_keys_create_or_update.add("role")
+        self._mandatory_keys_delete = set()
+        self._mandatory_keys_delete.add("vm")
 
     def log(self, *args):
         """

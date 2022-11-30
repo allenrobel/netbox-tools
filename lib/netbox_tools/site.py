@@ -1,93 +1,204 @@
+"""
+Name: site.py
+Description: create, update, and delete operations on netbox site
+"""
+
+from inspect import stack
+import sys
 from netbox_tools.common import tag_id
-from netbox_tools.common import create_slug, get_tag, get_tags
+from netbox_tools.common import create_slug
 
-class Site(object):
-    def __init__(self, nb, info):
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys = ['name']
-        self.optional_keys = ['description', 'tags'] # FYI only.  Not used in this class.
+OUR_VERSION = 101
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
-            if key not in self.info:
-                print('Site.validate_keys: exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
 
-    def generate_args(self):
-        self.args['name'] = self.name
-        self.args['slug'] = create_slug(self.name)
-        if self.description != None:
-            self.args['description'] = self.description
-        if self.tags != None:
-            self.args['tags'] = self.tags
-        
+class Site:
+    """
+    create, update, and delete operations on netbox site
+    """
+
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_keys_create_update = set()
+        self._mandatory_keys_create_update.add("name")
+        self._mandatory_keys_delete = set()
+        self._mandatory_keys_delete.add("name")
+        self._optional_keys = set()  # FYI only.  Not used in this class.
+        self._optional_keys.add("description")
+        self._optional_keys.add("tags")
+
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
+
+    def _validate_keys_create_update(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_keys_create_update:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
+
+    def _validate_keys_delete(self):
+        """
+        Verify that all mandatory delete operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_keys_delete:
+            if key not in self._info:
+                self.log(f"exiting. mandatory key {key} not found in info {self._info}")
+                sys.exit(1)
+
+    def _set_description(self):
+        """
+        Add description, if any, to args
+        """
+        if self.description is None:
+            return
+        self._args["description"] = self.description
+
+    def _set_name(self):
+        """
+        Add name to args
+        """
+        self._args["name"] = self.name
+
+    def _set_slug(self):
+        """
+        Add slug to args
+        """
+        self._args["slug"] = create_slug(self.name)
+
+    def _set_tags(self):
+        """
+        Add tags, if any, to args; converting them to netbox IDs
+        """
+        if self.tags is None:
+            return
+        self._args["tags"] = []
+        for tag in self.tags:
+            self._args["tags"].append(tag_id(self._netbox_obj, tag))
+
+    def _generate_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._set_description()
+        self._set_name()
+        self._set_slug()
+        self._set_tags()
+
     def delete(self):
-        print('Site.delete: {}'.format(self.name))
-        if self.site == None:
-            print('Site.delete: Nothing to do. Site {} does not exist in netbox.'.format(self.name))
+        """
+        delete a site
+        """
+        self._validate_keys_delete()
+        if self.site_obj is None:
+            self.log(f"Nothing to do. Role {self.name} does not exist in netbox.")
             return
+        self.log(f"{self.name}")
         try:
-            self.site.delete()
-        except Exception as e:
-            print('Site.delete: WARNING. Unable to delete site {}.  Error was: {}'.format(self.name, e))
-            return
+            self.site_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to delete site {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create(self):
-        print('Site.create: {}'.format(self.name))
+        """
+        create a site
+        """
+        self.log(f"{self.name}")
         try:
-            self.nb.dcim.sites.create(self.args)
-        except Exception as e:
-            print('Site.create: Exiting. Unable to create site {}.  Error was: {}'.format(self.site, e))
-            exit(1)
+            self._netbox_obj.dcim.sites.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to create site {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def update(self):
-        print('Site.update: {}'.format(self.site))
-        self.args['id'] = self.site_id
+        """
+        update a site
+        """
+        if self.site_id is None:
+            self.log(f"Skipping. site {self.name} does not exist in Netbox")
+            return
+        self.log(f"{self.name}")
+        self._args["id"] = self.site_id
         try:
-            self.site.update(self.args)
-        except Exception as e:
-            print('Site.update: Exiting. Unable to update site {}.  Error was: {}'.format(self.name, e))
-            exit(1)
+            self.site_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                f"Exiting. Unable to update site {self.name}.",
+                f"Exception detail: {_general_exception}",
+            )
+            sys.exit(1)
 
     def create_or_update(self):
-        self.validate_keys()
-        self.generate_args()
-        if self.site == None:
+        """
+        entry point into create and update methods
+        """
+        self._validate_keys_create_update()
+        self._generate_args()
+        if self.site_obj is None:
             self.create()
         else:
             self.update()
 
     @property
     def name(self):
-        return self.info['name']
+        """
+        Return name set by the caller.
+        """
+        return self._info["name"]
 
     @property
     def description(self):
-        if 'description' in self.info:
-            return self.info['description']
-        else:
-            return None
+        """
+        Return description set by the caller.
+        Return None if the caller didn't set this.
+        """
+        if "description" in self._info:
+            return self._info["description"]
+        return None
 
     @property
-    def site(self):
-        return self.nb.dcim.sites.get(name=self.name)
+    def site_obj(self):
+        """
+        Return site object associated with name set by the caller.
+        Netbox will return None if the site does not exist.
+        """
+        return self._netbox_obj.dcim.sites.get(name=self.name)
 
     @property
     def site_id(self):
-        return self.site.id
+        """
+        Return Netbox ID for the site object associated with site name set by the caller.
+        Return None if the site doesn't exist in Netbox.
+        """
+        if self.site_obj is not None:
+            return self.site_obj.id
+        return None
 
     @property
     def tags(self):
-        if 'tags' in self.info:
-            tag_list = list()
-            for tag in self.info['tags']:
-                tag_obj = get_tag(self.nb, tag)
-                if tag_obj == None:
-                    print('Site.tags: exiting. tag {} does not exist in netbox. Valid tags: {}'.format(tag, get_tags(self.nb)))
-                    exit(1)
-                tag_list.append(tag_id(self.nb, tag))
-            return tag_list
-        else:
-            return None
+        """
+        Return the list of tag names set by the caller.
+        Return none if the caller didn't set this.
+        """
+        if "tags" in self._info:
+            return self._info["tags"]
+        return None

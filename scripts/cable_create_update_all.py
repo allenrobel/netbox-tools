@@ -3,10 +3,13 @@
 Name: cable_create_update_all.py
 Description: Create/update all cables defined in ``--yaml``
 '''
-our_version = 100
 import argparse
+from inspect import stack
+import sys
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.cable import Cable
+
+OUR_VERSION = 101
 
 def get_parser():
     help_yaml = 'YAML file containing device type information.'
@@ -27,34 +30,42 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 
+def log(*args):
+    """
+    simple logger
+    """
+    print(
+        f"{stack()[1].function}(v{OUR_VERSION}): {' '.join(args)}"
+    )
+
 def get_device_from_interface_key(info, interface_key):
     if interface_key not in info['interfaces']:
-        print('get_device_port_from_port_key: exiting. port_key {} not found in interfaces {}'.format(
-            ','.join(info['interfaces'].keys())
-        ))
-        exit(1)
+        interfaces = ','.join(info['interfaces'].keys())
+        log(
+            f"exiting. port_key {interface_key} not found in interfaces {interfaces}"
+        )
+        sys.exit(1)
     if 'device' not in info['interfaces'][interface_key]:
-        print('get_device_port_from_port_key: exiting. device key not found in interface dict {}'.format(
-            info['interfaces'][interface_key]
-        ))
-        exit(1)
+        log(
+            f"exiting. device key not found in interface dict {info['interfaces'][interface_key]}"
+        )
+        sys.exit(1)
     return info['interfaces'][interface_key]['device']
 
 def get_interface_from_interface_key(info, interface_key):
     if interface_key not in info['interfaces']:
-        print('get_device_port_from_port_key: exiting. port_key {} not found in interfaces {}'.format(
-            ','.join(info['interfaces'].keys())
-        ))
-        exit(1)
+        interfaces = ','.join(info['interfaces'].keys())
+        log(f"exiting. port_key {interface_key} not found in interfaces {interfaces}")
+        sys.exit(1)
     if 'interface' not in info['interfaces'][interface_key]:
-        print('get_device_port_from_port_key: exiting. interface key not found in interface dict {}'.format(
-            info['interfaces'][interface_key]
-        ))
-        exit(1)
+        log(
+            f"exiting. interface key not found in interface dict {info['interfaces'][interface_key]}"
+        )
+        sys.exit(1)
     return info['interfaces'][interface_key]['interface']
 
 def make_args(info, key):

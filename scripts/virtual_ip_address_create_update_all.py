@@ -6,7 +6,7 @@ Description: Create/update all virtual_ip_addresses (those belonging to virtual 
 our_version = 100
 import argparse
 
-from netbox_tools.common import netbox, load_yaml
+from netbox_tools.common import netbox, load_yaml, make_ip_address_dict
 from netbox_tools.virtual_ip_address import VirtualIpAddress
 
 def get_parser():
@@ -39,5 +39,6 @@ print('---')
 for key in info['virtual_interfaces']:
     if 'ip4' not in info['virtual_interfaces'][key]:
         continue
-    vip = VirtualIpAddress(nb, info['virtual_interfaces'][key])
+    ip_address_dict = make_ip_address_dict(info['ip4_addresses'], info['virtual_interfaces'][key])
+    vip = VirtualIpAddress(nb, ip_address_dict)
     vip.create_or_update()

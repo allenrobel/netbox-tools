@@ -5,8 +5,19 @@ Description: Create/update virtual_machine with key ``--key`` in file ``--yaml``
 '''
 our_version = 100
 import argparse
-from netbox_tools.common import netbox, load_yaml, virtual_interface_id, ip_address_id
-from netbox_tools.virtual_machine import VirtualMachine, initialize_vm_primary_ip, make_vm_primary_ip, map_vm_primary_ip
+from netbox_tools.common import (
+    netbox,
+    load_yaml,
+    virtual_interface_id,
+    ip_address_id,
+    make_ip_address_dict
+)
+from netbox_tools.virtual_machine import (
+    VirtualMachine,
+    initialize_vm_primary_ip,
+    make_vm_primary_ip,
+    map_vm_primary_ip
+)
 from netbox_tools.virtual_interface import VirtualInterface
 from netbox_tools.virtual_ip_address import VirtualIpAddress
 
@@ -90,7 +101,9 @@ if 'ip4' not in interface_dict:
     exit(0)
 i = VirtualInterface(nb, interface_dict)
 i.create_or_update()
-vip = VirtualIpAddress(nb, interface_dict)
+ip_addresses_dict = info['ip4_addresses']
+ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
+vip = VirtualIpAddress(nb, ip_address_dict)
 vip.create_or_update()
 assign_primary_ip_to_vm(
     interface_dict['ip4'],

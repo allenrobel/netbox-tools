@@ -16,17 +16,22 @@ import sys
 # local libraries
 from netbox_tools.cluster import Cluster
 from netbox_tools.cluster_type import ClusterType
-from netbox_tools.common import netbox
-from netbox_tools.common import interface_id
-from netbox_tools.common import ip_address_id
-from netbox_tools.common import virtual_interface_id
-from netbox_tools.common import load_yaml
+from netbox_tools.common import (
+    netbox,
+    interface_id,
+    ip_address_id,
+    virtual_interface_id,
+    load_yaml,
+    make_ip_address_dict
+)
 from netbox_tools.console_port import ConsolePort
 from netbox_tools.console_server_port import ConsoleServerPort
-from netbox_tools.device import Device
-from netbox_tools.device import initialize_device_primary_ip
-from netbox_tools.device import make_device_primary_ip
-from netbox_tools.device import map_device_primary_ip
+from netbox_tools.device import (
+    Device,
+    initialize_device_primary_ip,
+    make_device_primary_ip,
+    map_device_primary_ip
+)
 from netbox_tools.device_type import DeviceType
 from netbox_tools.interface import Interface
 from netbox_tools.ip_address import IpAddress
@@ -39,10 +44,12 @@ from netbox_tools.site import Site
 from netbox_tools.tag import Tag
 from netbox_tools.virtual_interface import VirtualInterface
 from netbox_tools.virtual_ip_address import VirtualIpAddress
-from netbox_tools.virtual_machine import VirtualMachine
-from netbox_tools.virtual_machine import initialize_vm_primary_ip
-from netbox_tools.virtual_machine import make_vm_primary_ip
-from netbox_tools.virtual_machine import map_vm_primary_ip
+from netbox_tools.virtual_machine import (
+    VirtualMachine,
+    initialize_vm_primary_ip,
+    make_vm_primary_ip,
+    map_vm_primary_ip
+)
 from netbox_tools.vlan import Vlan
 from netbox_tools.vlan_group import VlanGroup
 
@@ -188,12 +195,11 @@ def devices_create_update(interfaces_dict, ip_addresses_dict, devices_dict, devi
         print("---")
 
 
-def virtual_machines_create_update(interfaces_dict, vm_dict, virtual_machine_class):
+def virtual_machines_create_update(interfaces_dict, ip_addresses_dict, vm_dict, virtual_machine_class):
     """
     create or update virtual_machine and set the virtual_machine's
     primary_ip to its management interface ipv4 address
     """
-    #print(f"vm_dict: {vm_dict}")
     for vm_key in vm_dict:
         vm_obj = virtual_machine_class(nb, vm_dict[vm_key])
         vm_obj.create_or_update()
@@ -207,7 +213,8 @@ def virtual_machines_create_update(interfaces_dict, vm_dict, virtual_machine_cla
             continue
         intf_obj = VirtualInterface(nb, interface_dict)
         intf_obj.create_or_update()
-        vip_obj = VirtualIpAddress(nb, interface_dict)
+        ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
+        vip_obj = VirtualIpAddress(nb, ip_address_dict)
         vip_obj.create_or_update()
         assign_primary_ip_to_vm(
             interface_dict["ip4"],
@@ -244,22 +251,6 @@ def get_runner_dict():
     runner[16] = {"key": "virtual_machines", "object": VirtualMachine}
     return runner
 
-def make_ip_address_dict(ip_addresses_dict, interface_dict):
-    """
-    Return a dictionary with the keys expected by the IpAddress class.
-    """
-    if 'ip4' not in interface_dict:
-        return None
-    ip4 = interface_dict['ip4']
-    if ip4 not in ip_addresses_dict:
-        return interface_dict
-    ip_address_dict = interface_dict
-    if 'status' in ip_addresses_dict[ip4]:
-        ip_address_dict['status'] = ip_addresses_dict[ip4]['status']
-    if 'role' in ip_addresses_dict[ip4]:
-        ip_address_dict['role'] = ip_addresses_dict[ip4]['role']
-    return ip_address_dict
-
 cfg = get_parser()
 nb = netbox()
 info = load_yaml(cfg.yaml)
@@ -280,7 +271,10 @@ for item in sorted(runner_dict):
     if key == "virtual_machines":
         # special case for virtual_machines
         virtual_machines_create_update(
-            info["virtual_interfaces"], info[key], runner_dict[item]["object"]
+            info["virtual_interfaces"],
+            info['ip4_addresses'],
+            info[key],
+            runner_dict[item]["object"]
         )
         continue
     for entity in info[key]:

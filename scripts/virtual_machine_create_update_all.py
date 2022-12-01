@@ -5,8 +5,19 @@ Description: Create/update virtual_machines defined in ``--yaml``
 '''
 our_version = 100
 import argparse
-from netbox_tools.common import netbox, load_yaml, virtual_interface_id, ip_address_id
-from netbox_tools.virtual_machine import VirtualMachine, initialize_vm_primary_ip, make_vm_primary_ip, map_vm_primary_ip
+from netbox_tools.common import (
+    netbox,
+    load_yaml,
+    virtual_interface_id,
+    ip_address_id,
+    make_ip_address_dict
+)
+from netbox_tools.virtual_machine import (
+    VirtualMachine,
+    initialize_vm_primary_ip,
+    make_vm_primary_ip,
+    map_vm_primary_ip
+)
 from netbox_tools.virtual_interface import VirtualInterface
 from netbox_tools.virtual_ip_address import VirtualIpAddress
 
@@ -61,14 +72,15 @@ def get_interface_dict(vm_dict, interfaces_dict):
         exit(1)
     return interfaces_dict[interface_key]
 
-
 cfg = get_parser()
 nb = netbox()
 info = load_yaml(cfg.yaml)
 if 'virtual_machines' not in info:
     print('exiting. virtual_machines are not defined in {}'.format(cfg.yaml))
     exit(1)
+
 for key in info['virtual_machines']:
+    print('---')
     vm = VirtualMachine(nb, info['virtual_machines'][key])
     vm.create_or_update()
     interface_dict = get_interface_dict(info['virtual_machines'][key], info['virtual_interfaces'])
@@ -80,7 +92,9 @@ for key in info['virtual_machines']:
         continue
     i = VirtualInterface(nb, interface_dict)
     i.create_or_update()
-    vip = VirtualIpAddress(nb, interface_dict)
+    ip_addresses_dict = info['ip4_addresses']
+    ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
+    vip = VirtualIpAddress(nb, ip_address_dict)
     vip.create_or_update()
     assign_primary_ip_to_vm(
         interface_dict['ip4'],

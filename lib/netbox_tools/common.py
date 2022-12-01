@@ -362,6 +362,56 @@ def get_ip_address(netbox_instance, ip4):
         )
         return None
 
+def make_ip_address_dict(ip_addresses_dict, interface_dict):
+    """
+    Return a dictionary with the keys expected by the IpAddress class.
+
+    Parameters:
+       ip_addresses_dict: the entire ip4_addresses dict, see example.yml in this repo
+       interface_dict: dictionary for one interface culled from the interfaces dict in example.yml
+    """
+    if 'ip4' not in interface_dict:
+        return None
+    ip_address_dict = {}
+    if 'device' in interface_dict:
+        device_key = 'device'
+    elif 'virtual_machine' in interface_dict:
+        device_key = 'virtual_machine'
+    else:
+        print("common.make_ip_address_dict: exiting")
+        print("interface_dict missing key: 'device' or 'virtual_machine'")
+        sys.exit(1)
+    ip4 = interface_dict['ip4']
+    try:
+        ip_address_dict = {}
+        ip_address_dict['ip4'] = ip4
+        ip_address_dict['interface'] = interface_dict['interface']
+        ip_address_dict[device_key] = interface_dict[device_key]
+    except KeyError as _key_error_exception:
+        print(f"missing mandatory key in interface_dict {interface_dict}")
+        print("mandatory keys: ip4, interface, [device or virtual_machine]")
+        print(f"Exception detail: {_key_error_exception}")
+        sys.exit(1)
+    if ip4 not in ip_addresses_dict:
+        return ip_address_dict
+    if 'description' in ip_addresses_dict[ip4]:
+        ip_address_dict['description'] = ip_addresses_dict[ip4]['description']
+    else:
+        ip_address_dict['description'] = ""
+    if 'role' in ip_addresses_dict[ip4]:
+        ip_address_dict['role'] = ip_addresses_dict[ip4]['role']
+    else:
+        ip_address_dict['role'] = ""
+    if 'status' in ip_addresses_dict[ip4]:
+        ip_address_dict['status'] = ip_addresses_dict[ip4]['status']
+    else:
+        ip_address_dict['status'] = ""
+    if 'tags' in ip_addresses_dict[ip4]:
+        ip_address_dict['tags'] = ip_addresses_dict[ip4]['tags']
+    else:
+        ip_address_dict['tags'] = []
+    return ip_address_dict
+
 
 def ip_address_id(netbox_instance, ip4):
     """

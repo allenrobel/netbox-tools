@@ -3,14 +3,26 @@
 Name: device_create_update_all.py
 Description: Create/update devices defined in ``--yaml``
 
-This script creates/updates device, device mgmt interface, and device primary_ip 
+create/update device, device mgmt interface, and device primary_ip 
 '''
-our_version = 101
 import argparse
-from netbox_tools.common import netbox, load_yaml, interface_id, ip_address_id
-from netbox_tools.device import Device, initialize_device_primary_ip, make_device_primary_ip, map_device_primary_ip
+from netbox_tools.common import (
+    netbox,
+    load_yaml,
+    interface_id,
+    ip_address_id,
+    make_ip_address_dict
+)
+from netbox_tools.device import (
+    Device,
+    initialize_device_primary_ip,
+    make_device_primary_ip,
+    map_device_primary_ip
+)
 from netbox_tools.interface import Interface
 from netbox_tools.ip_address import IpAddress
+
+our_version = 102
 
 def get_parser():
     help_yaml = 'YAML file containing devices information.'
@@ -33,21 +45,6 @@ def get_parser():
                         action='version',
                         version='%(prog)s {}'.format(our_version))
     return parser.parse_args()
-
-def assign_primary_ip_to_device(ip, device, interface):
-    ipv4_id = ip_address_id(nb, ip)
-    intf_id = interface_id(nb, device, interface)
-    if ipv4_id == None:
-        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(ip))
-        exit(1)
-    if intf_id == None:
-        print('assign_primary_ip_to_device: Exiting. device {} interface {} not found in netbox'.format(
-            device,
-            interface))
-        exit(1)
-    initialize_device_primary_ip(nb, device)
-    map_device_primary_ip(nb, device, interface, ip)
-    make_device_primary_ip(nb, device, ip)
 
 def get_interface_dict(device_dict, interfaces_dict):
     if 'interface' not in device_dict:
@@ -76,9 +73,7 @@ for key in info['devices']:
         continue
     i = Interface(nb, interface_dict)
     i.create_or_update()
-    ip = IpAddress(nb, interface_dict)
+    ip_addresses_dict = info['ip4_addresses']
+    ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
+    ip = IpAddress(nb, ip_address_dict)
     ip.create_or_update()
-    assign_primary_ip_to_device(
-        interface_dict['ip4'],
-        info['devices'][key]['device'],
-        interface_dict['interface'])

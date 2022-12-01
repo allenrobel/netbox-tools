@@ -1,6 +1,6 @@
 """
 Name: cable.py
-Description: Class for create, update, and delete operations on netbox cable
+Description: create, update, and delete operations on netbox cable
 """
 from inspect import stack
 import sys
@@ -9,7 +9,7 @@ from netbox_tools.common import interface_id
 from netbox_tools.common import tag_id
 from netbox_tools.colors import color_to_rgb
 
-OUR_VERSION = 104
+OUR_VERSION = 105
 
 
 class Cable:
@@ -17,8 +17,8 @@ class Cable:
     create, update, and delete operations on netbox dcim.cable
     """
 
-    def __init__(self, netbox, info):
-        self._netbox = netbox
+    def __init__(self, netbox_obj, info):
+        self._netbox_obj = netbox_obj
         self._info = info
         self.lib_version = OUR_VERSION
         self._classname = __class__.__name__
@@ -93,7 +93,7 @@ class Cable:
         if they provide invalid input.
         """
         self.valid_choices = {}
-        choices_dict = self._netbox.dcim.cables.choices()
+        choices_dict = self._netbox_obj.dcim.cables.choices()
         for item in choices_dict:
             valid_values = choices_dict[item]
             self.valid_choices[item] = [item["value"] for item in valid_values]
@@ -213,7 +213,7 @@ class Cable:
         self._args["a_terminations"] = []
         termination = {}
         termination["object_id"] = interface_id(
-            self._netbox, self.device_a, self.port_a
+            self._netbox_obj, self.device_a, self.port_a
         )
         termination["object_type"] = self._port_type_map[self.port_a_type]
         self._args["a_terminations"].append(termination)
@@ -241,7 +241,7 @@ class Cable:
         self._args["b_terminations"] = []
         termination = {}
         termination["object_id"] = interface_id(
-            self._netbox, self.device_b, self.port_b
+            self._netbox_obj, self.device_b, self.port_b
         )
         termination["object_type"] = self._port_type_map[self.port_b_type]
         self._args["b_terminations"].append(termination)
@@ -280,7 +280,7 @@ class Cable:
         """
         self.log(f"{self.label}")
         try:
-            self._netbox.dcim.cables.create(self._args)
+            self._netbox_obj.dcim.cables.create(self._args)
         except RequestError as request_error:
             self.log(
                 f"exiting. RequestError Unable to create Cable {self.label}.",
@@ -326,7 +326,7 @@ class Cable:
             sys.exit(1)
 
         try:
-            self._netbox.dcim.cables.create(self._args)
+            self._netbox_obj.dcim.cables.create(self._args)
         except RequestError as request_error:
             self.log(
                 f"exiting. Unable to update Cable {self.label}.",
@@ -417,7 +417,7 @@ class Cable:
         """
         return a cable object by searching for the cable's label
         """
-        return self._netbox.dcim.cables.get(label=self.label)
+        return self._netbox_obj.dcim.cables.get(label=self.label)
 
     @property
     def cable_id(self):

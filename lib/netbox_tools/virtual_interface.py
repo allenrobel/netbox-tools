@@ -152,6 +152,9 @@ class VirtualInterface:
         self._args["virtual_machine"] = vm_id(self._netbox_obj, self.virtual_machine)
 
     def _generate_create_update_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
         self._set_description()
         self._set_interface_enabled()
         self._set_interface_mode()

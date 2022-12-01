@@ -141,7 +141,7 @@ class IpAddress:
         """
         if self.role is None:
             return
-        if self.role in self._valid_choices["role"]:
+        if self.role in self._valid_choices["role"] or self.role == "":
             self._args["role"] = self.role
         else:
             _valid_choices = ",".join(sorted(self._valid_choices["role"]))
@@ -168,6 +168,20 @@ class IpAddress:
             )
             sys.exit(1)
 
+    def _set_tags(self):
+        """
+        Add tags, if any, to args; converting them to netbox IDs
+        """
+        if self.tags is None:
+            return
+        self._args["tags"] = []
+        for tag in self.tags:
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
+
     def _generate_create_update_args(self):
         """
         Generate all supported arguments for create and update methods
@@ -177,6 +191,7 @@ class IpAddress:
         self._set_description()
         self._set_role()
         self._set_status()
+        self._set_tags()
 
     def delete(self):
         """
@@ -240,14 +255,6 @@ class IpAddress:
         make_device_primary_ip(self._netbox_obj, self.device, self.ip4)
 
     @property
-    def device(self):
-        """
-        Return the device set by the caller.
-        We've already checked that this is set in _validate_create_update_keys()
-        """
-        return self._info["device"]
-
-    @property
     def description(self):
         """
         Return the ip address description set by the caller.
@@ -258,14 +265,20 @@ class IpAddress:
         return None
 
     @property
-    def status(self):
+    def device(self):
         """
-        Return the ip address status set by the caller.
-        If the caller didn't set this, return None.
+        Return the device set by the caller.
+        We've already checked that this is set in _validate_create_update_keys()
         """
-        if "status" in self._info:
-            return self._info["status"]
-        return None
+        return self._info["device"]
+
+    @property
+    def interface(self):
+        """
+        Return the interface set by the caller.
+        We've already checked that this is set in _validate_create_update_keys()
+        """
+        return self._info["interface"]
 
     @property
     def ip_address_obj(self):
@@ -284,30 +297,12 @@ class IpAddress:
         return self._netbox_obj.ipam.ip_addresses.get(address=address, mask=mask)
 
     @property
-    def role(self):
-        """
-        Return the ip address role set by the caller.
-        If the caller didn't set this, return None
-        """
-        if "role" in self._info:
-            return self._info["role"]
-        return None
-
-    @property
     def ip_address_id(self):
         """
         Return the Netbox ID associated with the ip address object.
         If the ip address object doesn't exist, None will be returned.
         """
         return self.ip_address_obj.id
-
-    @property
-    def interface(self):
-        """
-        Return the interface set by the caller.
-        We've already checked that this is set in _validate_create_update_keys()
-        """
-        return self._info["interface"]
 
     @property
     def ip4(self):
@@ -324,3 +319,33 @@ class IpAddress:
         TODO: Remove after 2023-09-29
         """
         return self._info["interface"]
+
+    @property
+    def role(self):
+        """
+        Return the ip address role set by the caller.
+        If the caller didn't set this, return None
+        """
+        if "role" in self._info:
+            return self._info["role"]
+        return None
+
+    @property
+    def status(self):
+        """
+        Return the ip address status set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "status" in self._info:
+            return self._info["status"]
+        return None
+
+    @property
+    def tags(self):
+        """
+        Return the list of tag names set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "tags" in self._info:
+            return self._info["tags"]
+        return None

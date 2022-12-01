@@ -1,14 +1,17 @@
 '''
 Name: virtual_ip_address.py
-Description: Class for create and update operations on netbox ip_addresss for virtual machines
+Description: create, update, and delete operations on netbox ip_addresss for virtual machines
 '''
-our_version = 101
-from inspect import stack, getframeinfo, currentframe
-from netbox_tools.common import get_vm, vm_id
+from inspect import stack
+import sys
+from netbox_tools.common import get_vm, vm_id, tag_id
 
-class VirtualIpAddress(object):
-    '''
-    nb = netbox instance
+OUR_VERSION = 104
+
+class VirtualIpAddress():
+    """
+    create, update, and delete operations on netbox ip_addresss for virtual machines
+    netbox_obj = netbox instance
     info = dictionary with the following keys:
     {
         # mandatory
@@ -16,186 +19,331 @@ class VirtualIpAddress(object):
         interface: interface on which ip addresses will be assigned e.g. vmnet0, etc
         ip4: ipv4 address for the interface e.g. 1.1.1.0/24
         # optional
-        ip_description: free-form description of the ip address
-        ip_status: status of the ip address. Valid values: active, reserved, deprecated, dhcp, slaac
+        description: free-form description of the ip address
+        status: status of the ip address. Example values: active, reserved, deprecated
+        role: role of the ip address. Example values: loopback, vip
     }
-    '''
-    def __init__(self, nb, info):
-        self.lib_version = our_version
-        self.classname = __class__.__name__
-        self.nb = nb
-        self.info = info
-        self.args = dict()
-        self.mandatory_keys = set()
-        self.mandatory_keys.add('interface')
-        self.mandatory_keys.add('ip4')
-        self.mandatory_keys.add('virtual_machine')
-        self.optional_keys = set()
-        self.optional_keys.add('ip_description')
-        self.optional_keys.add('ip_status')
-        self.validate_keys()
-        self.generate_args()
-        self.initialize_vm_primary_ip()
+    """
+    def __init__(self, netbox_obj, info):
+        self.lib_version = OUR_VERSION
+        self._classname = __class__.__name__
+        self._netbox_obj = netbox_obj
+        self._info = info
+        self._args = {}
+        self._mandatory_keys = set()
+        self._mandatory_keys.add('interface')
+        self._mandatory_keys.add('ip4')
+        self._mandatory_keys.add('virtual_machine')
+        self._optional_keys = set()
+        self._optional_keys.add('description')
+        self._optional_keys.add('role')
+        self._optional_keys.add('status')
+        self._populate_valid_choices()
+        self._validate_keys()
+        self._generate_args()
+        self._initialize_vm_primary_ip()
 
-    def log(self, msg):
-        print('{}(v{}).{}: {}'.format(self.classname, self.lib_version, stack()[1].function, msg))
+    def log(self, *args):
+        """
+        simple logger
+        """
+        print(
+            f"{self._classname}(v{self.lib_version}).{stack()[1].function}: {' '.join(args)}"
+        )
 
-    def validate_keys(self):
-        for key in self.mandatory_keys:
-            if key not in self.info:
-                self.log('exiting. mandatory key {} not found in info {}'.format(key, self.info))
-                exit(1)
+    def _populate_valid_choices(self):
+        """
+        retrieve valid ip address choices from the users netbox instance
+        """
+        self._valid_choices = {}
+        choices_dict = self._netbox_obj.ipam.ip_addresses.choices()
+        for item in choices_dict:
+            valid_values = choices_dict[item]
+            self._valid_choices[item] = [item["value"] for item in valid_values]
+
+    def _validate_keys(self):
+        """
+        Verify that all mandatory create/update operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_keys:
+            if key not in self._info:
+                self.log(
+                    f"exiting. mandatory key {key} not found in info {self._info}"
+                )
+                sys.exit(1)
 
 
-    def set_address(self):
-        self.args['address'] = self.ip4
+    def _set_address(self):
+        """
+        Add address to args
+        """
+        self._args['address'] = self.ip4
 
 
-    def set_assigned_object_id(self):
-        self.args['assigned_object_id'] = vm_id(self.nb, self.virtual_machine)
+    def _set_assigned_object_id(self):
+        """
+        Add assigned_object_id to args
+        """
+        self._args['assigned_object_id'] = vm_id(self._netbox_obj, self.virtual_machine)
 
 
-    def set_description(self):
-        if self.ip_description == None:
-            self.args['description'] = '{} : {}'.format(
-                self.virtual_machine,
-                self.ip4)
+    def _set_description(self):
+        """
+        Add description to args.
+        If user has not set this, set a generic description for them.
+        """
+        if self.description is None:
+            self._args['description'] = f"{self.virtual_machine} : {self.ip4}"
         else:
-            self.args['description'] = self.ip_description
+            self._args['description'] = self.description
 
 
-    def set_interface(self):
-        self.args['interface'] = vm_id(self.nb, self.virtual_machine)
+    def _set_interface(self):
+        """
+        Add interface to args; converting it to a netbox id
+        """
+        self._args['interface'] = vm_id(self._netbox_obj, self.virtual_machine)
 
-
-    def set_status(self):
-        if self.ip_status == None:
-            self.args['status'] = 'active'
+    def _set_role(self):
+        """
+        Update args with the ip address role, if the user has set this.
+        Exit with error if the user set an invalid role.
+        """
+        if self.role is None:
+            return
+        if self.role in self._valid_choices["role"] or self.role == "":
+            self._args["role"] = self.role
         else:
-            self.args['status'] = self.ip_status
+            _valid_choices = ",".join(sorted(self._valid_choices["role"]))
+            self.log(
+                f"exiting. Invalid role. Got {self.role}",
+                f"Expected one of {_valid_choices}.",
+            )
+            sys.exit(1)
+
+    def _set_status(self):
+        """
+        Update args with the ip address status, if the user has set this.
+        Exit with error if the user set an invalid status.
+        """
+        if self.status is None:
+            return
+        if self.status in self._valid_choices["status"]:
+            self._args["status"] = self.status
+        else:
+            _valid_choices = ",".join(sorted(self._valid_choices["status"]))
+            self.log(
+                f"exiting. Invalid status. Got {self.status}",
+                f"Expected one of {_valid_choices}.",
+            )
+            sys.exit(1)
+
+    def _set_tags(self):
+        """
+        Add tags, if any, to args; converting them to netbox IDs
+        """
+        if self.tags is None:
+            return
+        self._args["tags"] = []
+        for tag in self.tags:
+            tid = tag_id(self._netbox_obj, tag)
+            if tid is None:
+                self.log(f"tag {tag} not found in Netbox.  Skipping.")
+                continue
+            self._args["tags"].append(tid)
+
+    def _generate_args(self):
+        """
+        Generate all supported arguments for create and update methods
+        """
+        self._set_address()
+        self._set_assigned_object_id()
+        self._set_description()
+        self._set_interface()
+        self._set_role()
+        self._set_status()
+        self._set_tags()
 
 
-    def generate_args(self):
-        self.set_address()
-        self.set_assigned_object_id()
-        self.set_description()
-        self.set_interface()
-        self.set_status()
-
-
-    def initialize_vm_primary_ip(self):
+    def _initialize_vm_primary_ip(self):
         '''
         Initialize primary_ip4 and primary_ip to avoid errors in map_vm_primary_ip()address.save()
         '''
-        vm = get_vm(self.nb, self.virtual_machine)
-        vm.primary_ip4 = None
-        vm.primary_ip = None
-        vm.save()
+        vm_obj = get_vm(self._netbox_obj, self.virtual_machine)
+        vm_obj.primary_ip4 = None
+        vm_obj.primary_ip = None
+        vm_obj.save()
 
 
     def create(self):
-        self.log('virtual_machine {}, address {}'.format(self.virtual_machine, self.ip4))
+        """
+        create a virtual_machine
+        """
+        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
         try:
-            self.nb.ipam.ip_addresses.create(self.args)
-        except Exception as e:
-            self.log('exiting. Unable to create virtual_machine {} ip_address {}.  Error was: {}'.format(
-                self.virtual_machine,
-                self.ip4,
-                e))
-            exit(1)
+            self._netbox_obj.ipam.ip_addresses.create(self._args)
+        except Exception as _general_exception:
+            self.log(
+                "exiting.",
+                f"Unable to create virtual_machine {self.virtual_machine} ip_address {self.ip4}."
+                f"Exception detail {_general_exception}"
+            )
+            sys.exit(1)
 
 
     def update(self):
-        self.log('virtual_machine {}, address {}'.format(self.virtual_machine, self.ip4))
-        self.args['id'] = self.ip_address_id
+        """
+        update a virtual_machine
+        """
+        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
+        self._args['id'] = self.ip_address_id
         try:
-            self.ip_address.update(self.args)
-        except Exception as e:
-            self.log('exiting. Unable to update virtual_machine {} ip_address {}.  Error was: {}'.format(
-                self.virtual_machine,
-                self.ip4,
-                e))
-            exit(1)
+            self.ip_address_obj.update(self._args)
+        except Exception as _general_exception:
+            self.log(
+                "exiting.",
+                f"Unable to update virtual_machine {self.virtual_machine} ip_address {self.ip4}."
+                f"Exception detail {_general_exception}"
+            )
+            sys.exit(1)
 
 
     def delete(self):
-        self.log('virtual_machine {} address {}'.format(self.virtual_machine, self.ip4))
+        """
+        delete a virtual_machine
+        """
+        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
         try:
-            self.ip_address.delete()
-        except Exception as e:
-            self.log('exiting. Unable to delete virtual_machine {} ip_address {}.  Error was: {}'.format(
-                self.virtual_machine,
-                self.ip4,
-                e))
-            exit(1)
+            self.ip_address_obj.delete()
+        except Exception as _general_exception:
+            self.log(
+                "exiting.",
+                f"Unable to delete virtual_machine {self.virtual_machine} ip_address {self.ip4}."
+                f"Exception detail {_general_exception}"
+            )
+            sys.exit(1)
 
 
     def create_or_update(self):
-        if self.ip_address == None:
+        """
+        entry point into create and update methods
+        """
+        if self.ip_address_obj is None:
             self.create()
         else:
             self.update()
 
 
     @property
-    def ip_description(self):
-        if 'ip_description' in self.info:
-            return self.info['ip_description']
-        else:
-            return None
+    def description(self):
+        """
+        Return the ip description set by the caller.
+        Return None if the caller did not set this.
+        """
+        if 'description' in self._info:
+            return self._info['description']
+        return None
 
 
     @property
-    def ip_status(self):
-        if 'ip_status' in self.info:
-            return self.info['ip_status']
-        else:
-            return None
+    def status(self):
+        """
+        Return the ip status set by the caller.
+        Return None if the caller did not set this.
+        """
+        if 'status' in self._info:
+            return self._info['status']
+        return None
 
 
     @property
-    def ip_address(self):
+    def ip_address_obj(self):
+        """
+        Return the Netbox ip address object associated with ip4 address set by the caller.
+        """
         try:
             address,mask = self.ip4.split('/')
-        except Exception as e:
-            self.log('exiting. Unexpected IP address format.  Expected A.B.C.D/E. Got {}. Specific error was: {}'.format(self.ip4, e))
-            exit(1)
-        return self.nb.ipam.ip_addresses.get(
+        except Exception as _general_exception:
+            self.log(
+                "exiting. Unexpected IP address format.  Expected A.B.C.D/E.",
+                f"Got {self.ip4}."
+                f"Exception detail: {_general_exception}"
+            )
+            sys.exit(1)
+        return self._netbox_obj.ipam.ip_addresses.get(
             address=address,
             mask=mask)
 
 
     @property
     def ip_address_enabled(self):
-        if 'ip_address_enabled' in self.info:
-            return self.info['ip_address_enabled']
-        else:
-            return None
+        """
+        Return the enabled status set by the caller.
+        Return None if the caller did not set this.
+        """
+        if 'ip_address_enabled' in self._info:
+            return self._info['ip_address_enabled']
+        return None
 
 
     @property
     def ip_address_id(self):
-        return self.ip_address.id
+        """
+        Return the Netbox ID for the ip4 address set by the caller.
+        """
+        return self.ip_address_obj.id
 
 
     @property
     def ip_address_type(self):
-        if 'ip_address_type' in self.info:
-            return self.info['ip_address_type']
-        else:
-            return None
+        """
+        Return the ip address type set by the caller.
+        Return None if the caller did not set this.
+        """
+        if 'ip_address_type' in self._info:
+            return self._info['ip_address_type']
+        return None
 
 
     @property
     def interface(self):
-        return self.info['interface']
+        """
+        Return the interface set by the caller.
+        """
+        return self._info['interface']
 
 
     @property
     def ip4(self):
-        return self.info['ip4']
+        """
+        Return the ipv4 address set by the caller.
+        """
+        return self._info['ip4']
 
+    @property
+    def role(self):
+        """
+        Return the ip address role set by the caller.
+        If the caller didn't set this, return None
+        """
+        if "role" in self._info:
+            return self._info["role"]
+        return None
+
+    @property
+    def tags(self):
+        """
+        Return the list of tag names set by the caller.
+        If the caller didn't set this, return None.
+        """
+        if "tags" in self._info:
+            return self._info["tags"]
+        return None
 
     @property
     def virtual_machine(self):
-        return self.info['virtual_machine']
+        """
+        Return the virtual machine set by the caller.
+        """
+        return self._info['virtual_machine']

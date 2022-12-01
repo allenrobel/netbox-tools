@@ -35,10 +35,10 @@ def get_parser():
 cfg = get_parser()
 info = load_yaml(cfg.yaml)
 nb = netbox()
-print('---')
 for key in info['virtual_interfaces']:
     if 'ip4' not in info['virtual_interfaces'][key]:
         continue
+    print('---')
     ip_address_dict = make_ip_address_dict(info['ip4_addresses'], info['virtual_interfaces'][key])
     vip = VirtualIpAddress(nb, ip_address_dict)
     vip.create_or_update()

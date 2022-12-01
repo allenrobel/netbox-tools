@@ -3,23 +3,17 @@
 Name: virtual_machine_create_update_all.py
 Description: Create/update virtual_machines defined in ``--yaml``
 '''
-our_version = 100
 import argparse
 from netbox_tools.common import (
     netbox,
     load_yaml,
-    virtual_interface_id,
-    ip_address_id,
     make_ip_address_dict
 )
-from netbox_tools.virtual_machine import (
-    VirtualMachine,
-    initialize_vm_primary_ip,
-    make_vm_primary_ip,
-    map_vm_primary_ip
-)
+from netbox_tools.virtual_machine import VirtualMachine,
 from netbox_tools.virtual_interface import VirtualInterface
 from netbox_tools.virtual_ip_address import VirtualIpAddress
+
+OUR_VERSION = 102
 
 def get_parser():
     help_yaml = 'YAML file containing virtual_machines information.'
@@ -40,26 +34,9 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
-
-
-def assign_primary_ip_to_vm(ip, vm, interface):
-    ip4_id = ip_address_id(nb, ip)
-    intf_id = virtual_interface_id(nb, vm, interface)
-    if ip4_id == None:
-        print('assign_primary_ip_to_vm: Exiting. Address {} not found in netbox'.format(ip))
-        exit(1)
-    if intf_id == None:
-        print('assign_primary_ip_to_vm: Exiting. device {} interface {} not found in netbox'.format(
-            vm,
-            interface))
-        exit(1)
-    print('assign_primary_ip_to_vm: vm {} interface {} ip {} ip4_id {}'.format(vm, interface, ip, ip4_id))
-    initialize_vm_primary_ip(nb, vm)
-    map_vm_primary_ip(nb, vm, interface, ip)
-    make_vm_primary_ip(nb, vm, ip)
 
 
 def get_interface_dict(vm_dict, interfaces_dict):
@@ -71,6 +48,7 @@ def get_interface_dict(vm_dict, interfaces_dict):
         print('get_interface: exiting. Interface {} not found in {} interfaces {}.'.format(interface_key, cfg.yaml, interfaces_dict.keys()))
         exit(1)
     return interfaces_dict[interface_key]
+
 
 cfg = get_parser()
 nb = netbox()
@@ -96,7 +74,3 @@ for key in info['virtual_machines']:
     ip_address_dict = make_ip_address_dict(ip_addresses_dict, interface_dict)
     vip = VirtualIpAddress(nb, ip_address_dict)
     vip.create_or_update()
-    assign_primary_ip_to_vm(
-        interface_dict['ip4'],
-        info['virtual_machines'][key]['vm'],
-        interface_dict['interface'])

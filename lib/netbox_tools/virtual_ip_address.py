@@ -5,24 +5,25 @@ Description: create, update, and delete operations on netbox ip_addresss for vir
 from inspect import stack
 import sys
 from netbox_tools.common import get_vm, vm_id, tag_id
-
-OUR_VERSION = 104
+from netbox_tools.virtual_machine import (
+    make_vm_primary_ip,
+    map_vm_primary_ip
+)
+OUR_VERSION = 105
 
 class VirtualIpAddress():
     """
     create, update, and delete operations on netbox ip_addresss for virtual machines
     netbox_obj = netbox instance
     info = dictionary with the following keys:
-    {
-        # mandatory
-        virtual_machine: vm to which the interface belongs e.g. netbox_vm
-        interface: interface on which ip addresses will be assigned e.g. vmnet0, etc
-        ip4: ipv4 address for the interface e.g. 1.1.1.0/24
-        # optional
-        description: free-form description of the ip address
-        status: status of the ip address. Example values: active, reserved, deprecated
-        role: role of the ip address. Example values: loopback, vip
-    }
+        mandatory
+            virtual_machine: vm to which the interface belongs e.g. netbox_vm
+            interface: interface on which ip addresses will be assigned e.g. vmnet0, etc
+            ip4: ipv4 address for the interface e.g. 1.1.1.0/24
+        optional
+            description: free-form description of the ip address
+            role: role of the ip address. Example values: loopback, vip
+            status: status of the ip address. Example values: active, reserved, deprecated
     """
     def __init__(self, netbox_obj, info):
         self.lib_version = OUR_VERSION
@@ -30,18 +31,17 @@ class VirtualIpAddress():
         self._netbox_obj = netbox_obj
         self._info = info
         self._args = {}
-        self._mandatory_keys = set()
-        self._mandatory_keys.add('interface')
-        self._mandatory_keys.add('ip4')
-        self._mandatory_keys.add('virtual_machine')
+        self._mandatory_keys_create_update = set()
+        self._mandatory_keys_create_update.add('interface')
+        self._mandatory_keys_create_update.add('ip4')
+        self._mandatory_keys_create_update.add('virtual_machine')
+        self._mandatory_keys_delete = set()
+        self._mandatory_keys_delete.add('ip4')
         self._optional_keys = set()
         self._optional_keys.add('description')
         self._optional_keys.add('role')
         self._optional_keys.add('status')
         self._populate_valid_choices()
-        self._validate_keys()
-        self._generate_args()
-        self._initialize_vm_primary_ip()
 
     def log(self, *args):
         """
@@ -61,18 +61,29 @@ class VirtualIpAddress():
             valid_values = choices_dict[item]
             self._valid_choices[item] = [item["value"] for item in valid_values]
 
-    def _validate_keys(self):
+    def _validate_keys_create_update(self):
         """
         Verify that all mandatory create/update operation keys are set.
         If all keys are not set, log an error and exit.
         """
-        for key in self._mandatory_keys:
+        for key in self._mandatory_keys_create_update:
             if key not in self._info:
                 self.log(
                     f"exiting. mandatory key {key} not found in info {self._info}"
                 )
                 sys.exit(1)
 
+    def _validate_keys_delete(self):
+        """
+        Verify that all mandatory delete operation keys are set.
+        If all keys are not set, log an error and exit.
+        """
+        for key in self._mandatory_keys_delete:
+            if key not in self._info:
+                self.log(
+                    f"exiting. mandatory key {key} not found in info {self._info}"
+                )
+                sys.exit(1)
 
     def _set_address(self):
         """
@@ -178,9 +189,9 @@ class VirtualIpAddress():
 
     def create(self):
         """
-        create a virtual_machine
+        create a virtual ip address
         """
-        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
+        self.log(f"virtual_machine {self.virtual_machine}, address {self.ip4}")
         try:
             self._netbox_obj.ipam.ip_addresses.create(self._args)
         except Exception as _general_exception:
@@ -194,9 +205,9 @@ class VirtualIpAddress():
 
     def update(self):
         """
-        update a virtual_machine
+        update a virtual ip address
         """
-        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
+        self.log(f"virtual_machine {self.virtual_machine}, address {self.ip4}")
         self._args['id'] = self.ip_address_id
         try:
             self.ip_address_obj.update(self._args)
@@ -211,15 +222,22 @@ class VirtualIpAddress():
 
     def delete(self):
         """
-        delete a virtual_machine
+        delete a virtual ip address
         """
-        self.log("virtual_machine {self.virtual_machine}, address {self.ip4}")
+        self._validate_keys_delete()
+        if self.ip_address_obj is None:
+            self.log(
+                "Nothing to do.",
+                f"ip_address {self.ip4} not found in Netbox."
+            )
+            return
+        self.log(f"address {self.ip4}")
         try:
             self.ip_address_obj.delete()
         except Exception as _general_exception:
             self.log(
                 "exiting.",
-                f"Unable to delete virtual_machine {self.virtual_machine} ip_address {self.ip4}."
+                f"Unable to delete ip_address {self.ip4}."
                 f"Exception detail {_general_exception}"
             )
             sys.exit(1)
@@ -229,10 +247,15 @@ class VirtualIpAddress():
         """
         entry point into create and update methods
         """
+        self._validate_keys_create_update()
+        self._generate_args()
+        self._initialize_vm_primary_ip()
         if self.ip_address_obj is None:
             self.create()
         else:
             self.update()
+        map_vm_primary_ip(self._netbox_obj, self.virtual_machine, self.interface, self.ip4)
+        make_vm_primary_ip(self._netbox_obj, self.virtual_machine, self.ip4)
 
 
     @property

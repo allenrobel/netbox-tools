@@ -9,7 +9,7 @@ from netbox_tools.common import (
     load_yaml,
     make_ip_address_dict
 )
-from netbox_tools.virtual_machine import VirtualMachine,
+from netbox_tools.virtual_machine import VirtualMachine
 from netbox_tools.virtual_interface import VirtualInterface
 from netbox_tools.virtual_ip_address import VirtualIpAddress
 

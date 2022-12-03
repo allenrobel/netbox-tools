@@ -108,14 +108,14 @@ class Device:
             self.log(
                 "WARNING: 'devices: <device>: mgmt_interface' in your YAML file is deprecated",
                 "Use 'devices: <device>: interface' instead.",
-                "We will no longer accept the deprecated names after 2023-09-29",
+                "Deprecated names will no longer be accepted after 2023-09-29",
             )
             self._info["interface"] = self._info["mgmt_interface"]
         if "name" in self._info:
             self.log(
                 "WARNING: 'devices: <device>: name' in your YAML file is deprecated.",
                 "Use 'devices: <device>: device' instead.",
-                "We will no longer accept the deprecated names after 2023-09-29",
+                "Deprecated names will no longer be accepted after 2023-09-29",
             )
             self._info["device"] = self._info["name"]
 

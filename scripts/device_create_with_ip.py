@@ -1,157 +1,237 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: device_create_with_ip.py
-Summary: Create a device in netbox
-See also: device_create_all.py
+Description: Create netbox device with primary ip using commmand-line arguments
+See also: device_create_update_all.py, device_create_update_one.py
 
 This script does the following:
   1. Create, or update, device
-  2. Create mgmt0 interface for device
-  3. Add IPv4 address to mgmt0 interface
+  2. Create management interface for the device
+  3. Add IPv4 address to management interface
   4. Make IPv4 address the primary_ip for device
 
-Example usage:
+example_dict usage:
 
-./device_create_2.py \
-        --device foo \
-        --interface mgmt0 \
-        --interface_type 1000base-t \
-        --ip4 10.10.10.10/24 \
-        --role lab_tor \
-        --site SJC03-1-155 \
-        --serial CN943G \
-        --tags admin,lab_infra \
-        --type CISCO-2600
-'''
+./device_create_with_ip.py \
+    --device cvd_spine_3 \
+    --interface cvd_spine_3_mgmt0 \
+    --ip4 172.22.150.114/24 \
+    --device_role spine \
+    --site SJC03-1-155 \
+    --interface_role vip \
+    --device_type N9K-C9504 \
+    --interface_type 1000base-t
 
-our_version = 103
-from netbox_tools.common import ip_address_id, interface_id
-from netbox_tools.device import Device, initialize_device_primary_ip, map_device_primary_ip, make_device_primary_ip
+"""
+import argparse
+from inspect import stack
+import pynetbox
+
+from netbox_tools.device import Device
 from netbox_tools.interface import Interface
 from netbox_tools.ip_address import IpAddress
-import pynetbox
-import argparse
-
 from netbox_tools.credentials import NetboxCredentials
-from netbox_tools.common import get_device
+
+OUR_VERSION = 104
+
 
 def get_parser():
-    help_device = 'Name of the device to add.'
-    help_interface = 'Management interface for the device.'
-    help_interface_type = 'PHY type for the device management interface.'
-    help_ip4 = 'Management IPv4 address for the device.'
-    help_role = 'Role for the device. Role must already exist in netbox.'
-    help_serial = 'Optional. Default: na. Serial number of the device.'
-    help_site = 'Site in which device will reside. Site must already exist in netbox.'
-    help_tags = 'Optional. Comma-separated list of pre-existing tags to associate with the device. All tags must already exist in netbox.'
-    help_type = 'Type of device (i.e. model number). model number must already exist in netbox'
-    ex_prefix     = 'Example: '
-    ex_device = '{} --device leaf_3'.format(ex_prefix)
-    ex_interface = '{} --interface mgmt0'.format(ex_prefix)
-    ex_interface_type = '{} --interface_type 1000base-t'.format(ex_prefix)
-    ex_ip4 = '{} --ip4 192.168.1.5/24'.format(ex_prefix)
-    ex_role = '{} --role leaf'.format(ex_prefix)
-    ex_serial = '{} --serial CX045BN'.format(ex_prefix)
-    ex_site = '{} --site f1'.format(ex_prefix)
-    ex_tags = '{} --tags poc,admin'.format(ex_prefix)
-    ex_type = '{} --type N9K-C93180YC-EX'.format(ex_prefix)
+    """
+    return an argparse parser object
+    """
+    help_dict = {}
+    help_dict["device"] = "Name of the device to add."
+    help_dict["interface"] = "Management interface for the device."
+    help_dict["interface_type"] = "PHY type for the device management interface."
+    help_dict["ip4"] = "Management IPv4 address for the device."
+    help_dict[
+        "device_role"
+    ] = "Role for the device. Device role must already exist in netbox."
+    help_dict[
+        "interface_role"
+    ] = "Role for the interface. Netbox requires specific interface roles."
+    help_dict["serial"] = "Optional. Default: na. Serial number of the device."
+    help_dict[
+        "site"
+    ] = "Site in which device will reside. Site must already exist in netbox."
+    help_dict[
+        "tags"
+    ] = "Optional comma-separated list of pre-existing tags associated with device."
+    help_dict["tags"] += "All tags must already exist in netbox."
+    help_dict[
+        "device_type"
+    ] = "Type of device (i.e. model number). model number must already exist in netbox"
+    ex_prefix = "example_dict: "
+    example_dict = {}
+    example_dict["device"] = f"{ex_prefix} --device leaf_3"
+    example_dict["device_role"] = f"{ex_prefix} --device_role leaf"
+    example_dict["device_type"] = f"{ex_prefix} --device_type N9K-C93180YC-EX"
+    example_dict["interface"] = f"{ex_prefix} --interface mgmt0"
+    example_dict["interface_role"] = f"{ex_prefix} --interface_role loopback"
+    example_dict["interface_type"] = f"{ex_prefix} --interface_type 1000base-t"
+    example_dict["ip4"] = f"{ex_prefix} --ip4 192.168.1.5/24"
+    example_dict["serial"] = f"{ex_prefix} --serial CX045BN"
+    example_dict["site"] = f"{ex_prefix} --site f1"
+    example_dict["tags"] = f"{ex_prefix} --tags poc,admin"
 
-    parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Netbox: Add a device')
+    parser = argparse.ArgumentParser(description="DESCRIPTION: Netbox: Add a device")
 
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
+    default = parser.add_argument_group(title="DEFAULT SCRIPT ARGS")
 
-    mandatory.add_argument('--device',
-                        dest='device',
-                        required=True,
-                        help=help_device + ex_device)
-    mandatory.add_argument('--interface',
-                        dest='interface',
-                        required=True,
-                        help=help_interface + ex_interface)
-    mandatory.add_argument('--interface_type',
-                        dest='interface_type',
-                        required=True,
-                        help=help_interface_type + ex_interface_type)
-    mandatory.add_argument('--ip4',
-                        dest='ip4',
-                        required=True,
-                        help=help_ip4 + ex_ip4)
-    mandatory.add_argument('--role',
-                        dest='role',
-                        required=True,
-                        help=help_role + ex_role)
-    default.add_argument('--serial',
-                        dest='serial',
-                        required=False,
-                        default=None,
-                        help=help_serial + ex_serial)
-    mandatory.add_argument('--site',
-                        dest='site',
-                        required=True,
-                        help=help_site + ex_site)
-    default.add_argument('--tags',
-                        dest='tags',
-                        required=False,
-                        default=None,
-                        help=help_tags + ex_tags)
-    mandatory.add_argument('--type',
-                        dest='type',
-                        required=True,
-                        help=help_type + ex_type)
+    mandatory.add_argument(
+        "--device",
+        dest="device",
+        required=True,
+        help=f"{help_dict['device']} {example_dict['device']}",
+    )
+    mandatory.add_argument(
+        "--interface",
+        dest="interface",
+        required=True,
+        help=f"{help_dict['interface']} {example_dict['interface']}",
+    )
+    mandatory.add_argument(
+        "--interface_type",
+        dest="interface_type",
+        required=True,
+        help=f"{help_dict['interface_type']} {example_dict['interface_type']}",
+    )
+    mandatory.add_argument(
+        "--ip4",
+        dest="ip4",
+        required=True,
+        help=f"{help_dict['ip4']} {example_dict['ip4']}",
+    )
+    mandatory.add_argument(
+        "--device_role",
+        dest="device_role",
+        required=True,
+        help=f"{help_dict['device_role']} {example_dict['device_role']}",
+    )
+    mandatory.add_argument(
+        "--interface_role",
+        dest="interface_role",
+        required=True,
+        help=f"{help_dict['interface_role']} {example_dict['interface_role']}",
+    )
+    default.add_argument(
+        "--serial",
+        dest="serial",
+        required=False,
+        default=None,
+        help=f"{help_dict['serial']} {example_dict['serial']}",
+    )
+    mandatory.add_argument(
+        "--site",
+        dest="site",
+        required=True,
+        help=f"{help_dict['site']} {example_dict['site']}",
+    )
+    default.add_argument(
+        "--tags",
+        dest="tags",
+        required=False,
+        default=None,
+        help=f"{help_dict['tags']} {example_dict['tags']}",
+    )
+    mandatory.add_argument(
+        "--device_type",
+        dest="device_type",
+        required=True,
+        help=f"{help_dict['device_type']} {example_dict['device_type']}",
+    )
 
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(our_version))
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
 
     return parser.parse_args()
 
+
+def log(*args):
+    """
+    simple logger
+    """
+    print(f"{stack()[1].function}(v{OUR_VERSION}): {' '.join(args)}")
+
+
 def get_tags():
-    tags = list()
-    for tag in cfg.tags.split(','):
+    """
+    return the list of tags set by the user
+    """
+    tags = []
+    for tag in cfg.tags.split(","):
         tags.append(tag)
     return tags
-def get_info():
-    info = dict()
-    info['ip4'] = cfg.ip4
-    info['interface'] = cfg.interface
-    info['interface_type'] = cfg.interface_type
-    info['device'] = cfg.device
-    info['role'] = cfg.role
-    if cfg.serial != None:
-        info['serial'] = cfg.serial
+
+
+def get_device_info():
+    """
+    return a dictionary containing parameters expected by Device.
+    """
+    info = {}
+    info["ip4"] = cfg.ip4
+    info["interface"] = cfg.interface
+    info["interface_type"] = cfg.interface_type
+    info["device"] = cfg.device
+    info["role"] = cfg.device_role
+    if cfg.serial is not None:
+        info["serial"] = cfg.serial
     else:
-        cfg.serial = 'na'
-    info['site'] = cfg.site
-    if cfg.tags != None:
-        info['tags'] = get_tags()
-    info['type'] = cfg.type
+        cfg.serial = "na"
+    info["site"] = cfg.site
+    if cfg.tags is not None:
+        info["tags"] = get_tags()
+    info["type"] = cfg.device_type
     return info
 
-def assign_primary_ip_to_device(info):
-    ipv4_id = ip_address_id(nb, info['ip4'])
-    intf_id = interface_id(nb, info['device'], info['interface'])
-    if ipv4_id == None:
-        print('assign_primary_ip_to_device: Exiting. Address {} not found in netbox'.format(info['ip4']))
-        exit(1)
-    if intf_id == None:
-        print('assign_primary_ip_to_device: Exiting. Interface {} not found in netbox'.format(info['interface']))
-        exit(1)
-    initialize_device_primary_ip(nb, info['device'])
-    map_device_primary_ip(nb, info['device'], info['interface'], info['ip4'])
-    make_device_primary_ip(nb, info['device'], info['ip4'])
+
+def get_interface_info():
+    """
+    return a dictionary containing parameters expected by Interface
+    """
+    info = {}
+    info["ip4"] = cfg.ip4
+    info["interface"] = cfg.interface
+    info["interface_type"] = cfg.interface_type
+    info["device"] = cfg.device
+    info["role"] = cfg.interface_role
+    if cfg.serial is not None:
+        info["serial"] = cfg.serial
+    else:
+        cfg.serial = "na"
+    info["site"] = cfg.site
+    if cfg.tags is not None:
+        info["tags"] = get_tags()
+    info["type"] = cfg.interface_type
+    return info
+
+
+def get_ip_address_info():
+    """
+    return dictionary with parameters expected by IpAddress class
+    """
+    info = {}
+    info["ip4"] = cfg.ip4
+    info["interface"] = cfg.interface
+    info["device"] = cfg.device
+    return info
+
 
 cfg = get_parser()
-nc = NetboxCredentials()
-nb = pynetbox.api(nc.url, token=nc.token)
+netbox_credentials_obj = NetboxCredentials()
+netbox_obj = pynetbox.api(
+    netbox_credentials_obj.url, token=netbox_credentials_obj.token
+)
 
-info = get_info()
-print('---')
-d = Device(nb, info)
-d.create_or_update()
-i = Interface(nb, info)
-i.create_or_update()
-ip = IpAddress(nb, info)
-ip.create_or_update()
-assign_primary_ip_to_device(info)
+device_info_dict = get_device_info()
+interface_info_dict = get_interface_info()
+ip_address_info_dict = get_ip_address_info()
+print("---")
+device_obj = Device(netbox_obj, device_info_dict)
+device_obj.create_or_update()
+interface_obj = Interface(netbox_obj, interface_info_dict)
+interface_obj.create_or_update()
+ip_address_obj = IpAddress(netbox_obj, ip_address_info_dict)
+ip_address_obj.create_or_update()

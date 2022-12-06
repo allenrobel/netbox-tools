@@ -4,7 +4,7 @@ Name: device_print_filtered.py
 Summary: Print devices filtered by any/all of location, model, tags.
 Description:
 
-If --tags or --model are not provided, print all devices.
+If --location, --model, or --tags are not provided, print all devices.
 If --tags is provided, print devices that match the boolean ANDed set of tags.
 If --model is provided, print devices that match model number.
 If --location is provided, print devices that match device location.
@@ -218,8 +218,8 @@ def filtered_on_location():
 FMT = "{:<9} {:<18} {:<9} {:<18} {:<12} {:<22} {:<6} {:<10} {:<15}"
 
 cfg = get_parser()
-nb = netbox()
-devices = nb.dcim.devices.all()
+netbox_obj = netbox()
+devices = netbox_obj.dcim.devices.all()
 
 matches = unfiltered()
 if cfg.tags is not None:

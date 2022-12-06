@@ -79,10 +79,15 @@ def assign_primary_ip_to_device():
     intf_id = interface_id(netbox_obj, cfg.device, cfg.interface)
 
     if ipv4_id is None:
-        log(f"exiting. Address {cfg.ipv4} not found in netbox")
+        log(
+            f"exiting. Address {cfg.ipv4} not found at {netbox_obj.base_url}"
+        )
         sys.exit(1)
     if intf_id is None:
-        log(f"exiting. Interface {cfg.interface} not found in netbox")
+        log(
+            "exiting.",
+            f"Interface {cfg.interface} not found at {netbox_obj.base_url}",
+        )
         sys.exit(1)
     initialize_device_primary_ip(netbox_obj, cfg.device)
     map_device_primary_ip(netbox_obj, cfg.device, cfg.interface, cfg.ipv4)

@@ -40,15 +40,14 @@ def cable_id(netbox_instance, label):
         cable = netbox_instance.dcim.cables.get(label=label)
         if cable is not None:
             return cable.id
-        print(
-            f"common.cable_id: returning None. cable associated with label {label} does \
-            not exist in netbox"
-        )
+        msg = "common.cable_id: returning None."
+        msg += f" cable associated with label {label} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.cable_id: returning None for cable label {label}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.cable_id: returning None for cable label {label}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -61,14 +60,14 @@ def cluster_id(netbox_instance, name):
         cluster = netbox_instance.virtualization.clusters.get(name=name)
         if cluster is not None:
             return cluster.id
-        print(
-            f"common.cluster_id: returning None. cluster name {name} does not exist in netbox"
-        )
+        msg = "common.cluster_id: returning None."
+        msg += f" cluster name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.cluster_id: returning None for cluster {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.cluster_id: returning None for cluster name {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -81,16 +80,14 @@ def cluster_group_id(netbox_instance, name):
         cluster_group = netbox_instance.virtualization.cluster_groups.get(name=name)
         if cluster_group is not None:
             return cluster_group.id
-        print(
-            f"common.cluster_group_id: returning None. cluster_group name {name} does not \
-            exist in netbox"
-        )
+        msg = "common.cluster_group_id: returning None."
+        msg += f" cluster_group name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.cluster_group_id: returning None for cluster_group name {name}.\
-             exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.cluster_group_id: returning None for cluster_group {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -103,16 +100,14 @@ def cluster_type_id(netbox_instance, name):
         cluster_type = netbox_instance.virtualization.cluster_types.get(name=name)
         if cluster_type is not None:
             return cluster_type.id
-        print(
-            f"common.cluster_type_id: returning None. \
-            cluster_type name {name} does not exist in netbox"
-        )
+        msg = "common.cluster_type_id: returning None."
+        msg += f" cluster_type name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.cluster_type_id: returning None for cluster_type {name}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.cluster_type_id: returning None for cluster_type {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -133,13 +128,15 @@ def get_console_port(netbox_instance, device, port):
         console_port = netbox_instance.dcim.console_ports.get(device=device, name=port)
         if console_port is not None:
             return console_port
-        print(
-            f"common.console_port: returning None. \
-            console_port device {device} port {port} does not exist in netbox"
-        )
+        msg = "common.get_console_port: returning None."
+        msg += f" device {device} port {port} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.console_port: returning None. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.get_console_port: returning None"
+        msg += f" for device {device} console_server_port {port}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -152,17 +149,15 @@ def console_port_id(netbox_instance, device, port):
         console_port = netbox_instance.dcim.console_ports.get(device=device, name=port)
         if console_port is not None:
             return console_port.id
-        print(
-            f"common.console_port_id: returning None. \
-            console_port device {device} port {port} does not exist in netbox"
-        )
+        msg = "common.console_port_id: returning None."
+        msg += f" device {device} port {port} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.console_port_id: \
-            returning None for device {device} console_port {port}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.console_port_id: returning None"
+        msg += f" for device {device} console_server_port {port}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -185,13 +180,15 @@ def get_console_server_port(netbox_instance, device, port):
         )
         if console_server_port is not None:
             return console_server_port
-        print(
-            f"common.console_server_port: returning None. \
-            console_server_port device {device} port {port} does not exist in netbox"
-        )
+        msg = "common.get_console_server_port: returning None."
+        msg += f" device {device} port {port} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.console_server_port: returning None. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.get_console_server_port: returning None"
+        msg += f" for device {device} console_server_port {port}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -206,17 +203,15 @@ def console_server_port_id(netbox_instance, device, port):
         )
         if console_server_port is not None:
             return console_server_port.id
-        print(
-            f"common.console_server_port: returning None. \
-            console_server_port device {device} port {port} does not exist in netbox"
-        )
+        msg = "common.console_server_port_id: returning None."
+        msg += f" device {device} port {port} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.console_server_port: \
-            returning None for device {device} console_server_port {port}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.console_server_port_id: returning None"
+        msg += f" for device {device} console_server_port {port}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -230,12 +225,14 @@ def get_device(netbox_instance, name):
         device = netbox_instance.dcim.devices.get(name=name)
         if device is not None:
             return device
-        print(f"common.device: returning None. device {name} does not exist in netbox")
+        msg = "common.get_device: returning None."
+        msg += f" device {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.device: returning None for device name {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_device: returning None for device name {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -248,14 +245,14 @@ def device_id(netbox_instance, name):
         device = netbox_instance.dcim.devices.get(name=name)
         if device is not None:
             return device.id
-        print(
-            f"common.device_id: returning None. device {name} does not exist in netbox"
-        )
+        msg = "common.device_id: returning None."
+        msg += f" device {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.device_id: returning None for device name {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.device_id: returning None for device name {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -268,10 +265,10 @@ def get_device_type(netbox_instance, name):
     try:
         device_type = netbox_instance.dcim.device_types.get(slug=name.lower())
         return device_type
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_device_type: returning None for device_type {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_device_type: returning None for device_type {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -284,15 +281,14 @@ def device_type_id(netbox_instance, name):
         device_type = netbox_instance.dcim.device_types.get(model=name)
         if device_type is not None:
             return device_type.id
-        print(
-            f"common.device_type_id: returning None. device_type {name} does not exist in netbox"
-        )
+        msg = f"common.device_type_id: returning None."
+        msg += f" device_type {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.device_type_id: returning None for device_type {name}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.device_type_id: returning None for device_type {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -307,11 +303,10 @@ def get_interface(netbox_instance, device, interface):
             name=interface, device=device
         )
         return interface_object
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_interface: returning None for device {device} interface {interface}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_interface: returning None for device {device} interface {interface}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -326,16 +321,14 @@ def interface_id(netbox_instance, device, interface):
         )
         if interface_object is not None:
             return interface_object.id
-        print(
-            f"common.interface_id: returning None. device {device} interface {interface} \
-            does not exist in netbox"
-        )
+        msg = f"common.interface_id: returning None."
+        msg += f" device {device} interface {interface} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.interface_id: returning None for device {device} interface {interface}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.interface_id: returning None for device {device} interface {interface}."
+        msg += f"Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -347,20 +340,19 @@ def get_ip_address(netbox_instance, ip4):
     """
     try:
         address, mask = ip4.split("/")
-    except (ValueError, Exception) as error:
-        print(
-            f"exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {ip4}. \
-            Exception detail: {error}"
-        )
+    except (ValueError, Exception) as _value_error:
+        msg = f"exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {ip4}."
+        msg += f"Exception detail: {_value_error}"
+        print(msg)
         sys.exit(1)
     try:
         return netbox_instance.ipam.ip_addresses.get(address=address, mask=mask)
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_ip_address: returning None for ip {ip4}. \
-            Exception detail: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_ip_address: returning None for ip {ip4}."
+        msg += f"Exception detail: {_request_error}"
+        print(msg)
         return None
+
 
 def make_ip_address_dict(ip_addresses_dict, interface_dict):
     """
@@ -370,46 +362,49 @@ def make_ip_address_dict(ip_addresses_dict, interface_dict):
        ip_addresses_dict: the entire ip4_addresses dict, see example.yml in this repo
        interface_dict: dictionary for one interface culled from the interfaces dict in example.yml
     """
-    if 'ip4' not in interface_dict:
+    if "ip4" not in interface_dict:
         return None
     ip_address_dict = {}
-    if 'device' in interface_dict:
-        device_key = 'device'
-    elif 'virtual_machine' in interface_dict:
-        device_key = 'virtual_machine'
+    if "device" in interface_dict:
+        device_key = "device"
+    elif "virtual_machine" in interface_dict:
+        device_key = "virtual_machine"
     else:
-        print("common.make_ip_address_dict: exiting")
-        print("interface_dict missing key: 'device' or 'virtual_machine'")
+        msg = "common.make_ip_address_dict: exiting."
+        msg += " interface_dict missing key: 'device' or 'virtual_machine'"
+        print(msg)
         sys.exit(1)
-    ip4 = interface_dict['ip4']
+    ip4 = interface_dict["ip4"]
     try:
         ip_address_dict = {}
-        ip_address_dict['ip4'] = ip4
-        ip_address_dict['interface'] = interface_dict['interface']
+        ip_address_dict["ip4"] = ip4
+        ip_address_dict["interface"] = interface_dict["interface"]
         ip_address_dict[device_key] = interface_dict[device_key]
     except KeyError as _key_error_exception:
-        print(f"missing mandatory key in interface_dict {interface_dict}")
-        print("mandatory keys: ip4, interface, [device or virtual_machine]")
-        print(f"Exception detail: {_key_error_exception}")
+        msg = "common.make_ip_address_dict: missing mandatory key in"
+        msg += f" interface_dict {interface_dict}"
+        msg += " Mandatory keys: ip4, interface, [device or virtual_machine]"
+        msg += f" Exception detail: {_key_error_exception}"
+        print(msg)
         sys.exit(1)
     if ip4 not in ip_addresses_dict:
         return ip_address_dict
-    if 'description' in ip_addresses_dict[ip4]:
-        ip_address_dict['description'] = ip_addresses_dict[ip4]['description']
+    if "description" in ip_addresses_dict[ip4]:
+        ip_address_dict["description"] = ip_addresses_dict[ip4]["description"]
     else:
-        ip_address_dict['description'] = ""
-    if 'role' in ip_addresses_dict[ip4]:
-        ip_address_dict['role'] = ip_addresses_dict[ip4]['role']
+        ip_address_dict["description"] = ""
+    if "role" in ip_addresses_dict[ip4]:
+        ip_address_dict["role"] = ip_addresses_dict[ip4]["role"]
     else:
-        ip_address_dict['role'] = ""
-    if 'status' in ip_addresses_dict[ip4]:
-        ip_address_dict['status'] = ip_addresses_dict[ip4]['status']
+        ip_address_dict["role"] = ""
+    if "status" in ip_addresses_dict[ip4]:
+        ip_address_dict["status"] = ip_addresses_dict[ip4]["status"]
     else:
-        ip_address_dict['status'] = ""
-    if 'tags' in ip_addresses_dict[ip4]:
-        ip_address_dict['tags'] = ip_addresses_dict[ip4]['tags']
+        ip_address_dict["status"] = ""
+    if "tags" in ip_addresses_dict[ip4]:
+        ip_address_dict["tags"] = ip_addresses_dict[ip4]["tags"]
     else:
-        ip_address_dict['tags'] = []
+        ip_address_dict["tags"] = []
     return ip_address_dict
 
 
@@ -420,24 +415,23 @@ def ip_address_id(netbox_instance, ip4):
     """
     try:
         address, mask = ip4.split("/")
-    except (ValueError, Exception) as error:
-        print(
-            f"exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {ip4}. \
-            Exception detail: {error}"
-        )
+    except (ValueError, Exception) as _value_error:
+        msg = f"common.ip_address_id: exiting. Unexpected format for prefix. Expected A.B.C.D/E, got {ip4}."
+        msg += f" Exception detail: {_value_error}"
+        print(msg)
         sys.exit(1)
     try:
         ip_address = netbox_instance.ipam.ip_addresses.get(address=address, mask=mask)
         if ip_address is not None:
             return ip_address.id
-        print(
-            f"common.ip_address_id: returning None. ipv4 address {ip4} does not exist in netbox"
-        )
+        msg = f"common.ip_address_id: returning None."
+        msg += f" ipv4 address {ip4} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.ip_address_id: returning None for ip {ip4}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.ip_address_id: returning None for ip {ip4}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -454,11 +448,11 @@ def get_virtual_interface(netbox_instance, virtual_machine, virtual_interface):
             name=virtual_interface, virtual_machine=virtual_machine
         )
         return virtual_interface_object
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_virtual_interface: returning None for virtual_machine {virtual_machine} \
-            virtual_interface {virtual_interface}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.get_virtual_interface: returning None"
+        msg += f" for virtual_machine {virtual_machine} virtual_interface {virtual_interface}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -473,16 +467,18 @@ def virtual_interface_id(netbox_instance, virtual_machine, virtual_interface):
         )
         if virtual_interface_object is not None:
             return virtual_interface_object.id
-        print(
-            f"common.ip_address_id: returning None. virtual_machine {virtual_machine} \
-            virtual_interface {virtual_interface} does not exist in netbox"
+        msg = "common.virtual_interface_id: returning None."
+        msg += (
+            f" virtual_machine {virtual_machine} virtual_interface {virtual_interface}"
         )
+        msg += f" not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.virtual_interface_id: returning None for virtual_machine {virtual_machine} \
-            virtual_interface {virtual_interface}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.virtual_interface_id: returning None"
+        msg += f" for virtual_machine {virtual_machine} virtual_interface {virtual_interface}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -496,18 +492,18 @@ def netbox_id_untagged_vlan(netbox_instance, vid):
         vlan_object = netbox_instance.ipam.vlans.get(vid=vid)
         if vlan_object is not None:
             return vlan_object.id
-        print(
-            f"common.netbox_id_untagged_vlan: returning None. vid {vid} does not exist in netbox"
-        )
+        msg = "common.netbox_id_untagged_vlan: returning None"
+        msg += f" vid {vid} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.netbox_id_untagged_vlan: returning None for vid {vid}. exception was: {error}"
-        )
-        print(
-            f"common.netbox_id_untagged_vlan: possibly vlan ID (vid) {vid} does not yet exist in \
-            netbox, in which case you need to create it first."
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.netbox_id_untagged_vlan: returning None for vid {vid}"
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
+        msg = f"common.netbox_id_untagged_vlan: possibly vlan ID (vid) {vid}"
+        msg += f" does not yet exist at {netbox_instance.base_url}"
+        msg += " in which case you need to create it first."
+        print(msg)
         return None
 
 
@@ -520,20 +516,18 @@ def vlan_name_to_id(netbox_instance, vlan_name):
         vlan_object = netbox_instance.ipam.vlans.get(name=vlan_name)
         if vlan_object is not None:
             return vlan_object.id
-        print(
-            f"common.vlan_name_to_id: returning None. vlan_name {vlan_name} \
-            does not exist in netbox"
-        )
+        msg = "common.vlan_name_to_id: returning None."
+        msg += f" vlan_name {vlan_name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.vlan_name_to_id: returning None for vlan_name {vlan_name}. \
-            exception was: {error}"
-        )
-        print(
-            f"common.vlan_name_to_id: possibly vlan_name {vlan_name} does not yet exist in netbox, \
-            in which case you need to create it first."
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.vlan_name_to_id: returning None for vlan_name {vlan_name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
+        msg = f"common.vlan_name_to_id: possibly vlan_name {vlan_name}"
+        msg += f" does not yet exist at {netbox_instance.base_url}"
+        msg += " in which case you need to create it first."
+        print(msg)
         return None
 
 
@@ -546,18 +540,18 @@ def vlan_vid_to_id(netbox_instance, vlan_vid):
         vlan_object = netbox_instance.ipam.vlans.get(vid=vlan_vid)
         if vlan_object is not None:
             return vlan_object.id
-        print(
-            f"common.vlan_vid_to_id: returning None. vlan_vid {vlan_vid} does not exist in netbox"
-        )
+        msg = "common.vlan_vid_to_id: returning None."
+        msg += f" vlan_vid {vlan_vid} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.vlan_vid_to_id: returning None for vlan_vid {vlan_vid}. exception was: {error}"
-        )
-        print(
-            f"common.vlan_vid_to_id: possibly vlan_vid {vlan_vid} does not yet exist in netbox, \
-            in which case you need to create it first."
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.vlan_name_to_id: returning None for vlan_vid {vlan_vid}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
+        msg = f"common.vlan_vid_to_id: possibly vlan_vid {vlan_vid}"
+        msg += f" does not yet exist at {netbox_instance.base_url}"
+        msg += " in which case you need to create it first."
+        print(msg)
         return None
 
 
@@ -570,16 +564,14 @@ def vlan_group_id(netbox_instance, vlan_group_name):
         vlan_group_object = netbox_instance.ipam.vlan_groups.get(name=vlan_group_name)
         if vlan_group_object is not None:
             return vlan_group_object.id
-        print(
-            f"common.vlan_group_id: returning None. vlan_group_name {vlan_group_name} \
-            does not exist in netbox"
-        )
+        msg = "common.vlan_group_id: returning None."
+        msg += f" vlan_group_name {vlan_group_name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.vlan_group_id: returning None for vlan_group_name {vlan_group_name}. \
-            exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.vlan_group_id: returning None for vlan_group_name {vlan_group_name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -593,14 +585,14 @@ def location_id(netbox_instance, name):
         location = netbox_instance.dcim.locations.get(name=name)
         if location is not None:
             return location.id
-        print(
-            f"common.location_id: returning None. location name {name} does not exist in netbox"
-        )
+        msg = "common.location_id: returning None."
+        msg += f" location name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.location_id: returning None for location {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.location_id: returning None for location {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -614,12 +606,14 @@ def rack_id(netbox_instance, name):
         rack = netbox_instance.dcim.racks.get(name=name)
         if rack is not None:
             return rack.id
-        print(
-            f"common.rack_id: returning None. rack name {name} does not exist in netbox"
-        )
+        msg = "common.rack_id: returning None."
+        msg += f" rack name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.rack_id: returning None for rack {name}. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.rack_id: returning None for rack {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -632,11 +626,10 @@ def get_manufacturer(netbox_instance, name):
     try:
         manufacturer = netbox_instance.dcim.manufacturers.get(name=name)
         return manufacturer
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_manufacturer: returning None for manufacturer {name}.\
-             exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_manufacturer: returning None for manufacturer {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -649,16 +642,14 @@ def manufacturer_id(netbox_instance, name):
         manufacturer = netbox_instance.dcim.manufacturers.get(name=name)
         if manufacturer is not None:
             return manufacturer.id
-        print(
-            f"common.manufacturer_id: returning None. manufacturer name {name} \
-            does not exist in netbox"
-        )
+        msg = "common.manufacturer_id: returning None."
+        msg += f" manufacturer name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.manufacturer_id: returning None for manufacturer {name}. \
-            exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.manufacturer_id: returning None for manufacturer {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -671,10 +662,10 @@ def get_role(netbox_instance, name):
     try:
         role = netbox_instance.dcim.device_roles.get(name=name)
         return role
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.get_role: returning None for role {name}. exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_role: returning None for role {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -687,15 +678,14 @@ def role_id(netbox_instance, name):
         role = netbox_instance.dcim.device_roles.get(name=name)
         if role is not None:
             return role.id
-        print(
-            f"common.role_id: returning None. role name {name} does not exist in netbox"
-        )
+        msg = "common.role_id: returning None."
+        msg += f" role name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.role_id: returning None for role_id associated with role {name}. \
-            exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.role_id: returning None for role_id associated with role {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -709,15 +699,14 @@ def site_id(netbox_instance, name):
         site = netbox_instance.dcim.sites.get(name=name)
         if site is not None:
             return site.id
-        print(
-            f"common.site_id: returning None. site name {name} does not exist in netbox"
-        )
+        msg = "common.site_id: returning None."
+        msg += f" site name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.site_id: returning None for site_id associated with site {name}. \
-            exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.site_id: returning None for site_id associated with site {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -729,15 +718,16 @@ def get_tag(netbox_instance, name):
     """
     try:
         tag = netbox_instance.extras.tags.get(name=name)
-        if tag is None:
-            print(
-                f"common.get_tag: returning None. tag {name} does not exist in netbox.".format(
-                    name
-                )
-            )
-        return tag
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.get_tag: returning None for tag {name}. exception was: {error}")
+        if tag is not None:
+            return tag
+        msg = "common.get_tag: returning None."
+        msg += f" tag {name} not found at {netbox_instance.base_url}"
+        print(msg)
+        return None
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_tag: returning None for tag {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -750,15 +740,14 @@ def tag_id(netbox_instance, name):
         tag = netbox_instance.extras.tags.get(name=name)
         if tag is not None:
             return tag.id
-        print(
-            f"common.tag_id: returning None. tag name {name} does not exist in netbox"
-        )
+        msg = "common.tag_id: returning None."
+        msg += f" tag name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(
-            f"common.tag_id: returning None for tag_id associated with tag {name}. \
-            exception was: {error}"
-        )
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.tag_id: returning None for tag_id associated with tag {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -769,8 +758,10 @@ def get_tags(netbox_instance):
     try:
         tags = netbox_instance.extras.tags.all()
         return [tag.name for tag in tags]
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.get_tags: returning None. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = "common.get_tags: returning None."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -783,10 +774,14 @@ def get_vm(netbox_instance, name):
         vm_obj = netbox_instance.virtualization.virtual_machines.get(name=name)
         if vm_obj is not None:
             return vm_obj
-        print(f"common.get_vm: returning None. vm {name} does not exist in netbox")
+        msg = "common.get_vm: returning None."
+        msg += f" vm {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.get_vm: returning None for vm {name}. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.get_vm: returning None for vm {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -799,10 +794,14 @@ def vm_id(netbox_instance, name):
         vm_obj = netbox_instance.virtualization.virtual_machines.get(name=name)
         if vm_obj is not None:
             return vm_obj.id
-        print(f"common.vm_id: returning None. vm name {name} does not exist in netbox")
+        msg = "common.vm_id: returning None."
+        msg += f" vm name {name} not found at {netbox_instance.base_url}"
+        print(msg)
         return None
-    except (pynetbox.RequestError, Exception) as error:
-        print(f"common.vm_id: returning None for vm {name}. exception was: {error}")
+    except (pynetbox.RequestError, Exception) as _request_error:
+        msg = f"common.vm_id: returning None for vm {name}."
+        msg += f" Exception detail: {_request_error}"
+        print(msg)
         return None
 
 
@@ -828,6 +827,8 @@ def load_yaml(filename):
         with open(filename, "r", encoding="utf8") as file_handle:
             contents = yaml.load(file_handle, Loader=yaml.FullLoader)
         return contents
-    except Exception as error:
-        print(f"common.load_yaml: exiting. Exception was: {error}")
+    except Exception as _general_exception:
+        msg = "common.load_yaml: exiting."
+        msg += f" Exception detail {_general_exception}"
+        print(msg)
         sys.exit(1)

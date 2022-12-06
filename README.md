@@ -193,6 +193,7 @@ Script                         | Description
 [device_count] | Print the number of devices matching a given query
 [device_create_update_all] | Create/update all devices defined in ``--yaml``
 [device_create_update_one] | Create/update device with key ``--key`` in file ``--yaml``
+[device_print_filtered] | Print devices matching ``--location``, ``--model``, and ``--tags``
 [device_type_create_update] | Create/update a device type using command line options
 [device_type_create_update_all] | Create/update all device types defined in ``--yaml``
 [device_type_delete_all] | Delete all device types contained in the YAML file ``--yaml``
@@ -278,6 +279,7 @@ See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) for full text.
 [device_count]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_count.py
 [device_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_create_update_all.py
 [device_create_update_one]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_create_update_one.py
+[device_print_filtered]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_print_filtered.py
 [device_type_create_update]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update.py
 [device_type_create_update_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_create_update_all.py
 [device_type_delete_all]: https://github.com/allenrobel/netbox-tools/blob/master/scripts/device_type_delete_all.py

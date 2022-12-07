@@ -8,7 +8,7 @@ from netbox_tools.common import manufacturer_id
 from netbox_tools.common import create_slug
 from netbox_tools.common import tag_id
 
-OUR_VERSION = 105
+OUR_VERSION = 106
 
 
 class DeviceType:
@@ -34,7 +34,7 @@ class DeviceType:
     """
 
     def __init__(self, netbox_obj, info):
-        self._netbox = netbox_obj
+        self._netbox_obj = netbox_obj
         self._info = info
         self._classname = __class__.__name__
         self.lib_version = OUR_VERSION
@@ -83,7 +83,7 @@ class DeviceType:
         """
         add manufacturer to args
         """
-        self._args["manufacturer"] = manufacturer_id(self._netbox, self.manufacturer)
+        self._args["manufacturer"] = manufacturer_id(self._netbox_obj, self.manufacturer)
 
     def _set_model(self):
         """
@@ -148,7 +148,7 @@ class DeviceType:
         """
         self.log(f"{self.model}")
         try:
-            self._netbox.dcim.device_types.create(self._args)
+            self._netbox_obj.dcim.device_types.create(self._args)
         except Exception as _general_error:
             self.log(
                 f"exiting. Unable to create device_type {self.model}.",
@@ -225,7 +225,7 @@ class DeviceType:
         return an instance of the netbox device_type
         If the device_type does not exist, None will be returned
         """
-        return self._netbox.dcim.device_types.get(model=self.model)
+        return self._netbox_obj.dcim.device_types.get(model=self.model)
 
     @property
     def device_type_id(self):

@@ -1,73 +1,117 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: device_type_print.py
 Description: Display information about a device type
-'''
-our_version = 103
+"""
 import argparse
+from inspect import stack
+import sys
 import json
 from netbox_tools.common import netbox
 
-def get_parser():
-    help_detail = 'Optional. If present, print detailed info about the device_type (aka model).'
-    help_model = 'Retrieve and display information for model.'
+OUR_VERSION = 104
 
-    ex_prefix = ' Example: '
-    ex_detail = '{} --detail'.format(ex_prefix)
-    ex_model = '{} --model N9K-C93180YC-EX'.format(ex_prefix)
+
+def get_parser():
+    """
+    return an argparse parser object
+    """
+    help_detail = "Optional. If present, display detailed info about the device_type."
+    help_model = "Search for device_type based on value of device_type model."
+
+    ex_prefix = " Example: "
+    ex_detail = f"{ex_prefix} --detail"
+    ex_model = f"{ex_prefix} --model N9K-C93180YC-EX"
 
     parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Print information for a device model (Netbox device model is roughly equivilent to model number)')
+        description="DESCRIPTION: Print information for a device type."
+    )
 
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
+    default = parser.add_argument_group(title="DEFAULT SCRIPT ARGS")
 
-    mandatory.add_argument('--model',
-                        dest='model',
-                        required=True,
-                        help=help_model + ex_model)
+    mandatory.add_argument(
+        "--model", dest="model", required=True, help=f"{help_model} {ex_model}"
+    )
 
-    default.add_argument('--detail',
-                        dest='detail',
-                        required=False,
-                        default=False,
-                        action='store_true',
-                        help=help_detail + ex_detail)
+    default.add_argument(
+        "--detail",
+        dest="detail",
+        required=False,
+        default=False,
+        action="store_true",
+        help=f"{help_detail} {ex_detail}",
+    )
 
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(our_version))
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
 
     return parser.parse_args()
 
+
+def log(*args):
+    """
+    simple logger
+    """
+    print(f"{stack()[1].function}(v{OUR_VERSION}): {' '.join(args)}")
+
+
 def error():
-    device_types = list()
-    items = nb.dcim.device_types.all()
+    """
+    Handle case where device_type object is not present in Netbox.
+    Throw the user a bone by printing a list of device_types that ARE present.
+    """
+    device_type_models = []
+    items = netbox_obj.dcim.device_types.all()
     for item in items:
-        device_types.append(item.model)
-    print('Device type (aka model) {} does not exist in netbox.  Valid device types: {}'.format(cfg.model, ', '.join(device_types)))
-    exit(1)
+        device_type_models.append(item.model)
+    log(
+        f"Device type model {cfg.model} does not exist at {netbox_obj.base_url}.",
+        f"Valid device type models: {', '.join(device_type_models)}",
+    )
+    sys.exit(1)
+
 
 def get_device_type():
-    device_type = nb.dcim.device_types.get(model=cfg.model)
-    if device_type == None:
+    """
+    return device_type object associated with model
+    """
+    result = netbox_obj.dcim.device_types.get(model=cfg.model)
+    if result is None:
         error()
-    return device_type
+    return result
 
-def print_detail(device_type):
-    pretty = json.dumps(dict(device_type), indent=4, sort_keys=True)
+
+def print_detail():
+    """
+    print json returned by Netbox for the device_type object
+    """
+    pretty = json.dumps(dict(device_type_obj), indent=4, sort_keys=True)
     print(pretty)
 
+
 def print_headers():
-    print(fmt.format('id', 'model', 'device_count', 'manufacturer'))
-    print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 20))
+    """
+    print table headers
+    """
+    print(FMT.format("id", "device_type", "device_count", "manufacturer"))
+    print(FMT.format("-" * 5, "-" * 15, "-" * 12, "-" * 20))
+
 
 cfg = get_parser()
-nb = netbox()
-device_type = get_device_type()
+netbox_obj = netbox()
+device_type_obj = get_device_type()
 if cfg.detail:
-    print_detail(device_type)
+    print_detail()
 else:
-    fmt = '{:>5} {:<15} {:>12} {:<20}'
+    FMT = "{:>5} {:<15} {:>12} {:<20}"
     print_headers()
-    print(fmt.format(device_type.id, device_type.model, device_type.device_count, device_type.manufacturer.name))
+    print(
+        FMT.format(
+            device_type_obj.id,
+            device_type_obj.model,
+            device_type_obj.device_count,
+            device_type_obj.manufacturer.name,
+        )
+    )

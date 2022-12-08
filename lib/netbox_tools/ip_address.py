@@ -156,14 +156,14 @@ class IpAddress:
         Update args with the ip address status, if the user has set this.
         Exit with error if the user set an invalid status.
         """
-        if self.status is None:
+        if self.status is None or self.status == "":
             return
         if self.status in self._valid_choices["status"]:
             self._args["status"] = self.status
         else:
             _valid_choices = ",".join(sorted(self._valid_choices["status"]))
             self.log(
-                f"exiting. Invalid status. Got {self.status}",
+                f"exiting. Invalid status. Got {self.status}.",
                 f"Expected one of {_valid_choices}.",
             )
             sys.exit(1)

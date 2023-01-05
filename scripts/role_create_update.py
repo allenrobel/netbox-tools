@@ -8,7 +8,7 @@ Example Usage:
 
 NOTE: --color is currently limited to the set of colors defined in colors.py
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox
 from netbox_tools.role import Role
@@ -52,7 +52,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

@@ -3,7 +3,7 @@
 Name: ip_prefix_create_update_all.py
 Description: Create/update all ip prefixes defined in ``--yaml``
 '''
-our_version = 103
+OUR_VERSION = 103
 import argparse
 
 from netbox_tools.common import netbox, load_yaml
@@ -28,7 +28,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

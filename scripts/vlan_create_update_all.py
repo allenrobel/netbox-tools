@@ -3,7 +3,7 @@
 Name: vlan_create_update_all.py
 Description: Create/update vlans defined in ``--yaml``
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.vlan import Vlan
@@ -27,7 +27,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

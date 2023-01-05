@@ -7,7 +7,7 @@ Example Usage:
 ./vlan_group_create_update.py --vlan_group AdminServers --min_vid 1 --max_vid 15 --description "Admin Server Vlans" --tags server,admin
 
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.vlan_group import VlanGroup
@@ -59,7 +59,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

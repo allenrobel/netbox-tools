@@ -3,7 +3,7 @@
 Name: sites_print.py
 Description: Display information about all sites
 '''
-our_version = 103
+OUR_VERSION = 103
 import argparse
 from netbox_tools.common import netbox
 
@@ -16,7 +16,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

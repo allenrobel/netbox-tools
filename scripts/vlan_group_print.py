@@ -3,7 +3,7 @@
 Name: vlan_group_print.py
 Description: Display information about vlan_group ``--vlan_group``
 '''
-our_version = 103
+OUR_VERSION = 103
 import argparse
 import json
 from netbox_tools.common import netbox
@@ -35,7 +35,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

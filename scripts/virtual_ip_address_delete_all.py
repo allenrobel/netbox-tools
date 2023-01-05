@@ -3,7 +3,7 @@
 Name: virtual_ip_address_delete_all.py
 Description: Delete all virtual_ip_addresses (those belonging to virtual machines) defined in ``--yaml``
 '''
-our_version = 100
+OUR_VERSION = 100
 import argparse
 
 from netbox_tools.common import netbox, load_yaml
@@ -28,7 +28,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

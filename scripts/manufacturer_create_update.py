@@ -3,7 +3,7 @@
 Name: manufacturer_create_update.py
 Description: Create/update manufacturer ``--manufacturer``
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.manufacturer import Manufacturer
@@ -25,7 +25,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

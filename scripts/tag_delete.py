@@ -3,7 +3,7 @@
 Name: tag_delete.py
 Description: Delete tag ``--tag``
 '''
-our_version = 105
+OUR_VERSION = 105
 import argparse
 
 from netbox_tools.common import netbox
@@ -27,7 +27,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

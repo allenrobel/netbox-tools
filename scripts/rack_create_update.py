@@ -6,7 +6,7 @@ Example Usage:
 
 ./rack_create_update.py --rack A001 --location row-a --site volcano --u_height 48 --comments "a comment" --tags infra,admin
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox
 from netbox_tools.rack import Rack
@@ -63,7 +63,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

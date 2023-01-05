@@ -40,7 +40,7 @@ device_roles:
 
 
 '''
-our_version = 103
+OUR_VERSION = 103
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.role import Role
@@ -64,7 +64,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

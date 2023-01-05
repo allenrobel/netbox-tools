@@ -5,7 +5,7 @@ Description: Delete all locations defined in ``--yaml``
 
 Be careful!  This will not ask for confirmation.
 '''
-our_version = 102
+OUR_VERSION = 102
 import argparse
 from netbox_tools.common import netbox
 from netbox_tools.common import load_yaml
@@ -30,7 +30,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(our_version))
+                        version='%(prog)s {}'.format(OUR_VERSION))
 
     return parser.parse_args()
 

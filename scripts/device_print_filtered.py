@@ -4,46 +4,52 @@ Name: device_print_filtered.py
 Summary: Print devices filtered by any/all of location, model, tags.
 Description:
 
-If --location, --model, or --tags are not provided, print all devices.
+If --role, --tags, or --model are not provided, print all devices.
 If --tags is provided, print devices that match the boolean ANDed set of tags.
 If --model is provided, print devices that match model number.
 If --location is provided, print devices that match device location.
+If --role is provided, print devices that match device role.
 If all arguments are provided, print devices that match the boolean ANDed result of all searches.
 
 For example:
 
-   --tags foo,bar,baz --model N9K-C9336C-FX2 --location row-v
+   --tags foo,bar,baz --model N9K-C9336C-FX2 --location row-v --role spine
 
-Would match N9K-C9336C-FX2 that contain all three tags foo, bar, and baz and
+Would match N9K-C9336C-FX2 that are spines, and contain all three tags foo, bar, and baz and
 that are located in row-v.
 """
 import argparse
 from netbox_tools.common import netbox
 
-OUR_VERSION = 104
+OUR_VERSION = 105
 
 
 def get_parser():
     """
     return an argparse parser object
     """
+    help_location = "Device location"
+    help_model = "Device model number"
+    help_role = "Device role, e.g. spine"
     help_tags = "Comma-separated list of tags (no spaces)."
     help_tags += " If present, only devices containing tag(s) are printed."
     help_tags += " Else, all devices are printed."
-    help_model = "Device model number"
-    help_location = "Device location"
 
     ex_prefix = " Example: "
-    ex_tags = f"{ex_prefix} --tags deathstar,admin"
-    ex_model = f"{ex_prefix} --model N9K-C9336C-FX2"
     ex_location = f"{ex_prefix} --model N9K-C9336C-FX2"
+    ex_model = f"{ex_prefix} --model N9K-C9336C-FX2"
+    ex_role = f"{ex_prefix} --role leaf"
+    ex_tags = f"{ex_prefix} --tags deathstar,admin"
 
     parser = argparse.ArgumentParser(
-        description="DESCRIPTION: Netbox: Print list of devices filtered by tag and/or model"
+        description="DESCRIPTION: Netbox: Print list of devices filtered by model, role, or tag(s)"
     )
 
     default = parser.add_argument_group(title="DEFAULT SCRIPT ARGS")
 
+    default.add_argument(
+        "--role", dest="role", required=False, help=f"{help_role} {ex_role}"
+    )
     default.add_argument(
         "--tags", dest="tags", required=False, help=f"{help_tags} {ex_tags}"
     )
@@ -72,6 +78,7 @@ def print_header():
         FMT.format(
             "device_id",
             "name",
+            "role",
             "location",
             "model",
             "serial",
@@ -85,6 +92,7 @@ def print_header():
         FMT.format(
             "-" * 9,
             "-" * 18,
+            "-" * 15,
             "-" * 9,
             "-" * 18,
             "-" * 12,
@@ -142,6 +150,7 @@ def print_matches(matches_dict):
             FMT.format(
                 device.id,
                 device.name,
+                str(device.device_role),
                 str(device.location),
                 device.device_type.model,
                 device.serial,
@@ -162,6 +171,51 @@ def unfiltered():
     for device in devices:
         matches_dict[device.name] = device
     return matches_dict
+
+
+def filtered_on_location():
+    """
+    Given the full set of devices from unfiltered(), return a dictionary, keyed on device name,
+    whose values are set to False for all devices that do not match the device.location the user
+    is searching for.  If the value is already False, skip it since this means it didn't
+    match a previous search (e.g. filtered_on_model()).
+    """
+    for device in matches:
+        if matches[device] is False:
+            continue
+        if str(matches[device].location) != cfg.location:
+            matches[device] = False
+    return matches
+
+
+def filtered_on_model():
+    """
+    Given the full set of devices from unfiltered(), return a dictionary, keyed on device name,
+    whose values are set to False for all devices that do not match the device_type.model the user
+    is searching for.  If the value is already False, skip it since this means it didn't
+    match a previous search (e.g. filtered_on_model()).
+    """
+    for device in matches:
+        if matches[device] is False:
+            continue
+        if matches[device].device_type.model != cfg.model:
+            matches[device] = False
+    return matches
+
+
+def filtered_on_role():
+    """
+    Given the full set of devices from unfiltered(), return a dictionary, keyed on device name,
+    whose values are set to False for all devices that do not match the device.device_role the user
+    is searching for.  If the value is already False, skip it since this means it didn't
+    match a previous search (e.g. filtered_on_model()).
+    """
+    for device in matches:
+        if matches[device] is False:
+            continue
+        if str(matches[device].device_role) != cfg.role:
+            matches[device] = False
+    return matches
 
 
 def filtered_on_tag():
@@ -185,48 +239,20 @@ def filtered_on_tag():
     return matches
 
 
-def filtered_on_model():
-    """
-    Given the full set of devices from unfiltered(), return a dictionary, keyed on device name,
-    whose values are set to False for all devices that do not match the device_type.model the user
-    is searching for.  If the value is already False, skip it since this means it didn't
-    match a previous search (e.g. filtered_on_model()).
-    """
-    for device in matches:
-        if matches[device] is False:
-            continue
-        if matches[device].device_type.model != cfg.model:
-            matches[device] = False
-    return matches
-
-
-def filtered_on_location():
-    """
-    Given the full set of devices from unfiltered(), return a dictionary, keyed on device name,
-    whose values are set to False for all devices that do not match the device.location the user
-    is searching for.  If the value is already False, skip it since this means it didn't
-    match a previous search (e.g. filtered_on_model()).
-    """
-    for device in matches:
-        if matches[device] is False:
-            continue
-        if str(matches[device].location) != cfg.location:
-            matches[device] = False
-    return matches
-
-
-FMT = "{:<9} {:<18} {:<9} {:<18} {:<12} {:<22} {:<6} {:<10} {:<15}"
+FMT = "{:<9} {:<18} {:<15} {:<9} {:<18} {:<12} {:<22} {:<6} {:<10} {:<15}"
 
 cfg = get_parser()
-netbox_obj = netbox()
-devices = netbox_obj.dcim.devices.all()
+nb = netbox()
+devices = nb.dcim.devices.all()
 
 matches = unfiltered()
-if cfg.tags is not None:
-    matches = filtered_on_tag()
-if cfg.model is not None:
-    matches = filtered_on_model()
 if cfg.location is not None:
     matches = filtered_on_location()
+if cfg.model is not None:
+    matches = filtered_on_model()
+if cfg.role is not None:
+    matches = filtered_on_role()
+if cfg.tags is not None:
+    matches = filtered_on_tag()
 
 print_matches(matches)

@@ -7,7 +7,7 @@ import sys
 from netbox_tools.common import create_slug, tag_id
 from netbox_tools.colors import color_to_rgb
 
-OUR_VERSION = 102
+OUR_VERSION = 103
 
 
 class Role:
@@ -27,6 +27,7 @@ class Role:
         self._optional_keys = set()  # FYI only.  Not used in this class.
         self._optional_keys.add("description")
         self._optional_keys.add("tags")
+        self._optional_keys.add("vm_role")
 
     def log(self, *args):
         """
@@ -86,6 +87,14 @@ class Role:
                 continue
             self._args["tags"].append(tid)
 
+    def _set_vm_role(self):
+        """
+        Add vm_role, if any, to args
+        """
+        if self.vm_role is None:
+            return
+        self._args["vm_role"] = self.vm_role
+
     def _generate_args(self):
         """
         Generate all supported arguments for create and update methods
@@ -95,6 +104,7 @@ class Role:
         self._set_name()
         self._set_slug()
         self._set_tags()
+        self._set_vm_role()
 
     def delete(self):
         """
@@ -221,3 +231,20 @@ class Role:
         if "tags" in self._info:
             return self._info["tags"]
         return None
+
+    @property
+    def vm_role(self):
+        """
+        Return vm_role set by the caller.
+        If vm_role is not set, default to False.  Note, this is the
+        opposite default from Netbox, but we tend to have more physical
+        devices in our labs here.
+        """
+        if "vm_role" in self._info:
+            if isinstance(self._info["vm_role"], bool):
+                return self._info["vm_role"]
+            self.log(
+                f"Exiting. Expected boolean for vm_role.  Got {self._info['vm_role']}"
+            )
+            sys.exit(1)
+        return False

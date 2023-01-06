@@ -1,75 +1,101 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: rack_print.py
 Description: Display information about ``--rack``
-'''
-OUR_VERSION = 103
+"""
 import argparse
 import json
+import sys
 from netbox_tools.common import netbox
 
-def get_parser():
-    help_detail = 'Optional. If present, print detailed info about device.'
-    help_rack = 'Name of the rack.'
+OUR_VERSION = 104
 
-    ex_prefix     = 'Example: '
-    ex_detail = '{} --detail'.format(ex_prefix)
-    ex_rack = '{} --rack V009'.format(ex_prefix)
+
+def get_parser():
+    """
+    return an argparse parser object
+    """
+    help_detail = "Optional. If present, print detailed info about --rack."
+    help_rack = "Name of the rack."
+
+    ex_prefix = "Example: "
+    ex_detail = f"{ex_prefix} --detail"
+    ex_rack = f"{ex_prefix} --rack V009"
 
     parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Display information about a rack')
+        description="DESCRIPTION: Display information about ``--rack``"
+    )
 
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
+    default = parser.add_argument_group(title="DEFAULT SCRIPT ARGS")
 
-    default.add_argument('--detail',
-                        dest='detail',
-                        required=False,
-                        default=False,
-                        action='store_true',
-                        help=help_detail + ex_detail)
-    mandatory.add_argument('--rack',
-                        dest='rack',
-                        required=True,
-                        help=help_rack + ex_rack)
+    default.add_argument(
+        "--detail",
+        dest="detail",
+        required=False,
+        default=False,
+        action="store_true",
+        help=f"{help_detail} {ex_detail}",
+    )
+    mandatory.add_argument(
+        "--rack", dest="rack", required=True, help=f"{help_rack} {ex_rack}"
+    )
 
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(OUR_VERSION))
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
 
     return parser.parse_args()
 
+
 def error():
-    racks = list()
+    """
+    print a helpful error and exit
+    """
+    racks = []
     items = nb.dcim.racks.all()
     for item in items:
         racks.append(item.name)
-    print('Rack {} does not exist in netbox.  Valid racks: {}'.format(cfg.rack, ', '.join(racks)))
-    exit(1)
+    print(f"Rack {cfg.rack} does not exist in netbox.  Valid racks: {', '.join(racks)}")
+    sys.exit(1)
+
 
 def get_rack():
-    rack = nb.dcim.racks.get(name=cfg.rack)
-    if rack == None:
+    """
+    return rack object matching cfg.rack
+    If rack is not found, error and exit.
+    """
+    rack_obj = nb.dcim.racks.get(name=cfg.rack)
+    if rack_obj is None:
         error()
-    return rack
+    return rack_obj
+
 
 def print_detail():
+    """
+    print detailed info about a rack
+    """
     pretty = json.dumps(dict(rack), indent=4, sort_keys=True)
     print(pretty)
 
+
 def print_headers():
-    print(fmt.format('id', 'name', 'site'))
-    print(fmt.format('-' * 5, '-' * 15, '-' * 15))
+    """
+    print column headers
+    """
+    print(FMT.format(id="id", name="name", site="site"))
+    print(FMT.format(id="-" * 5, name="-" * 15, site="-" * 15))
+
 
 cfg = get_parser()
 nb = netbox()
 rack = get_rack()
 
-fmt = '{:>5} {:>15} {:>15}'
+FMT = "{id:>5} {name:>15} {site:>15}"
 
 if cfg.detail:
     print_detail()
-    exit()
+    sys.exit(0)
 
 print_headers()
-print(fmt.format(rack.id, rack.name, rack.site.name))
+print(FMT.format(id=rack.id, name=rack.name, site=rack.site.name))

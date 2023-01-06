@@ -1,39 +1,43 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: site_create_update_all.py
 Description: Create/update sites defined in ``--yaml``
-'''
-OUR_VERSION = 101
+"""
 import argparse
 from netbox_tools.common import netbox, load_yaml
 from netbox_tools.site import Site
 
-def get_parser():
-    help_yaml = 'YAML file containing sites information.'
+OUR_VERSION = 102
 
-    ex_prefix     = 'Example: '
-    ex_yaml = '{} --yaml ./sites.yml'.format(ex_prefix)
+
+def get_parser():
+    """
+    return an argparse parser object
+    """
+    help_yaml = "YAML file containing sites information."
+
+    ex_prefix = "Example: "
+    ex_yaml = f"{ex_prefix} --yaml ./sites.yml"
 
     parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Create/update sites defined in ``--yaml``')
+        description="DESCRIPTION: Create/update sites defined in ``--yaml``"
+    )
 
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
+    mandatory.add_argument(
+        "--yaml", dest="yaml", required=True, help=f"{help_yaml} {ex_yaml}"
+    )
 
-    mandatory.add_argument('--yaml',
-                        dest='yaml',
-                        required=True,
-                        help=help_yaml + ex_yaml)
-
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(OUR_VERSION))
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
 
     return parser.parse_args()
+
 
 cfg = get_parser()
 nb = netbox()
 info = load_yaml(cfg.yaml)
-for key in info['sites']:
-    s = Site(nb, info['sites'][key])
-    s.create_or_update()
+for key in info["sites"]:
+    site_obj = Site(nb, info["sites"][key])
+    site_obj.create_or_update()

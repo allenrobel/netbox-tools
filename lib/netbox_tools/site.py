@@ -107,7 +107,7 @@ class Site:
         """
         self._validate_keys_delete()
         if self.site_obj is None:
-            self.log(f"Nothing to do. Role {self.name} does not exist in netbox.")
+            self.log(f"Nothing to do. Site {self.name} does not exist in netbox.")
             return
         self.log(f"{self.name}")
         try:

@@ -399,7 +399,7 @@ def make_ip_address_dict(ip_addresses_dict, interface_dict):
         ip_address_dict["ip4"] = ip4
         ip_address_dict["interface"] = interface_dict["interface"]
         ip_address_dict["role"] = ""
-        ip_address_dict["status"] = ""
+        ip_address_dict["status"] = None
         ip_address_dict["tags"] = []
         ip_address_dict[device_key] = interface_dict[device_key]
     except KeyError as _key_error_exception:

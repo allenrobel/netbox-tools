@@ -1,42 +1,51 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: role_delete.py
-Description: Delete role ``--role``
-'''
-OUR_VERSION = 102
+Description: Delete Netbox device role ``--role``
+"""
 import argparse
-
 from netbox_tools.common import netbox
 from netbox_tools.role import Role
 
+OUR_VERSION = 103
+
+
 def get_parser():
-    help_role = 'Name of the role to delete.'
+    """
+    return an argparse parser object
+    """
+    help_role = "Name of the role to delete."
 
-    ex_prefix = ' Example: '
-    ex_role = '{} --role myrole'.format(ex_prefix)
+    ex_prefix = " Example: "
+    ex_role = f"{ex_prefix} --role myrole"
 
-    parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a role')
+    parser = argparse.ArgumentParser(
+        description="DESCRIPTION: Delete Netbox device role ``--role``"
+    )
 
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
 
-    mandatory.add_argument('--role',
-                        dest='role',
-                        required=True,
-                        help=help_role + ex_role)
+    mandatory.add_argument(
+        "--role", dest="role", required=True, help=f"{help_role} {ex_role}"
+    )
 
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(OUR_VERSION))
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
 
     return parser.parse_args()
 
+
 def get_info():
-    info = dict()
-    info['name'] = cfg.role
+    """
+    return dictionary containing args expected by Role
+    """
+    info = {}
+    info["name"] = cfg.role
     return info
+
 
 cfg = get_parser()
 nb = netbox()
-d = Role(nb, get_info())
-d.delete()
+role_obj = Role(nb, get_info())
+role_obj.delete()

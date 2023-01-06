@@ -1,42 +1,47 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: tag_delete.py
-Description: Delete tag ``--tag``
-'''
-OUR_VERSION = 105
+Description: Delete Netbox tag ``--tag``
+"""
 import argparse
-
 from netbox_tools.common import netbox
 from netbox_tools.tag import Tag
 
+OUR_VERSION = 106
+
+
 def get_parser():
-    help_tag = 'Name of the tag to delete.'
+    """
+    return an argparse parser object
+    """
+    help_tag = "Name of the tag to delete."
 
-    ex_prefix = ' Example: '
-    ex_tag = '{} --tag infra'.format(ex_prefix)
+    ex_prefix = " Example: "
+    ex_tag = f"{ex_prefix} --tag infra"
 
-    parser = argparse.ArgumentParser(description='DESCRIPTION: Netbox: Delete a tag')
-
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
-
-    mandatory.add_argument('--tag',
-                        dest='tag',
-                        required=True,
-                        help=help_tag + ex_tag)
-
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(OUR_VERSION))
-
+    parser = argparse.ArgumentParser(
+        description="DESCRIPTION: Delete Netbox tag ``--tag``"
+    )
+    mandatory = parser.add_argument_group(title="MANDATORY SCRIPT ARGS")
+    mandatory.add_argument(
+        "--tag", dest="tag", required=True, help=f"{help_tag} {ex_tag}"
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
     return parser.parse_args()
 
+
 def get_info():
-    info = dict()
-    info['name'] = cfg.tag
+    """
+    Return dictionary containing parameters expected by Tag
+    """
+    info = {}
+    info["name"] = cfg.tag
     return info
+
 
 cfg = get_parser()
 nb = netbox()
-t = Tag(nb, get_info())
-t.delete()
+tag_obj = Tag(nb, get_info())
+tag_obj.delete()

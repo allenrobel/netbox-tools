@@ -1,43 +1,82 @@
 #!/usr/bin/env python3
-'''
+"""
 Name: tags_print.py
 Description: Display information about all tags
-'''
-OUR_VERSION = 103
+"""
 import argparse
-
 from netbox_tools.colors import color
 from netbox_tools.common import netbox
 
+OUR_VERSION = 104
+
+
 def get_parser():
+    """
+    return an argparse parser object
+    """
     parser = argparse.ArgumentParser(
-            description='DESCRIPTION: Display information about all tags')
-
-    mandatory = parser.add_argument_group(title='MANDATORY SCRIPT ARGS')
-    default   = parser.add_argument_group(title='DEFAULT SCRIPT ARGS')
-
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(OUR_VERSION))
-
+        description="DESCRIPTION: Display information about all tags"
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {OUR_VERSION}"
+    )
     return parser.parse_args()
 
+
 def get_fmt():
-    return '{:>5} {:<15} {:>12} {:>6} {:<10} {:<30}'
+    """
+    return a format string
+    """
+    return (
+        "{id:>5} {name:<15} {tagged_items:>12} {rgb:>6} {color:<10} {description:<30}"
+    )
+
 
 def print_headers():
-    fmt = get_fmt()
-    print(fmt.format('id', 'name', 'tagged_items', 'rgb', 'color', 'description'))
-    print(fmt.format('-' * 5, '-' * 15, '-' * 12, '-' * 6, '-' * 10, '-' * 30))
+    """
+    print column headers
+    """
+    print(
+        get_fmt().format(
+            id="id",
+            name="name",
+            tagged_items="tagged_items",
+            rgb="rgb",
+            color="color",
+            description="description",
+        )
+    )
+    print(
+        get_fmt().format(
+            id="-" * 5,
+            name="-" * 15,
+            tagged_items="-" * 12,
+            rgb="-" * 6,
+            color="-" * 10,
+            description="-" * 30,
+        )
+    )
 
-def print_tags():
+
+def print_values():
+    """
+    print column values (tag info)
+    """
     tags = nb.extras.tags.all()
-    fmt = get_fmt()
     for tag in tags:
-        print(fmt.format(tag.id, tag.name, tag.tagged_items, tag.color, color(tag.color), tag.description))
+        print(
+            get_fmt().format(
+                id=tag.id,
+                name=tag.name,
+                tagged_items=tag.tagged_items,
+                rgb=tag.color,
+                color=color(tag.color),
+                description=tag.description,
+            )
+        )
+
 
 cfg = get_parser()
 nb = netbox()
-
 print_headers()
-print_tags()
+print_values()

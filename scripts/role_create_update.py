@@ -31,12 +31,14 @@ def get_parser():
     help_role = "role name"
     help_tags = "Comma-separated list of tags (no spaces) to apply to this role."
     help_tags += " All tags must already exist in Netbox."
+    help_vm_role = "If set, virtual machines can be added to this role."
 
     ex_prefix = "Example: "
     ex_color = "f{ex_prefix} --color green"
     ex_description = f"{ex_prefix} --description 'this is a role description'"
     ex_role = "f{ex_prefix} --role C004"
     ex_tags = "f{ex_prefix} --tags admin,infra"
+    ex_vm_role = "f{ex_prefix} --vm_role"
     parser = argparse.ArgumentParser(
         description="DESCRIPTION: Create/update Netbox device role using command line options"
     )
@@ -53,6 +55,14 @@ def get_parser():
         required=False,
         default=None,
         help=f"{help_description} {ex_description}",
+    )
+    optional.add_argument(
+        "--vm_role",
+        dest="vm_role",
+        required=False,
+        action="store_true",
+        default=False,
+        help=f"{help_vm_role} {ex_vm_role}",
     )
     mandatory.add_argument(
         "--role", dest="role", required=True, help=f"{help_role} {ex_role}"
@@ -77,12 +87,13 @@ def get_info():
     return dictionary containing args expected by Role
     """
     info = {}
-    info["name"] = cfg.role
     info["color"] = cfg.color
     if cfg.description is not None:
         info["description"] = cfg.description
+    info["name"] = cfg.role
     if cfg.tags is not None:
         info["tags"] = re.split(",", cfg.tags)
+    info['vm_role'] = cfg.vm_role
     return info
 
 

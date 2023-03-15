@@ -185,11 +185,11 @@ def get_runner_dict():
     runner[8] = {"key": "prefixes", "object": IpPrefix}
     runner[9] = {"key": "vlan_groups", "object": VlanGroup}
     runner[10] = {"key": "vlans", "object": Vlan}
-    runner[11] = {"key": "devices", "object": Device}
-    runner[12] = {"key": "console_server_ports", "object": ConsoleServerPort}
-    runner[13] = {"key": "console_ports", "object": ConsolePort}
-    runner[14] = {"key": "cluster_types", "object": ClusterType}
-    runner[15] = {"key": "clusters", "object": Cluster}
+    runner[11] = {"key": "cluster_types", "object": ClusterType}
+    runner[12] = {"key": "clusters", "object": Cluster}
+    runner[13] = {"key": "devices", "object": Device}
+    runner[14] = {"key": "console_server_ports", "object": ConsoleServerPort}
+    runner[15] = {"key": "console_ports", "object": ConsolePort}
     runner[16] = {"key": "virtual_machines", "object": VirtualMachine}
     return runner
 
